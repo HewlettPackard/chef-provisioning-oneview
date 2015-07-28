@@ -34,20 +34,20 @@ module Chef::Provisioning
       @oneview_api_version = get_oneview_api_version
       @oneview_key = login_to_oneview
 
-      @altair_base_url = altair_url
-      @altair_username = Chef::Config.knife[:altair_username]
-      @altair_password = Chef::Config.knife[:altair_password]
-      @altair_disable_ssl = Chef::Config::knife[:altair_ignore_ssl]
-      @altair_api_version = get_altair_api_version
-      @altair_key = login_to_altair
+      @icsp_base_url = icsp_url
+      @icsp_username = Chef::Config.knife[:icsp_username]
+      @icsp_password = Chef::Config.knife[:icsp_password]
+      @icsp_disable_ssl = Chef::Config::knife[:icsp_ignore_ssl]
+      @icsp_api_version = get_icsp_api_version
+      @icsp_key = login_to_icsp
     end
 
     def oneview_url
       Chef::Config.knife[:oneview_site]
     end
 
-    def altair_url
-      Chef::Config.knife[:altair_site]
+    def icsp_url
+      Chef::Config.knife[:icsp_site]
     end
 
 
@@ -119,7 +119,7 @@ module Chef::Provisioning
     def destroy_machine(action_handler, machine_spec, machine_options)
       if machine_spec.reference
         power_off(action_handler, machine_spec, machine_options) # Power off server
-        destroy_altair_server(action_handler, machine_spec) # Delete os deployment server from Altair
+        destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
         destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
 
         name = machine_spec.name # Save for next steps

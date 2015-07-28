@@ -7,15 +7,15 @@ module OneViewAPI
   include OneViewAPIv1_20
   include OneViewAPIv2_0
 
-  # API calls for OneView and Altair
+  # API calls for OneView and ICSP
   def rest_api(host, type, path, options = {})
     disable_ssl = false
     case host
-    when 'altair', :altair
-      uri = URI.parse(URI.escape(@altair_base_url + path))
-      options['X-API-Version'] ||= @altair_api_version unless [:put, 'put'].include?(type.downcase)
-      options['auth'] ||= @altair_key
-      disable_ssl = true if @altair_disable_ssl
+    when 'icsp', :icsp
+      uri = URI.parse(URI.escape(@icsp_base_url + path))
+      options['X-API-Version'] ||= @icsp_api_version unless [:put, 'put'].include?(type.downcase)
+      options['auth'] ||= @icsp_key
+      disable_ssl = true if @icsp_disable_ssl
     when 'oneview', :oneview
       uri = URI.parse(URI.escape(@oneview_base_url + path))
       options['X-API-Version'] ||= @oneview_api_version
@@ -72,16 +72,16 @@ module OneViewAPI
     version
   end
   
-  def get_altair_api_version
+  def get_icsp_api_version
     begin
-      version = rest_api(:altair, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
+      version = rest_api(:icsp, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
       raise "Couldn't get API version" unless version
       if version.class != Fixnum
         version = version.to_i
         raise "API version type mismatch" if !version > 0
       end
     rescue
-      puts "Failed to get Altair API version. Setting to default (102)"
+      puts "Failed to get ICSP API version. Setting to default (102)"
       version = 102
     end
     version
@@ -89,21 +89,21 @@ module OneViewAPI
 
   # Login functions
   def auth_tokens
-    @altair_key  ||= login_to_altair
+    @icsp_key  ||= login_to_icsp
     @oneview_key ||= login_to_oneview
-    {'altair_key' => @altair_key, 'oneview_key'=> @oneview_key}
+    {'icsp_key' => @icsp_key, 'oneview_key'=> @oneview_key}
   end
 
-  def login_to_altair
+  def login_to_icsp
     path = "/rest/login-sessions"
     options = {
       'body' => {
-        'userName' => @altair_username,
-        'password' => @altair_password,
+        'userName' => @icsp_username,
+        'password' => @icsp_password,
         'authLoginDomain' => 'LOCAL'
       }
     }
-    response = rest_api(:altair, :post, path, options)
+    response = rest_api(:icsp, :post, path, options)
     return response['sessionID'] if response['sessionID']
     raise("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
@@ -129,15 +129,15 @@ module OneViewAPI
     nil
   end
 
-  def get_altair_server_by_sn(serialNumber)
-    search_result = rest_api(:altair, :get,
+  def get_icsp_server_by_sn(serialNumber)
+    search_result = rest_api(:icsp, :get,
         "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
     if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serial_number
       my_server = search_result.first
     end
     unless my_server && my_server['uri']
-      os_deployment_servers = rest_api(:altair, :get, '/rest/os-deployment-servers')
-      # Pick the relevant os deployment server from altair
+      os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
+      # Pick the relevant os deployment server from icsp
       my_server = nil
       os_deployment_servers['members'].each do |server|
         if server['serialNumber'] == serialNumber
@@ -195,7 +195,7 @@ module OneViewAPI
     host_name = machine_options[:driver_options][:host_name]
     server_template = machine_options[:driver_options][:server_template]
 
-    auth_tokens # Login (to both Altair and OneView)
+    auth_tokens # Login (to both ICSP and OneView)
 
     # Check if profile exists first
     matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
@@ -269,9 +269,9 @@ module OneViewAPI
   end
 
 
-  # Use Altair to install OS
+  # Use ICSP to install OS
   def customize_machine(action_handler, machine_spec, machine_options, profile)
-    auth_tokens # Login (to both Altair and OneView)
+    auth_tokens # Login (to both ICSP and OneView)
 
     # Wait for server profile to finish building
     unless profile['state'] == 'Normal'
@@ -299,12 +299,12 @@ module OneViewAPI
     # Make sure server is started
     power_on(action_handler, machine_spec, machine_options, profile['serverHardwareUri'])
 
-    # Get Altair servers to poll and wait until server PXE complete (to make sure Altair is available).
+    # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
     my_server = nil
     action_handler.perform_action "Wait for #{machine_spec.name} to boot" do
       action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to PXE boot. This may take a while..."
       360.times do # Wait for up to 1 hr
-        os_deployment_servers = rest_api(:altair, :get, '/rest/os-deployment-servers')
+        os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
 
         # TODO: Maybe check for opswLifecycle = 'UNPROVISIONED' instead of serialNumber existance
         os_deployment_servers['members'].each do |server|
@@ -317,12 +317,12 @@ module OneViewAPI
         print "."
         sleep 10
       end
-      raise "Timeout waiting for server #{machine_spec.name} to register with Altair" if my_server.nil?
+      raise "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
 
     # Consume any custom attributes that were specified
     if machine_options[:driver_options][:custom_attributes]
-      curr_server = rest_api(:altair, :get, my_server['uri'])
+      curr_server = rest_api(:icsp, :get, my_server['uri'])
       machine_options[:driver_options][:custom_attributes].each do |key, val|
         curr_server['customAttributes'].push ({
           "values"=>[{"scope"=>"server", "value"=> val.to_s}], 
@@ -330,7 +330,7 @@ module OneViewAPI
         })
       end
       options = { 'body'=> curr_server }
-      rest_api(:altair, :put, my_server['uri'], options)
+      rest_api(:icsp, :put, my_server['uri'], options)
     end
 
     # Run OS install on a server
@@ -340,7 +340,7 @@ module OneViewAPI
         action_handler.report_progress "INFO: Installing OS: #{os_build} on #{machine_spec.name}"
         # Get os-deployment-build-plans
         build_plan_uri = nil
-        os_deployment_build_plans = rest_api(:altair, :get, '/rest/os-deployment-build-plans')
+        os_deployment_build_plans = rest_api(:icsp, :get, '/rest/os-deployment-build-plans')
         os_deployment_build_plans['members'].each do |bp|
           if bp['name'] == os_build
             build_plan_uri = bp['uri']
@@ -354,10 +354,10 @@ module OneViewAPI
           'osbpUris' => [build_plan_uri],
           'serverData' => [{'serverUri'=> my_server['uri'] }]
         }}
-        os_deployment_task = rest_api(:altair, :post, '/rest/os-deployment-jobs/?force=true', options)
+        os_deployment_task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
         os_deployment_task_uri = os_deployment_task['uri']
         720.times do # Wait for up to 2 hr
-          os_deployment_task = rest_api(:altair, :get, os_deployment_task_uri, options) # TODO: Need options?
+          os_deployment_task = rest_api(:icsp, :get, os_deployment_task_uri, options) # TODO: Need options?
           break if os_deployment_task['running'] == 'false'
           print "."
           sleep 10
@@ -393,10 +393,10 @@ module OneViewAPI
           'nics'       => nics
         }
       }] }
-      network_personalization_task = rest_api(:altair, :put, '/rest/os-deployment-apxs/personalizeserver', options)
+      network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
       network_personalization_task_uri = network_personalization_task['uri']
       60.times do # Wait for up to 10 min
-        network_personalization_task = rest_api(:altair, :get, network_personalization_task_uri, options)
+        network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
         break if network_personalization_task['running'] == 'false'
         print "."
         sleep 10
@@ -408,7 +408,7 @@ module OneViewAPI
     #   Get all, search for yours.  If not there or if it's in uninitialized state, pull again
     my_server_uri = my_server['uri']
     30.times do # Wait for up to 5 min
-      my_server = rest_api(:altair, :get, my_server_uri)
+      my_server = rest_api(:icsp, :get, my_server_uri)
       break if my_server['opswLifecycle'] == 'MANAGED'
       print "."
       sleep 10
@@ -419,22 +419,22 @@ module OneViewAPI
   end
 
 
-  def destroy_altair_server(action_handler, machine_spec)
-    my_server = get_altair_server_by_sn(machine_spec.reference['serial_number'])
+  def destroy_icsp_server(action_handler, machine_spec)
+    my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
     return false if my_server.nil? || my_server['uri'].nil?
     
-    action_handler.perform_action "Delete server #{machine_spec.name} from Altair" do
-      task = rest_api(:altair, :delete, my_server['uri']) # TODO: This returns nil instead of task info
+    action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
+      task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
 
       if task['uri']
         task_uri = task['uri']
         90.times do # Wait for up to 15 minutes
-          task = rest_api(:altair, :get, task_uri)
+          task = rest_api(:icsp, :get, task_uri)
           break if task['taskState'].downcase == "completed"
           print "."
           sleep 10
         end
-        raise "Deleting os deployment server #{machine_spec.name} at altair failed!" unless task['taskState'].downcase == "completed"
+        raise "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == "completed"
       end
     end
   end

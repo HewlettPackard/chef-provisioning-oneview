@@ -12,20 +12,20 @@ Chef Provisioning driver for HP OneView
   oneview_password    'password123'
   oneview_ignore_ssl  true # For self-signed certs
   
-  altair_site         'https://my-altair.my-domain.com'
-  altair_username     'Administrator'
-  altair_password     'password123'
-  altair_ignore_ssl   true # For self-signed certs
+  icsp_site           'https://my-icsp.my-domain.com'
+  icsp_username       'Administrator'
+  icsp_password       'password123'
+  icsp_ignore_ssl     true # For self-signed certs
   
   node_root_password  'password123'
   
   # If your Chef server has self-signed certs:
-  verify_api_cert  false
-  ssl_verify_mode  :verify_none
+  verify_api_cert     false
+  ssl_verify_mode     :verify_none
   ```
 
-- Your OneView, Insight Controll Server Provisioning, and Chef server's must be trusted by your certificate stores. See `ssl_issues.md` for more info on how to do this.
-- Your OneView and Insight Controll Server Provisioning servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
+- Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See `ssl_issues.md` for more info on how to do this.
+- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
 
 # Usage
 
