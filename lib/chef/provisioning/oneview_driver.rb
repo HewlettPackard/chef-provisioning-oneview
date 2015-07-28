@@ -6,6 +6,8 @@ require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/machine/unix_machine'
 require 'json'
 require 'ridley'
+require_relative 'driver_init/oneview'
+require_relative 'oneview_driver/version'
 require_relative 'oneview/oneview_api'
 
 module Chef::Provisioning
@@ -27,19 +29,19 @@ module Chef::Provisioning
     def initialize(canonical_url, config)
       super(canonical_url, config)
 
-      @oneview_base_url = oneview_url
-      @oneview_username = Chef::Config.knife[:oneview_username]
-      @oneview_password = Chef::Config.knife[:oneview_password]
+      @oneview_base_url    = oneview_url
+      @oneview_username    = Chef::Config.knife[:oneview_username]
+      @oneview_password    = Chef::Config.knife[:oneview_password]
       @oneview_disable_ssl = Chef::Config::knife[:oneview_ignore_ssl]
       @oneview_api_version = get_oneview_api_version
-      @oneview_key = login_to_oneview
+      @oneview_key         = login_to_oneview
 
-      @icsp_base_url = icsp_url
-      @icsp_username = Chef::Config.knife[:icsp_username]
-      @icsp_password = Chef::Config.knife[:icsp_password]
-      @icsp_disable_ssl = Chef::Config::knife[:icsp_ignore_ssl]
-      @icsp_api_version = get_icsp_api_version
-      @icsp_key = login_to_icsp
+      @icsp_base_url       = icsp_url
+      @icsp_username       = Chef::Config.knife[:icsp_username]
+      @icsp_password       = Chef::Config.knife[:icsp_password]
+      @icsp_disable_ssl    = Chef::Config::knife[:icsp_ignore_ssl]
+      @icsp_api_version    = get_icsp_api_version
+      @icsp_key            = login_to_icsp
     end
 
     def oneview_url
@@ -60,7 +62,7 @@ module Chef::Provisioning
         end
       end
       if !machine_spec.reference
-        action_handler.perform_action "Creating server #{machine_spec.name} with options #{machine_options}" do
+        action_handler.perform_action "Creating server #{machine_spec.name}" do
           profile = create_machine(action_handler, machine_spec, machine_options)
           machine_spec.reference = {
             'driver_url' => driver_url,
