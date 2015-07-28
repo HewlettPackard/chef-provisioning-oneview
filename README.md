@@ -7,25 +7,25 @@ Chef Provisioning driver for HP OneView
   ```ruby
   # (knife.rb)
   # (in addition to all the normal stuff like node_name, client_key, validation_client_name, validation_key, chef_server_url, etc.)
-  oneview_site        'https://my-oneview.my-domain.com'
-  oneview_username    'Administrator'
-  oneview_password    'password123'
-  oneview_ignore_ssl  true # For self-signed certs
+  knife[:oneview_site]       = 'https://my-oneview.my-domain.com'
+  knife[:oneview_username]   = 'Administrator'
+  knife[:oneview_password]   = 'password123'
+  knife[:oneview_ignore_ssl] = true # For self-signed certs
   
-  altair_site         'https://my-altair.my-domain.com'
-  altair_username     'Administrator'
-  altair_password     'password123'
-  altair_ignore_ssl   true # For self-signed certs
+  knife[:icsp_site]          = 'https://my-icsp.my-domain.com'
+  knife[:icsp_username]      = 'Administrator'
+  knife[:icsp_password]      = 'password123'
+  knife[:icsp_ignore_ssl]    = true # For self-signed certs
   
-  node_root_password  'password123'
+  knife[:node_root_password] = 'password123'
   
   # If your Chef server has self-signed certs:
-  verify_api_cert  false
-  ssl_verify_mode  :verify_none
+  verify_api_cert              false
+  ssl_verify_mode              :verify_none
   ```
 
-- Your OneView, Insight Controll Server Provisioning, and Chef server's must be trusted by your certificate stores. See `ssl_issues.md` for more info on how to do this.
-- Your OneView and Insight Controll Server Provisioning servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
+- Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See `ssl_issues.md` for more info on how to do this.
+- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
 
 # Usage
 
@@ -101,7 +101,7 @@ To develop and test this gem, you can create a recipes directory and run this as
 $ bundle install
 
 # To run recipes/default.rb on Chef Zero:
-$ bundle exec chef-client -z recipes/default.rb
+$ bundle exec chef-client -z examples/cookbooks/provisioning_cookbook/recipes/default.rb
 ```
 
 ### Building the Gem

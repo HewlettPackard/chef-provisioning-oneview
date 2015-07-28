@@ -4,6 +4,7 @@
 .config
 .yardoc
 Gemfile.lock
+Berksfile.lock
 InstalledFiles
 _yardoc
 coverage
@@ -21,13 +22,6 @@ tmp
 *.a
 mkmf.log
 *.sw*
-clients
-nodes
-docs/examples/clients
-docs/examples/nodes
-docs/examples/data_bags
-x.rb
-cookbooks/
-recipes/
 destroy_all.rb
 machines.rb
+.kitchen/

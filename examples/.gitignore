@@ -1,0 +1,12 @@
+*.gem
+*.rbc
+.bundle
+.config
+.yardoc
+Gemfile.lock
+Berksfile.lock
+nodes/
+clients/
+.chef/local-mode-cache/
+.chef/trusted_certs/
+*.pem

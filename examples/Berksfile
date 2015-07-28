@@ -1,0 +1,3 @@
+source "https://supermarket.chef.io"
+
+cookbook 'my_apache_server', path: './cookbooks/my_apache_server'
