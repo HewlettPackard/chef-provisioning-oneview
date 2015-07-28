@@ -9,3 +9,4 @@ nodes/
 clients/
 .chef/local-mode-cache/
 .chef/trusted_certs/
+*.pem
