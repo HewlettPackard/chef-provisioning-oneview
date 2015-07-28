@@ -23,6 +23,6 @@ Gem::Specification.new do |s|
   s.executables  = %w( )
 
   s.require_path = 'lib'
-  s.files = %w(Rakefile LICENSE README.md) + Dir.glob("{distro,lib,tasks,spec}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
+  s.files = %w(Rakefile LICENSE README.md) + Dir.glob("{distro,lib,spec}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
   s.license = "Apache-2.0"
 end
