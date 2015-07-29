@@ -66,5 +66,5 @@ knife[:my_chef_server] = my_chef_server_url
 if my_proxy
   http_proxy             my_proxy
   https_proxy            my_proxy
-  bootstrap_proxy        my_proxy
+  knife[:bootstrap_proxy] = my_proxy
 end
