@@ -17,7 +17,7 @@ module Chef::Provisioning
     def self.canonicalize_url(url, config)
       scheme, oneview_url = url.split(':' , 2)
       if oneview_url.nil? || oneview_url == ''
-        oneview_url = config[:knife][:oneview_site]
+        oneview_url = config[:knife][:oneview_url]
       end
       "oneview:" + oneview_url
     end
@@ -45,11 +45,11 @@ module Chef::Provisioning
     end
 
     def oneview_url
-      Chef::Config.knife[:oneview_site]
+      Chef::Config.knife[:oneview_url]
     end
 
     def icsp_url
-      Chef::Config.knife[:icsp_site]
+      Chef::Config.knife[:icsp_url]
     end
 
 

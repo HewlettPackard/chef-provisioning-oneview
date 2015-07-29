@@ -3,17 +3,21 @@ current_dir = File.dirname(__FILE__)
 
 #=============================================================================
 # Edit these attributes:
+#=============================================================================
 my_chef_server_url         = "https://chef-server.domain.com/organizations/oneview"
 
 node_name                    "CLIENT_NAME"
-validation_client_name       "oneview-validator"
+client_key                   "#{current_dir}/CLIENT_NAME.pem" # Must have node & client creation privileges (ie admin group)
 
-knife[:oneview_site]       = 'https://my-oneview.my-domain.com'
+validation_client_name       "oneview-validator"
+validation_key               "#{current_dir}/oneview-validator.pem"
+
+knife[:oneview_url]        = 'https://my-oneview.my-domain.com'
 knife[:oneview_username]   = 'Administrator'
 knife[:oneview_password]   = 'password123'
 knife[:oneview_ignore_ssl] = true
 
-knife[:icsp_site]          = 'https://my-icsp.my-domain.com'
+knife[:icsp_url]           = 'https://my-icsp.my-domain.com'
 knife[:icsp_username]      = 'Administrator'
 knife[:icsp_password]      = 'password123'
 knife[:icsp_ignore_ssl]    = true
@@ -35,8 +39,6 @@ my_proxy = 'http://proxy.domain.com:8080'
 
 log_level                :info
 log_location             STDOUT
-client_key               "#{current_dir}/client.pem"
-validation_key           "#{current_dir}/validator.pem"
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            ["#{current_dir}/../cookbooks"]
