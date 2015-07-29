@@ -19,6 +19,7 @@ gateway     = knife_options['gateway']     || 'xx.xx.xx.xx'
 dns         = knife_options['dns']         || 'xx.xx.xx.xx'
 domain_name = knife_options['domain_name'] || 'oneview-domain.com'
 mask        = knife_options['mask']        || '255.255.254.0'
+action_verb = knife_options['action']      || :converge # :stop and :destroy are other options
 
 # Hash that defines the machines to build. IP is the only attribute right now, but change as necessary.
 my_machines = knife_options['my_machines'] || {
@@ -51,7 +52,7 @@ log "Using '#{Chef::Config[:client_key]}' for knife client key"
 machine_batch 'oneview-machine-batch' do
 # Note: Enclosing the machine resources in this machine_batch block allows them to provision in parallel.
   
-  action :converge # Options are :converge , :stop , or :destroy   (among others, but those are the main ones)
+  action action_verb
 
   my_machines.each do |m_name, options|
     
