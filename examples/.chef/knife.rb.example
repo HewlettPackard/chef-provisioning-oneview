@@ -30,6 +30,24 @@ ssl_verify_mode              :verify_none
 
 # If you're behind a proxy
 my_proxy = 'http://proxy.domain.com:8080'
+
+# Define your infrastructure here. This info gets populated into the recepe. Leave blank if you want to edit the recipe directly.
+# Recipe location: chef-provisioning-oneview/examples/cookbooks/provisioning_cookbook/recipes/default.rb
+knife[:example_recipe_options] = {
+  'os_build' => 'CHEF-RHEL-6.5-x64',
+  'gateway' => 'xx.xx.xx.xx',
+  'dns' => 'xx.xx.xx.xx',
+  'domain_name' => 'oneview-domain.com',
+  'mask' => '255.255.254.0',
+  'my_machines' => {
+    'chef-web01' => {
+      'ip4' => 'xxx.xx.xx.xx'
+    },
+    'chef-web02' => {
+      'ip4' => 'xxx.xx.xx.xx'
+    }
+  }
+}
 #=============================================================================
 
 

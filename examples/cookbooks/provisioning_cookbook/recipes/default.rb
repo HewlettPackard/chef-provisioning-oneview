@@ -7,20 +7,21 @@
 # All rights reserved - Do Not Redistribute
 #
 
+knife_options = Chef::Config.knife[:example_recipe_options] || {}
 
 #====================================================
 #================== Custom Options ==================
 #====================================================
 #============ NOTE: Fill this section out ===========
 
-os_build = 'CHEF-RHEL-6.5-x64'
-gateway = 'xx.xx.xx.xx'
-dns = 'xx.xx.xx.xx'
-domain_name = 'oneview-domain.com'
-mask = '255.255.254.0'
+os_build    = knife_options['os_build']    || 'CHEF-RHEL-6.5-x64'
+gateway     = knife_options['gateway']     || 'xx.xx.xx.xx'
+dns         = knife_options['dns']         || 'xx.xx.xx.xx'
+domain_name = knife_options['domain_name'] || 'oneview-domain.com'
+mask        = knife_options['mask']        || '255.255.254.0'
 
 # Hash that defines the machines to build. IP is the only attribute right now, but change as necessary.
-my_machines = {
+my_machines = knife_options['my_machines'] || {
   'chef-web01' => {
     'ip4' => 'xx.xx.xx.xx'
   },
@@ -31,7 +32,6 @@ my_machines = {
 #====================================================
 #================ End Custom Options ================
 #====================================================
-
 
 require 'chef/provisioning'
 
