@@ -15,16 +15,16 @@ module Chef::Provisioning
     include OneViewAPI
 
     def self.canonicalize_url(url, config)
-      scheme, oneviewUrl = url.split(':' , 2)
-      if oneviewUrl.nil? || oneviewUrl == ''
-        oneviewUrl = config[:knife][:oneview_url]
+      scheme, oneview_url = url.split(':' , 2)
+      if oneview_url.nil? || oneview_url == ''
+        oneview_url = config[:knife][:oneview_url]
       end
-      raise "Must set the knife[:oneview_url] attribute!" if oneviewUrl.nil? || oneviewUrl.empty?
-      "oneview:" + oneviewUrl
+      raise "Must set the knife[:oneview_url] attribute!" if oneview_url.nil? || oneview_url.empty?
+      "oneview:" + oneview_url
     end
 
-    def self.from_url(oneviewUrl, config)
-      OneViewDriver.new(oneviewUrl, config)
+    def self.from_url(oneview_url, config)
+      OneViewDriver.new(oneview_url, config)
     end
 
     def initialize(canonical_url, config)
