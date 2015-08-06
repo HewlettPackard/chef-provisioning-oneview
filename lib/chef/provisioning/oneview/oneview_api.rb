@@ -3,7 +3,7 @@ require_relative 'v2.0/api'
 
 module OneViewAPI
   private
-  
+
   include OneViewAPIv1_20
   include OneViewAPIv2_0
 

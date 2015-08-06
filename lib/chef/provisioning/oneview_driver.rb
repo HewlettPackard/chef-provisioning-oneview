@@ -29,27 +29,19 @@ module Chef::Provisioning
     def initialize(canonical_url, config)
       super(canonical_url, config)
 
-      @oneview_base_url    = oneview_url
-      @oneview_username    = Chef::Config.knife[:oneview_username]
-      @oneview_password    = Chef::Config.knife[:oneview_password]
-      @oneview_disable_ssl = Chef::Config::knife[:oneview_ignore_ssl]
+      @oneview_base_url    = config[:knife][:oneview_url]
+      @oneview_username    = config[:knife][:oneview_username]
+      @oneview_password    = config[:knife][:oneview_password]
+      @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
       @oneview_api_version = get_oneview_api_version
       @oneview_key         = login_to_oneview
 
-      @icsp_base_url       = icsp_url
-      @icsp_username       = Chef::Config.knife[:icsp_username]
-      @icsp_password       = Chef::Config.knife[:icsp_password]
-      @icsp_disable_ssl    = Chef::Config::knife[:icsp_ignore_ssl]
+      @icsp_base_url       = config[:knife][:icsp_url]
+      @icsp_username       = config[:knife][:icsp_username]
+      @icsp_password       = config[:knife][:icsp_password]
+      @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = get_icsp_api_version
       @icsp_key            = login_to_icsp
-    end
-
-    def oneview_url
-      Chef::Config.knife[:oneview_url]
-    end
-
-    def icsp_url
-      Chef::Config.knife[:icsp_url]
     end
 
 
