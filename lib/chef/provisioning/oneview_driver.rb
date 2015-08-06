@@ -30,23 +30,23 @@ module Chef::Provisioning
     def initialize(canonical_url, config)
       super(canonical_url, config)
 
-      @oneview_base_url    = Chef::Config.knife[:oneview_url]
+      @oneview_base_url    = config[:knife][:oneview_url]
         raise "Must set the knife[:oneview_url] attribute!" if @oneview_base_url.nil? || @oneview_base_url.empty?
-      @oneview_username    = Chef::Config.knife[:oneview_username]
+      @oneview_username    = config[:knife][:oneview_username]
         raise "Must set the knife[:oneview_username] attribute!" if @oneview_username.nil? || @oneview_username.empty?
-      @oneview_password    = Chef::Config.knife[:oneview_password]
+      @oneview_password    = config[:knife][:oneview_password]
         raise "Must set the knife[:oneview_password] attribute!" if @oneview_password.nil? || @oneview_password.empty?
-      @oneview_disable_ssl = Chef::Config::knife[:oneview_ignore_ssl]
+      @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
       @oneview_api_version = get_oneview_api_version
       @oneview_key         = login_to_oneview
 
-      @icsp_base_url       = Chef::Config.knife[:icsp_url]
+      @icsp_base_url       = config[:knife][:icsp_url]
         raise "Must set the knife[:icsp_url] attribute!" if @icsp_base_url.nil? || @icsp_base_url.empty?
-      @icsp_username       = Chef::Config.knife[:icsp_username]
+      @icsp_username       = config[:knife][:icsp_username]
         raise "Must set the knife[:icsp_username] attribute!" if @icsp_username.nil? || @icsp_username.empty?
-      @icsp_password       = Chef::Config.knife[:icsp_password]
+      @icsp_password       = config[:knife][:icsp_password]
         raise "Must set the knife[:icsp_password] attribute!" if @icsp_password.nil? || @icsp_password.empty?
-      @icsp_disable_ssl    = Chef::Config::knife[:icsp_ignore_ssl]
+      @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = get_icsp_api_version
       @icsp_key            = login_to_icsp
     end
