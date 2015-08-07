@@ -51,20 +51,20 @@ log "Using '#{Chef::Config[:client_key]}' for knife client key"
 
 machine_batch 'oneview-machine-batch' do
 # Note: Enclosing the machine resources in this machine_batch block allows them to provision in parallel.
-  
+
   action action_verb
 
   my_machines.each do |m_name, options|
-    
+
     machine m_name do
       recipe 'my_apache_server'
 
       machine_options :driver_options => {
-        :server_template => 'Web Server Template',
+        :server_template => 'Template - Web Server',
         :os_build => os_build,
         :host_name => m_name,
         :ip_address => options['ip4'], # For bootstrapping only.
-        
+
         :domainType => 'workgroup',
         :domainName => domain_name,
         :gateway =>  gateway,
@@ -92,7 +92,7 @@ machine_batch 'oneview-machine-batch' do
       chef_environment '_default'
       converge true
     end # End machine resource block
-    
+
   end # End my_machines.each loop
 
 end # End machine_batch resource block

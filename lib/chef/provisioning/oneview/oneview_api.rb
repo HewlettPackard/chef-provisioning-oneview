@@ -3,7 +3,7 @@ require_relative 'v2.0/api'
 
 module OneViewAPI
   private
-  
+
   include OneViewAPIv1_20
   include OneViewAPIv2_0
 
@@ -56,7 +56,7 @@ module OneViewAPI
     response = http.request(request)
     JSON.parse( response.body ) rescue response
   end
-  
+
   def get_oneview_api_version
     begin
       version = rest_api(:oneview, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
@@ -71,7 +71,7 @@ module OneViewAPI
     end
     version
   end
-  
+
   def get_icsp_api_version
     begin
       version = rest_api(:icsp, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
@@ -262,7 +262,7 @@ module OneViewAPI
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        raise "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        raise "Server template couldn't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
     return matching_profiles['members'].first
@@ -299,6 +299,7 @@ module OneViewAPI
     # Make sure server is started
     power_on(action_handler, machine_spec, machine_options, profile['serverHardwareUri'])
 
+binding.pry
     # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
     my_server = nil
     action_handler.perform_action "Wait for #{machine_spec.name} to boot" do
@@ -307,6 +308,7 @@ module OneViewAPI
         os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
 
         # TODO: Maybe check for opswLifecycle = 'UNPROVISIONED' instead of serialNumber existance
+        binding.pry
         os_deployment_servers['members'].each do |server|
           if server['serialNumber'] == profile['serialNumber']
             my_server = server
@@ -320,12 +322,14 @@ module OneViewAPI
       raise "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
 
+binding.pry
+
     # Consume any custom attributes that were specified
     if machine_options[:driver_options][:custom_attributes]
       curr_server = rest_api(:icsp, :get, my_server['uri'])
       machine_options[:driver_options][:custom_attributes].each do |key, val|
         curr_server['customAttributes'].push ({
-          "values"=>[{"scope"=>"server", "value"=> val.to_s}], 
+          "values"=>[{"scope"=>"server", "value"=> val.to_s}],
           "key" => key.to_s
         })
       end
@@ -367,7 +371,7 @@ module OneViewAPI
         end
       end
     end
-
+binding.pry
     # Perform network personalization
     action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
       action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
@@ -394,6 +398,7 @@ module OneViewAPI
         }
       }] }
       network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
+      binding.pry
       network_personalization_task_uri = network_personalization_task['uri']
       60.times do # Wait for up to 10 min
         network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
@@ -422,7 +427,7 @@ module OneViewAPI
   def destroy_icsp_server(action_handler, machine_spec)
     my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
     return false if my_server.nil? || my_server['uri'].nil?
-    
+
     action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
       task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
 
@@ -442,7 +447,7 @@ module OneViewAPI
 
   def destroy_oneview_profile(action_handler, machine_spec, profile=nil)
     profile ||= get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-    
+
     hardware_info = rest_api(:oneview, :get, profile['serverHardwareUri'])
     unless hardware_info.nil?
       action_handler.perform_action "Delete server #{machine_spec.name} from oneview" do
@@ -462,5 +467,5 @@ module OneViewAPI
       action_handler.report_progress "INFO: #{machine_spec.name} is already deleted."
     end
   end
-  
+
 end
