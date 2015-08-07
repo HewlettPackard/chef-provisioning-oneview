@@ -210,6 +210,7 @@ module OneViewAPI
     #  Get HPOVProfile by name (to see if it already exists)
     #  For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
+    raise "Error! Server template '#{server_template} is not available at OneView." unless templates['count'] > 0
 
     template_uri          = templates['members'].first['uri']
     serverHardwareTypeUri = templates['members'].first['serverHardwareTypeUri']
@@ -299,7 +300,6 @@ module OneViewAPI
     # Make sure server is started
     power_on(action_handler, machine_spec, machine_options, profile['serverHardwareUri'])
 
-binding.pry
     # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
     my_server = nil
     action_handler.perform_action "Wait for #{machine_spec.name} to boot" do
@@ -308,7 +308,6 @@ binding.pry
         os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
 
         # TODO: Maybe check for opswLifecycle = 'UNPROVISIONED' instead of serialNumber existance
-        binding.pry
         os_deployment_servers['members'].each do |server|
           if server['serialNumber'] == profile['serialNumber']
             my_server = server
@@ -321,8 +320,6 @@ binding.pry
       end
       raise "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
-
-binding.pry
 
     # Consume any custom attributes that were specified
     if machine_options[:driver_options][:custom_attributes]
@@ -371,7 +368,7 @@ binding.pry
         end
       end
     end
-binding.pry
+
     # Perform network personalization
     action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
       action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
@@ -398,7 +395,6 @@ binding.pry
         }
       }] }
       network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
-      binding.pry
       network_personalization_task_uri = network_personalization_task['uri']
       60.times do # Wait for up to 10 min
         network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
