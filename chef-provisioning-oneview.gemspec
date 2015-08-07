@@ -1,5 +1,5 @@
 $:.unshift(File.dirname(__FILE__) + '/lib')
-require 'chef/provisioning/oneview_driver/version'
+require 'chef/provisioning/oneview/version'
 
 Gem::Specification.new do |s|
   s.name = 'chef-provisioning-oneview'
