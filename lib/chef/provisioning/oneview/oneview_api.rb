@@ -3,7 +3,7 @@ require_relative 'v2.0/api'
 
 module OneViewAPI
   private
-  
+
   include OneViewAPIv1_20
   include OneViewAPIv2_0
 
@@ -56,7 +56,7 @@ module OneViewAPI
     response = http.request(request)
     JSON.parse( response.body ) rescue response
   end
-  
+
   def get_oneview_api_version
     begin
       version = rest_api(:oneview, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
@@ -71,7 +71,7 @@ module OneViewAPI
     end
     version
   end
-  
+
   def get_icsp_api_version
     begin
       version = rest_api(:icsp, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
@@ -210,6 +210,7 @@ module OneViewAPI
     #  Get HPOVProfile by name (to see if it already exists)
     #  For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
+    raise "Error! Server template '#{server_template} is not available at OneView." unless templates['count'] > 0
 
     template_uri          = templates['members'].first['uri']
     serverHardwareTypeUri = templates['members'].first['serverHardwareTypeUri']
@@ -262,7 +263,7 @@ module OneViewAPI
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        raise "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        raise "Server template couldn't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
     return matching_profiles['members'].first
@@ -325,7 +326,7 @@ module OneViewAPI
       curr_server = rest_api(:icsp, :get, my_server['uri'])
       machine_options[:driver_options][:custom_attributes].each do |key, val|
         curr_server['customAttributes'].push ({
-          "values"=>[{"scope"=>"server", "value"=> val.to_s}], 
+          "values"=>[{"scope"=>"server", "value"=> val.to_s}],
           "key" => key.to_s
         })
       end
@@ -422,7 +423,7 @@ module OneViewAPI
   def destroy_icsp_server(action_handler, machine_spec)
     my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
     return false if my_server.nil? || my_server['uri'].nil?
-    
+
     action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
       task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
 
@@ -442,7 +443,7 @@ module OneViewAPI
 
   def destroy_oneview_profile(action_handler, machine_spec, profile=nil)
     profile ||= get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-    
+
     hardware_info = rest_api(:oneview, :get, profile['serverHardwareUri'])
     unless hardware_info.nil?
       action_handler.perform_action "Delete server #{machine_spec.name} from oneview" do
@@ -462,5 +463,5 @@ module OneViewAPI
       action_handler.report_progress "INFO: #{machine_spec.name} is already deleted."
     end
   end
-  
+
 end
