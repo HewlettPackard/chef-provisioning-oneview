@@ -28,3 +28,7 @@ $ bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/default.rb
   ```
  
  4. If you want to continue and bootstrap the machine, you'll have two options: (1) set up a Chef Server and bootstrap it like normal or (2) copy the cookbooks onto the node and run chef-client in local (zero) mode from there.
+
+## Troubleshooting
+
+- One of the most common problems people run into is ssl certificate verification issues with private Chef servers. See [ssl_issues.md](ssl_issues.md) to fix these errors.
