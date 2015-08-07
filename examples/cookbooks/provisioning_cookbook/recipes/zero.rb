@@ -15,6 +15,7 @@ knife_options = Chef::Config.knife[:example_recipe_options] || {}
 #============ NOTE: Fill this section out ===========
 
 os_build    = knife_options['os_build']    || 'CHEF-RHEL-6.5-x64'
+my_template = knife_options['template']    || 'Template - Web Server'
 gateway     = knife_options['gateway']     || 'xx.xx.xx.xx'
 dns         = knife_options['dns']         || 'xx.xx.xx.xx'
 domain_name = knife_options['domain_name'] || 'oneview-domain.com'
@@ -50,7 +51,7 @@ machine_batch 'oneview-machine-batch' do
     machine m_name do
 
       machine_options :driver_options => {
-        :server_template => 'Web Server Template',
+        :server_template => my_template,
         :os_build => os_build,
         :host_name => m_name,
         :ip_address => options['ip4'], # For bootstrapping only.

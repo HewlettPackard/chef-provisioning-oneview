@@ -36,6 +36,7 @@ my_proxy = 'http://proxy.domain.com:8080'
 knife[:example_recipe_options] = {
   'action'      => :converge,  # :stop and :destroy are other options
   'os_build'    => 'CHEF-RHEL-6.5-x64',
+  'template'    => 'Template - Web Server',
   'gateway'     => 'xx.xx.xx.xx',
   'dns'         => 'xx.xx.xx.xx',
   'domain_name' => 'oneview-domain.com',
