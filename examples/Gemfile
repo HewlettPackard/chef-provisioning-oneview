@@ -2,4 +2,6 @@ source 'https://rubygems.org'
 
 gem 'chef-dk', ">= 0.5.0"
 gem 'berkshelf'
-gem "chef-provisioning-oneview"
+gem 'chef-provisioning-oneview'
+gem 'ridley'
+gem 'json'
