@@ -210,6 +210,9 @@ module OneViewAPI
     #  Get HPOVProfile by name (to see if it already exists)
     #  For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
+    unless templates['members'] && templates['members'].count > 0
+      raise "Template '#{server_template}' not found! Please match the template name with one that exists on OneView."
+    end
 
     template_uri             = templates['members'].first['uri']
     server_hardware_type_uri = templates['members'].first['serverHardwareTypeUri']
