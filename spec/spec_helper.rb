@@ -12,5 +12,5 @@ RSpec.configure do |config|
   end
 end
 
-#Chef::Log.level = :debug
+#Chef::Config[:log_level] = :debug
 Chef::Config[:log_level] = :warn
