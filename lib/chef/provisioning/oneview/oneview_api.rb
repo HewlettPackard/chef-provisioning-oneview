@@ -22,11 +22,11 @@ module OneViewAPI
       options['auth'] ||= @oneview_key
       disable_ssl = true if @oneview_disable_ssl
     else
-      raise "Invalid rest host: #{host}"
+      fail "Invalid rest host: #{host}"
     end
 
     http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == "https"
+    http.use_ssl = true if uri.scheme == 'https'
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE if disable_ssl
 
     case type.downcase
@@ -37,14 +37,14 @@ module OneViewAPI
     when 'put', :put
       request = Net::HTTP::Put.new(uri.request_uri)
     when 'delete', :delete
-        request = Net::HTTP::Delete.new(uri.request_uri)
+      request = Net::HTTP::Delete.new(uri.request_uri)
     else
-      raise "Invalid rest call: #{type}"
+      fail "Invalid rest call: #{type}"
     end
     options['Content-Type'] ||= 'application/json'
-    options.delete('Content-Type')  if [:none, "none", nil].include?(options['Content-Type'])
-    options.delete('X-API-Version') if [:none, "none", nil].include?(options['X-API-Version'])
-    options.delete('auth')          if [:none, "none", nil].include?(options['auth'])
+    options.delete('Content-Type')  if [:none, 'none', nil].include?(options['Content-Type'])
+    options.delete('X-API-Version') if [:none, 'none', nil].include?(options['X-API-Version'])
+    options.delete('auth')          if [:none, 'none', nil].include?(options['auth'])
     options.each do |key, val|
       if key.downcase == 'body'
         request.body = val.to_json rescue val
@@ -54,34 +54,34 @@ module OneViewAPI
     end
 
     response = http.request(request)
-    JSON.parse( response.body ) rescue response
+    JSON.parse(response.body) rescue response
   end
-  
+
   def get_oneview_api_version
     begin
-      version = rest_api(:oneview, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
-      raise "Couldn't get API version" unless version
+      version = rest_api(:oneview, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
+      fail "Couldn't get API version" unless version
       if version.class != Fixnum
         version = version.to_i
-        raise "API version type mismatch" if !version > 0
+        fail 'API version type mismatch' if !version > 0
       end
     rescue
-      puts "Failed to get OneView API version. Setting to default (120)"
+      puts 'Failed to get OneView API version. Setting to default (120)'
       version = 120
     end
     version
   end
-  
+
   def get_icsp_api_version
     begin
-      version = rest_api(:icsp, :get, "/rest/version", { 'Content-Type'=>:none, "X-API-Version"=>:none, "auth"=>:none })['currentVersion']
-      raise "Couldn't get API version" unless version
+      version = rest_api(:icsp, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
+      fail "Couldn't get API version" unless version
       if version.class != Fixnum
         version = version.to_i
-        raise "API version type mismatch" if !version > 0
+        fail 'API version type mismatch' if !version > 0
       end
     rescue
-      puts "Failed to get ICSP API version. Setting to default (102)"
+      puts 'Failed to get ICSP API version. Setting to default (102)'
       version = 102
     end
     version
@@ -91,11 +91,11 @@ module OneViewAPI
   def auth_tokens
     @icsp_key  ||= login_to_icsp
     @oneview_key ||= login_to_oneview
-    {'icsp_key' => @icsp_key, 'oneview_key'=> @oneview_key}
+    { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
   end
 
   def login_to_icsp
-    path = "/rest/login-sessions"
+    path = '/rest/login-sessions'
     options = {
       'body' => {
         'userName' => @icsp_username,
@@ -105,11 +105,11 @@ module OneViewAPI
     }
     response = rest_api(:icsp, :post, path, options)
     return response['sessionID'] if response['sessionID']
-    raise("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
+    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
   def login_to_oneview
-    path = "/rest/login-sessions"
+    path = '/rest/login-sessions'
     options = {
       'body' => {
         'userName' => @oneview_username,
@@ -119,7 +119,7 @@ module OneViewAPI
     }
     response = rest_api(:oneview, :post, path, options)
     return response['sessionID'] if response['sessionID']
-    raise("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
+    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
 
@@ -131,7 +131,7 @@ module OneViewAPI
 
   def get_icsp_server_by_sn(serialNumber)
     search_result = rest_api(:icsp, :get,
-        "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
+      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
     if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serial_number
       my_server = search_result.first
     end
@@ -150,21 +150,21 @@ module OneViewAPI
   end
 
 
-  def power_on(action_handler, machine_spec, machine_options, hardware_uri=nil)
-    set_power_state(action_handler, machine_spec, "on", hardware_uri)
+  def power_on(action_handler, machine_spec, hardware_uri = nil)
+    set_power_state(action_handler, machine_spec, 'on', hardware_uri)
   end
 
-  def power_off(action_handler, machine_spec, machine_options, hardware_uri=nil)
-    set_power_state(action_handler, machine_spec, "off", hardware_uri)
+  def power_off(action_handler, machine_spec, hardware_uri = nil)
+    set_power_state(action_handler, machine_spec, 'off', hardware_uri)
   end
 
-  def set_power_state(action_handler, machine_spec, state, hardware_uri=nil)
+  def set_power_state(action_handler, machine_spec, state, hardware_uri = nil)
     case state
-    when :on, "on", true
-      state = "on"
-    when :off, "off", false
-      state = "off"
-    else raise "Invalid power state #{state}"
+    when :on, 'on', true
+      state = 'on'
+    when :off, 'off', false
+      state = 'off'
+    else fail "Invalid power state #{state}"
     end
 
     if hardware_uri.nil?
@@ -176,15 +176,15 @@ module OneViewAPI
     unless hardware_info['powerState'].downcase == state
       action_handler.perform_action "Power #{state} server #{hardware_info['name']} for #{machine_spec.name}" do
         action_handler.report_progress "INFO: Powering #{state} server #{hardware_info['name']} for #{machine_spec.name}"
-        task = rest_api(:oneview, :put, "#{hardware_uri}/powerState", {'body'=>{"powerState"=>state.capitalize, "powerControl"=>"MomentaryPress"}})
+        task = rest_api(:oneview, :put, "#{hardware_uri}/powerState", { 'body' => { 'powerState' => state.capitalize, 'powerControl' => 'MomentaryPress' } })
         task_uri = task['uri']
         60.times do # Wait for up to 10 minutes
           task = rest_api(:oneview, :get, task_uri)
-          break if task['taskState'].downcase == "completed"
-          print "."
+          break if task['taskState'].downcase == 'completed'
+          print '.'
           sleep 10
         end
-        raise "Powering #{state} machine #{machine_spec.name} failed!" unless task['taskState'].downcase == "completed"
+        fail "Powering #{state} machine #{machine_spec.name} failed!" unless task['taskState'].downcase == 'completed'
       end
     end
     hardware_uri
@@ -202,7 +202,7 @@ module OneViewAPI
 
     if matching_profiles['count'] > 0
       profile = matching_profiles['members'].first
-      power_on(action_handler, machine_spec, machine_options, profile['serverHardwareUri']) # Make sure server is started
+      power_on(action_handler, machine_spec, profile['serverHardwareUri']) # Make sure server is started
       return profile
     end
 
@@ -211,27 +211,26 @@ module OneViewAPI
     #  For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
 
-    template_uri          = templates['members'].first['uri']
-    serverHardwareTypeUri = templates['members'].first['serverHardwareTypeUri']
-    enclosureGroupUri     = templates['members'].first['enclosureGroupUri']
+    template_uri             = templates['members'].first['uri']
+    server_hardware_type_uri = templates['members'].first['serverHardwareTypeUri']
+    enclosure_group_uri      = templates['members'].first['enclosureGroupUri']
 
     # Get availabe (and compatible) HP OV server blades. Take first one.
-    #blades = rest_api(:oneview, :get, "/rest/server-hardware?sort=name:asc&filter=serverProfileUri=null&filter=serverHardwareTypeUri='#{serverHardwareTypeUri}'&filter=serverGroupUri='#{enclosureGroupUri}'")
-    blades = rest_api(:oneview, :get, "/rest/server-hardware?sort=name:asc&filter=serverHardwareTypeUri='#{serverHardwareTypeUri}'&filter=serverGroupUri='#{enclosureGroupUri}'")
-    raise "Error! No available blades that are compatible with the server profile!" unless blades['count'] > 0
+    blades = rest_api(:oneview, :get, "/rest/server-hardware?sort=name:asc&filter=serverHardwareTypeUri='#{server_hardware_type_uri}'&filter=serverGroupUri='#{enclosure_group_uri}'")
+    fail 'Error! No available blades that are compatible with the server profile!' unless blades['count'] > 0
     chosen_blade = nil
     blades['members'].each do |member|
-      if (member["state"] != "ProfileApplied" &&  member["state"] != "ApplyingProfile")
+      if member['state'] != 'ProfileApplied' &&  member['state'] != 'ApplyingProfile'
         chosen_blade = member
         break
       end
     end
-    if !chosen_blade # TODO
+    if chosen_blade.nil? # TODO
       # Every bay is full and no more machines can be allocated
-      raise "No more blades are available for provisioning!"
+      fail 'No more blades are available for provisioning!'
     end
 
-    power_off(action_handler, machine_spec, machine_options, chosen_blade['uri'])
+    power_off(action_handler, machine_spec, chosen_blade['uri'])
     # New-HPOVProfileFromTemplate
     # Create new profile instance from template
     action_handler.perform_action "Initialize creation of server template for #{machine_spec.name}" do
@@ -251,21 +250,21 @@ module OneViewAPI
       end
 
       new_template_profile['serverHardwareUri'] = chosen_blade['uri']
-      task = rest_api(:oneview, :post, "/rest/server-profiles", { 'body'=>new_template_profile })
+      task = rest_api(:oneview, :post, '/rest/server-profiles', { 'body' => new_template_profile })
       task_uri = task['uri']
       # Poll task resource to see when profile has finished being applied
       60.times do # Wait for up to 5 min
         matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
         break if matching_profiles['count'] > 0
-        print "."
+        print '.'
         sleep 5
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        raise "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        fail "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
-    return matching_profiles['members'].first
+    matching_profiles['members'].first
   end
 
 
@@ -285,19 +284,19 @@ module OneViewAPI
           break if build_server_template_task['taskState'].downcase == 'completed'
           if build_server_template_task['taskState'].downcase == 'error'
             server_template = machine_options[:driver_options][:server_template]
-            raise "Error creating server profile from template #{server_template}: #{build_server_template_task['taskErrors'].first['message']}"
+            fail "Error creating server profile from template #{server_template}: #{build_server_template_task['taskErrors'].first['message']}"
           end
-          print "."
+          print '.'
           sleep 10
         end
-        raise "Timed out waiting for server to start and profile to be applied" unless build_server_template_task['taskState'].downcase == "completed"
+        fail 'Timed out waiting for server to start and profile to be applied' unless build_server_template_task['taskState'].downcase == 'completed'
       end
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
-      raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
+      fail "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
     end
 
     # Make sure server is started
-    power_on(action_handler, machine_spec, machine_options, profile['serverHardwareUri'])
+    power_on(action_handler, machine_spec, profile['serverHardwareUri'])
 
     # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
     my_server = nil
@@ -314,22 +313,22 @@ module OneViewAPI
           end
         end
         break if !my_server.nil?
-        print "."
+        print '.'
         sleep 10
       end
-      raise "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
+      fail "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
 
     # Consume any custom attributes that were specified
     if machine_options[:driver_options][:custom_attributes]
       curr_server = rest_api(:icsp, :get, my_server['uri'])
       machine_options[:driver_options][:custom_attributes].each do |key, val|
-        curr_server['customAttributes'].push ({
-          "values"=>[{"scope"=>"server", "value"=> val.to_s}], 
-          "key" => key.to_s
+        curr_server['customAttributes'].push({
+          'values' => [{ 'scope' => 'server',  'value' => val.to_s }],
+          'key' => key.to_s
         })
       end
-      options = { 'body'=> curr_server }
+      options = { 'body' => curr_server }
       rest_api(:icsp, :put, my_server['uri'], options)
     end
 
@@ -347,23 +346,23 @@ module OneViewAPI
             break
           end
         end
-        raise "OS build plan #{os_build} not found!" if build_plan_uri.nil?
+        fail "OS build plan #{os_build} not found!" if build_plan_uri.nil?
 
         # Do the OS deployment
         options = { 'body' => {
           'osbpUris' => [build_plan_uri],
-          'serverData' => [{'serverUri'=> my_server['uri'] }]
-        }}
+          'serverData' => [{ 'serverUri' => my_server['uri'] }]
+        } }
         os_deployment_task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
         os_deployment_task_uri = os_deployment_task['uri']
         720.times do # Wait for up to 2 hr
           os_deployment_task = rest_api(:icsp, :get, os_deployment_task_uri, options) # TODO: Need options?
           break if os_deployment_task['running'] == 'false'
-          print "."
+          print '.'
           sleep 10
         end
         unless os_deployment_task['state'] == 'STATUS_SUCCESS'
-          raise "Error running OS build plan #{os_build}: #{os_deployment_task['jobResult'].first['jobMessage']}\n#{os_deployment_task['jobResult'].first['jobResultErrorDetails']}"
+          fail "Error running OS build plan #{os_build}: #{os_deployment_task['jobResult'].first['jobMessage']}\n#{os_deployment_task['jobResult'].first['jobResultErrorDetails']}"
         end
       end
     end
@@ -375,7 +374,7 @@ module OneViewAPI
       if machine_options[:driver_options][:connections]
         machine_options[:driver_options][:connections].each do |id, data|
           c = data
-          c[:macAddress]   = profile['connections'].select {|c| c['id']==id}.first['mac']
+          c[:macAddress]   = profile['connections'].select {|x| x['id'] == id}.first['mac']
           c[:mask]       ||= machine_options[:driver_options][:mask]
           c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
           c[:gateway]    ||= machine_options[:driver_options][:gateway]
@@ -384,7 +383,7 @@ module OneViewAPI
           nics.push c
         end
       end
-      options = { 'body'=> [{
+      options = { 'body' => [{
         'serverUri' => my_server['uri'],
         'personalityData' => {
           'hostName'   => machine_options[:driver_options][:host_name],
@@ -398,11 +397,11 @@ module OneViewAPI
       60.times do # Wait for up to 10 min
         network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
         break if network_personalization_task['running'] == 'false'
-        print "."
+        print '.'
         sleep 10
       end
       unless network_personalization_task['state'] == 'STATUS_SUCCESS'
-        raise "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
+        fail "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
       end
     end
     #   Get all, search for yours.  If not there or if it's in uninitialized state, pull again
@@ -410,19 +409,19 @@ module OneViewAPI
     30.times do # Wait for up to 5 min
       my_server = rest_api(:icsp, :get, my_server_uri)
       break if my_server['opswLifecycle'] == 'MANAGED'
-      print "."
+      print '.'
       sleep 10
     end
 
-    raise "Timeout waiting for server #{machine_spec.name} to finish network personalization" if my_server['opswLifecycle'] != 'MANAGED'
-    return my_server
+    fail "Timeout waiting for server #{machine_spec.name} to finish network personalization" if my_server['opswLifecycle'] != 'MANAGED'
+    my_server
   end
 
 
   def destroy_icsp_server(action_handler, machine_spec)
     my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
     return false if my_server.nil? || my_server['uri'].nil?
-    
+
     action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
       task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
 
@@ -430,21 +429,23 @@ module OneViewAPI
         task_uri = task['uri']
         90.times do # Wait for up to 15 minutes
           task = rest_api(:icsp, :get, task_uri)
-          break if task['taskState'].downcase == "completed"
-          print "."
+          break if task['taskState'].downcase == 'completed'
+          print '.'
           sleep 10
         end
-        raise "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == "completed"
+        fail "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == 'completed'
       end
     end
   end
 
 
-  def destroy_oneview_profile(action_handler, machine_spec, profile=nil)
+  def destroy_oneview_profile(action_handler, machine_spec, profile = nil)
     profile ||= get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-    
+
     hardware_info = rest_api(:oneview, :get, profile['serverHardwareUri'])
-    unless hardware_info.nil?
+    if hardware_info.nil?
+      action_handler.report_progress "INFO: #{machine_spec.name} is already deleted."
+    else
       action_handler.perform_action "Delete server #{machine_spec.name} from oneview" do
         action_handler.report_progress "INFO: Deleting server profile #{machine_spec.name}"
         task = rest_api(:oneview, :Delete, "#{profile['uri']}")
@@ -452,15 +453,12 @@ module OneViewAPI
 
         60.times do # Wait for up to 10 minutes
           task = rest_api(:oneview, :get, task_uri)
-          break if task['taskState'].downcase == "completed"
-          print "."
+          break if task['taskState'].downcase == 'completed'
+          print '.'
           sleep 10
         end
-        raise "Deleting server profile #{machine_spec.name} failed!" unless task['taskState'].downcase == "completed"
+        fail "Deleting server profile #{machine_spec.name} failed!" unless task['taskState'].downcase == 'completed'
       end
-    else
-      action_handler.report_progress "INFO: #{machine_spec.name} is already deleted."
     end
   end
-  
 end

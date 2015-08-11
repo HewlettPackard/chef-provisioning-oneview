@@ -1,0 +1,82 @@
+# See default at https://github.com/bbatsov/rubocop/blob/master/config/default.yml
+
+# Common configuration.
+AllCops:
+  Exclude:
+    - 'examples/cookbooks/**/*'
+
+
+# Modified Cops:
+Metrics/AbcSize:
+  Max: 175
+
+Metrics/CyclomaticComplexity:
+  Max: 25
+
+Metrics/PerceivedComplexity:
+  Max: 25
+
+Metrics/ClassLength:
+  Max: 128
+
+Metrics/MethodLength:
+  Max: 125
+
+Metrics/LineLength:
+  Max: 210
+
+Style/IndentationWidth:
+  Width: 2
+
+Style/VariableName:
+  EnforcedStyle: snake_case
+
+Style/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Style/EmptyLinesAroundBlockBody:
+  EnforcedStyle: no_empty_lines
+
+
+# Disabled Cops:
+Style/AlignHash:
+  Enabled: false
+
+Style/BracesAroundHashParameters:
+  Enabled: false
+
+Style/AccessorMethodName:
+  Enabled: false
+
+Style/ClassAndModuleCamelCase:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/EmptyLines:
+  Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/IndentHash:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/RescueModifier:
+  Enabled: false
+
+Style/SpaceInsideBlockBraces:
+  Enabled: false
