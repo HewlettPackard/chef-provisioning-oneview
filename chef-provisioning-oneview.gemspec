@@ -12,18 +12,17 @@ Gem::Specification.new do |s|
   s.email = 'jared.smartt@hp.com'
   s.homepage = 'https://github.com/HewlettPackard/chef-provisioning-oneview'
 
-  s.add_dependency 'chef', '~> 12'
-  s.add_dependency 'chef-provisioning', '>= 0.19.0'
+  s.add_dependency 'chef', '~> 12.0'
+  s.add_dependency 'chef-provisioning', '~> 1.0'
   s.add_dependency 'ridley', '~> 4.2'
 
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'pry'
 
   s.bindir       = "bin"
   s.executables  = %w( )
 
   s.require_path = 'lib'
-  s.files = %w(Rakefile LICENSE README.md CHANGELOG.md) + Dir.glob("{distro,lib,spec}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
+  s.files = %w(Rakefile LICENSE README.md) + Dir.glob("{distro,lib,spec}/**/*", File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
   s.license = "Apache-2.0"
 end
