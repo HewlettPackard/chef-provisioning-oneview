@@ -111,14 +111,14 @@ module Chef::Provisioning
 
     def stop_machine(action_handler, machine_spec, machine_options)
       if machine_spec.reference
-        power_off(action_handler, machine_spec, machine_options)
+        power_off(action_handler, machine_spec)
       end
     end
 
 
     def destroy_machine(action_handler, machine_spec, machine_options)
       if machine_spec.reference
-        power_off(action_handler, machine_spec, machine_options) # Power off server
+        power_off(action_handler, machine_spec) # Power off server
         destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
         destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
 
