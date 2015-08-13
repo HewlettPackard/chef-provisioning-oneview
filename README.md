@@ -59,9 +59,9 @@ machine 'web01' do
         2 => {
           :ip4Address => 'xx.xx.xx.xx',
           :mask => '255.255.254.0', # Optional. Overrides mask property above
-          :dhcp => false
-          :gateway => 'xx.xx.xx.1' # Optional. Overrides gateway property above
-          :dns => 'xx.xx.xx.xx'    # Optional. Overrides dns property above
+          :dhcp => false            # Optional. Overrides dhcp property above
+          :gateway => 'xx.xx.xx.1'  # Optional. Overrides gateway property above
+          :dns => 'xx.xx.xx.xx'     # Optional. Overrides dns property above
         }
       },
       :custom_attributes => {
