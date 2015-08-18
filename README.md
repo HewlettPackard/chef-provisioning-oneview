@@ -38,7 +38,7 @@ Chef Provisioning driver for HP OneView
   ```
 
 - Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See [examples/ssl_issues.md](examples/ssl_issues.md) for more info on how to do this.
-- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
+- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too. See the wiki pages [OneView Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/OneView-Configuration) and [ICsp Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/ICsp-Configuration) for details about how to set them up.
 
 # Usage
 
