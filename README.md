@@ -1,7 +1,7 @@
 # chef-provisioning-oneview
 Chef Provisioning driver for HP OneView
 
-Currently supports OneView v1.20 and ICsp v1.02
+Currently supports OneView v1.2.0 and ICsp v7.4.0
 
 # Installation
 
