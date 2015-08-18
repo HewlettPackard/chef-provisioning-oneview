@@ -1,4 +1,3 @@
 module OneViewAPIv2_0
-  #TODO
-  
+  # TODO
 end
