@@ -1,6 +1,8 @@
 # chef-provisioning-oneview
 Chef Provisioning driver for HP OneView
 
+Currently supports OneView v1.20 and ICsp v1.02
+
 # Installation
 
 - Require the gem in your Gemfile: `gem 'chef-provisioning-oneview'`
