@@ -1,6 +1,21 @@
 # chef-provisioning-oneview
 Chef Provisioning driver for HP OneView
 
+Currently supports OneView v1.2.0 and ICsp v7.4.0
+
+# Installation
+
+- Require the gem in your Gemfile: `gem 'chef-provisioning-oneview'`
+  
+  Then run `$ bundle install`
+- Or run the command:
+  
+  ```ruby
+  $ gem install chef-provisioning-oneview
+  ```
+
+
+
 # Prerequisites
 - Set up your `knife.rb` file with the information the driver needs to connect to OneView and Insight Control Server Provisioning
   
@@ -24,8 +39,8 @@ Chef Provisioning driver for HP OneView
   ssl_verify_mode              :verify_none
   ```
 
-- Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See `ssl_issues.md` for more info on how to do this.
-- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
+- Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See [examples/ssl_issues.md](examples/ssl_issues.md) for more info on how to do this.
+- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too. See the wiki pages [OneView Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/OneView-Configuration) and [ICsp Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/ICsp-Configuration) for details about how to set them up.
 
 # Usage
 
@@ -86,13 +101,32 @@ end
 
 See https://github.com/chef/chef-provisioning-ssh for more transport_options.
 
+### Custom Attributes
+Insided the custom attributes hash, you can specify any data that you would like to pass into your ICsp build plan scripts or configuration files. For example, to specify a list of trusted public keys to be placed into the node's .ssh/authorized_keys file, add a custom attribute to the machine resource definition:
+
+```ruby
+:custom_attributes => {
+  :chefCert => 'ssh-rsa AA...'
+}
+```
+
+Then create/modify a custom build script in ICsp that will do something with this data. To access it, use the format: `@variable_name@` or `@variable_name:default_value@`. For our example, we could do something like:
+
+```bash
+#!/bin/bash
+authorized_keys = @chefCert@
+if [ -n "$authorized_keys"]; then
+  echo -e "$authorized_keys" > /mnt/sysimage/root/.ssh/authorized_keys
+fi
+```
+
 ### Behind a proxy
 Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
 
 # Doing a test run
-This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the examples directory for how to begin provisioning.
+This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.
 
 
 # Contributing
@@ -103,6 +137,10 @@ To build this gem, run `$ rake build` or `gem build chef-provisioning-oneview.ge
 
 Then once it's built you can install it by running `$ rake install` or `$ gem install ./chef-provisioning-oneview-<VERSION>.gem`.
 
+### Testing
+- RuboCop: `$ rake rubocop` or `$ rubocop .`
+- Rspec: `$ rake spec` or `$ rspec`
+- Both: Run `$ rake test` to run both RuboCop and Rspec tests.
 
 # Authors
  - Jared Smartt - [@jsmartt](https://github.com/jsmartt)
