@@ -1,0 +1,200 @@
+#!/bin/bash
+ 
+### This script is for custom setting for RHEL deployments
+### using Insight Control server provisioning
+ 
+ 
+# This script injects various required server settings
+# needed by Chef (setting proxy to connect to Internet, 
+# Yum repository configurations, SSL certification setting, 
+# and whether login should be enabled using username/password) 
+# into a RHEL deployment.
+ 
+# To use this script, add it to your RHEL Build Plan
+# just after the Integrate Linux HP SA Agent step and
+# before the Reboot step.
+ 
+ 
+# The location of the server filesystem before the final reboot
+MNTPREFIX=/mnt/sysimage
+
+### Shell variables that provide the server settings needed by chef. 
+### Users have to edit the value of these variables as per the requirements.
+### Users who need to set these variables can do so by editing these variables below.
+### Variable CHEF_PROXYSERVER is used to provide the proxy server address.
+### Variable YUM_REPOSITORY_INFO is used to provide the yum repository information
+### Variable CHEF_CERT is used to provide the SSH certificate information to be copied into the authoriation files.
+### Variable LOGIN_DISABLED should be set to YES/yes if the user requires to diasable user login and should be set ### to NO/no if LOGIN using username/password should not be disabled
+
+CHEF_PROXYSERVER=""
+YUM_REPOSITORY_INFO=""
+CHEF_CERT=""  
+LOGIN_DISABLED=""
+ 
+### Inject required proxy information for internet access
+### if needed.  To use this setting,  edit the script and set the CHEF_PROXYSERVER variable
+### with the desired
+### proxy server. That same proxy server will be used for
+### HTTP, HTTPS, and FTP.
+ 
+echo
+
+PROXYSERVER=$CHEF_PROXYSERVER
+if [ -n "$PROXYSERVER" ]
+then
+   # Proxy server defined - write the info
+   OUTFILE=/etc/profile.d/proxy.sh
+   echo "Writing proxy configuration information..."
+   echo "Proxy set to: $PROXYSERVER"
+cat <<PROXYINFO > $MNTPREFIX$OUTFILE
+PROXY="$PROXYSERVER"
+export http_proxy=\$PROXY
+export HTTP_PROXY=\$PROXY
+export https_proxy=\$PROXY
+export HTTPS_PROXY=\$PROXY
+export ftp_proxy=\$PROXY
+export FTP_PROXY=\$PROXY
+export no_proxy="localhost,127.0.0.1"
+export NO_PROXY="localhost,127.0.0.1"
+PROXYINFO
+
+   ### Update sudoers file
+ 
+   OUTFILE=/etc/sudoers
+   echo
+   echo "Updating sudoers file..."
+   echo 'Defaults    env_keep += "http_proxy https_proxy no_proxy"' >> $MNTPREFIX$OUTFILE
+   echo "Done."
+else
+   # No proxy server defined. Non fatal informational message.
+   echo "INFO - No proxy server was defined. To set a proxy server"
+   echo "edit the script and set the CHEF_PROXYSERVER shell variable"
+   echo "to the full URL of your proxy server."
+fi
+ 
+ 
+ 
+# DNS Handled in post install netconfig
+#OUTFILE=/etc/resolv.conf
+#echo "nameserver 16.110.135.52" >> $MNTPREFIX$OUTFILE
+#echo "nameserver 16.110.135.51" >> $MNTPREFIX$OUTFILE
+ 
+ 
+### Inject the yum repository information
+### To use this setting you must edit the script and set the variable YUM_REPOSITORY_INFO
+### This variable should contian the entire yum repository
+### definition, so at a minimum it should look like this:
+###
+### [Your-repository-name]
+### name=Your-repository-name
+### baseurl=http://your.repository.url
+###
+### It should contian any other options as required by your site.
+### These settings will all go into /etc/yum.repos.d/chef.repo
+ 
+echo
+# De-reference the YUM_REPOSITORY_INFO shell variable.
+YUMINFO=$YUM_REPOSITORY_INFO
+if [ -n "$YUMINFO" ]
+then
+   OUTFILE=/etc/yum.repos.d/chef.repo
+   echo
+   echo "Writing yum repository info..."
+   echo "$YUMINFO" > $MNTPREFIX$OUTFILE
+   if [ -n "$PROXYSERVER" ]
+   then
+      # Proxy server defined - write yum proxy info
+      OUTFILE=/etc/yum.conf
+      echo "proxy=$PROXYSERVER" >> $MNTPREFIX$OUTFILE
+   fi
+   echo "Done."
+else
+   echo "INFO - No yum repository information was defined. To define"
+   echo "a yum repository for this installation, edit the script  and "
+   echo "set the YUM_REPOSITORY_INFO varaible"
+   echo " to the full yum repository definition."
+   echo "At a minimum the definition should look like this:"
+   echo
+   echo "[Your-repository-name]"
+   echo "name=Your-repository-name"
+   echo "baseurl=http://your.repository.url"
+   echo
+   echo "Be sure to include any other options that your sire requires."
+fi
+ 
+ 
+ 
+
+
+### Inject the SSH certificate for access
+ 
+# The script gets the public SSH keys from the CHEF_CERT variable .
+# Chef users should assign this variable by editing the script and setting the appropriate CHEF_CERT. 
+# CHEF_CERT variable should contain the desired public SSH keys to put into the root
+# authorized_keys file. If no key is found, it reports it but it's
+# not considered an error.
+ 
+echo
+
+PUBLICKEY=$CHEF_CERT
+if [ -n "$PUBLICKEY" ]
+then
+   # Add the key to the /root/.ssh/authorized_keys file
+   # and make sure the owner and permissions are OK
+   SSHDIR=$MNTPREFIX/root/.ssh
+   echo "Adding the SSH key for this server"
+   echo "to /root/.ssh/authorized_keys file"
+   # If the .ssh directory isn't there, create it.
+   if [ ! -e $SSHDIR ]
+   then
+      mkdir $SSHDIR
+      chmod 700 $SSHDIR
+   fi
+   echo "$PUBLICKEY" >> $SSHDIR/authorized_keys
+   chown root $SSHDIR/authorized_keys
+   chmod 600 $SSHDIR/authorized_keys
+   echo "Done"
+else
+   # No SSH key was set by the user. 
+   echo "INFO - The CHEF_CERT for this server"
+   echo "was empty.  Edit this script and set the  CHEF_CERT variable  to set SSH Key."
+   echo "No SSH keys will be added to this server."
+fi
+
+
+### check if the user requires  the login to be disabled. If yes do the necessary changes in the ssh config file.
+
+# If the user has set the LOGIN_DISABLED to "yes" then the user has to set a valid SSH key.
+echo 
+echo "Checking the LOGIN_DISABLED setting."
+
+if [ "$LOGIN_DISABLED" = "YES" ] || [ "$LOGIN_DISABLED" = "yes" ]
+then
+  if [ -z "$PUBLICKEY" ]
+   then
+    echo
+    echo "ERROR: You cannot set LOGIN_DISABLED variable to YES"
+    echo "without setting valid SSH key."
+    echo "Please set the CHEF_CERT variable to a valid SSH key and try again."
+    echo  "Password Logins will not be disabled."
+  else
+   if [ -n "$PUBLICKEY" ]
+   then 
+        SSH_CONFIGFILE="/etc/ssh/sshd_config"
+        BACKUP="_backup"
+        cp $MNTPREFIX$SSH_CONFIGFILE $MNTPREFIX$SSH_CONFIGFILE$BACKUP
+        cat $MNTPREFIX$SSH_CONFIGFILE$BACKUP | sed '/^PasswordAuthentication/d' > $MNTPREFIX$SSH_CONFIGFILE 
+        echo "PasswordAuthentication no" >> $MNTPREFIX$SSH_CONFIGFILE
+        echo "RSAAuthentication yes" >> $MNTPREFIX$SSH_CONFIGFILE
+        echo "PubkeyAuthentication yes" >> $MNTPREFIX$SSH_CONFIGFILE
+        echo 
+        echo "Disabling username and password for login. You must use SSH Keys for login."
+    fi
+ fi
+else
+ if [ "$LOGIN_DISABLED" = "NO" ] ||[ "$LOGIN_DISABLED" = "no" ]
+ then
+  echo
+  echo "INFO: Nothing to be done for Login setting."
+ fi
+fi
