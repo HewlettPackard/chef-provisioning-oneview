@@ -7,8 +7,8 @@ require 'webmock/rspec'
 
 RSpec.configure do |config|
   config.before(:each) do
-    allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:get_oneview_api_version).and_return('1.20')
-    allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:get_icsp_api_version).and_return('120')
+    allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:get_oneview_api_version).and_return(120)
+    allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:get_icsp_api_version).and_return(102)
     allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:login_to_oneview).and_return('long_oneview_key')
     allow_any_instance_of(Chef::Provisioning::OneViewDriver).to receive(:login_to_icsp).and_return('long_icsp_key')
 
