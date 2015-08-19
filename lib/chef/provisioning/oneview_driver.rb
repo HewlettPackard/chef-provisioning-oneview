@@ -37,7 +37,7 @@ module Chef::Provisioning
       @oneview_password    = config[:knife][:oneview_password]
       fail 'Must set the knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
       @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
-      @oneview_api_version = get_oneview_api_version
+      @oneview_api_version = 120 # get_oneview_api_version
       @oneview_key         = login_to_oneview
 
       @icsp_base_url       = config[:knife][:icsp_url]
@@ -47,7 +47,7 @@ module Chef::Provisioning
       @icsp_password       = config[:knife][:icsp_password]
       fail 'Must set the knife[:icsp_password] attribute!' if @icsp_password.nil? || @icsp_password.empty?
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
-      @icsp_api_version    = get_icsp_api_version
+      @icsp_api_version    = 102 # get_icsp_api_version
       @icsp_key            = login_to_icsp
     end
 
@@ -109,10 +109,8 @@ module Chef::Provisioning
     end
 
 
-    def stop_machine(action_handler, machine_spec, machine_options)
-      if machine_spec.reference
-        power_off(action_handler, machine_spec)
-      end
+    def stop_machine(action_handler, machine_spec, _machine_options)
+      power_off(action_handler, machine_spec) if machine_spec.reference
     end
 
 
