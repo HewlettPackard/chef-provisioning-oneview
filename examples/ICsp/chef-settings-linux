@@ -74,10 +74,7 @@ fi
  
  
  
-# DNS Handled in post install netconfig
-#OUTFILE=/etc/resolv.conf
-#echo "nameserver 16.110.135.52" >> $MNTPREFIX$OUTFILE
-#echo "nameserver 16.110.135.51" >> $MNTPREFIX$OUTFILE
+
  
  
 ### Inject the yum repository information
