@@ -1,0 +1,15 @@
+{
+  "type": "ServerProfileListV4",
+  "members": [
+  ],
+  "total": 0,
+  "start": 0,
+  "prevPageUri": null,
+  "nextPageUri": null,
+  "count": 1,
+  "category": "server-profiles",
+  "created": "20150810T223058.112Z",
+  "eTag": "20150810T223058.112Z",
+  "modified": "20150810T223058.112Z",
+  "uri": "/rest/server-profiles?filter=serialNumber%20matches%20'FAKESN'&sort=name:asc"
+}

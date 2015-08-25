@@ -1,0 +1,14 @@
+{
+  "errorCode": "INVALID_FILTER",
+  "data": {
+  },
+  "details": "",
+  "errorSource": null,
+  "nestedErrors": [
+
+  ],
+  "recommendedActions": [
+    "Verify parameters and try again."
+  ],
+  "message": "The specified filter is not valid ([serialNumber matches ''])."
+}

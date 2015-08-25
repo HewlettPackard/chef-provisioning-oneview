@@ -1,0 +1,151 @@
+{
+  "type": "server-hardware-3",
+  "name": "dazzle, bay 2",
+  "state": "ProfileApplied",
+  "stateReason": "NotApplicable",
+  "assetTag": "\n      ",
+  "category": "server-hardware",
+  "created": "2015-07-02T16:24:23.447Z",
+  "description": null,
+  "eTag": "1439180722361",
+  "formFactor": "HalfHeight",
+  "licensingIntent": "OneViewNoiLO",
+  "locationUri": "/rest/enclosures/09SGH236PMVW",
+  "memoryMb": 16384,
+  "model": "ProLiant BL460c Gen8",
+  "modified": "2015-08-10T04:25:22.361Z",
+  "mpDnsName": "ILOMAQ96601Z4",
+  "mpFirmwareVersion": "2.10 Jan 15 2015",
+  "mpIpAddress": "172.125.24.230",
+  "mpModel": "iLO4",
+  "partNumber": "666161-B21",
+  "portMap": {
+    "deviceSlots": [
+      {
+        "deviceName": "HP FlexFabric 10Gb 2-port 554FLB Adapter",
+        "location": "Flb",
+        "oaSlotNumber": 9,
+        "physicalPorts": [
+          {
+            "interconnectPort": 2,
+            "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+            "mac": "11:11:11:11:31:28",
+            "portNumber": 1,
+            "type": "Ethernet",
+            "virtualPorts": [
+              {
+                "mac": "11:11:11:11:01:14",
+                "portFunction": "a",
+                "portNumber": 1,
+                "wwnn": null,
+                "wwpn": null
+              },
+              {
+                "mac": "11:11:11:11:31:29",
+                "portFunction": "b",
+                "portNumber": 2,
+                "wwnn": "11:11:11:11:11:11:11:11",
+                "wwpn": "11:11:11:11:11:11:11:11"
+              },
+              {
+                "mac": "11:11:11:11:31:2A",
+                "portFunction": "c",
+                "portNumber": 3,
+                "wwnn": null,
+                "wwpn": null
+              },
+              {
+                "mac": "11:11:11:11:31:2B",
+                "portFunction": "d",
+                "portNumber": 4,
+                "wwnn": null,
+                "wwpn": null
+              }
+            ],
+            "wwn": null
+          },
+          {
+            "interconnectPort": 2,
+            "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+            "mac": "11:11:11:11:31:2C",
+            "portNumber": 2,
+            "type": "Ethernet",
+            "virtualPorts": [
+              {
+                "mac": "11:11:11:11:01:15",
+                "portFunction": "a",
+                "portNumber": 1,
+                "wwnn": null,
+                "wwpn": null
+              },
+              {
+                "mac": "11:11:11:11:31:2D",
+                "portFunction": "b",
+                "portNumber": 2,
+                "wwnn": "11:11:11:11:11:11:11:11",
+                "wwpn": "11:11:11:11:11:11:11:11"
+              },
+              {
+                "mac": "11:11:11:11:31:2E",
+                "portFunction": "c",
+                "portNumber": 3,
+                "wwnn": null,
+                "wwpn": null
+              },
+              {
+                "mac": "11:11:11:11:31:2F",
+                "portFunction": "d",
+                "portNumber": 4,
+                "wwnn": null,
+                "wwpn": null
+              }
+            ],
+            "wwn": null
+          }
+        ],
+        "slotNumber": 1
+      },
+      {
+        "deviceName": "",
+        "location": "Mezz",
+        "oaSlotNumber": 1,
+        "physicalPorts": [
+
+        ],
+        "slotNumber": 1
+      },
+      {
+        "deviceName": "",
+        "location": "Mezz",
+        "oaSlotNumber": 2,
+        "physicalPorts": [
+
+        ],
+        "slotNumber": 2
+      }
+    ]
+  },
+  "position": 2,
+  "powerLock": false,
+  "powerState": "Powering-On",
+  "processorCoreCount": 6,
+  "processorCount": 1,
+  "processorSpeedMhz": 2000,
+  "processorType": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+  "refreshState": "NotRefreshing",
+  "romVersion": "I31 11/02/2014",
+  "serialNumber": "MAQ96601Z4",
+  "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+  "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+  "serverProfileUri": "/rest/server-profiles/1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+  "shortModel": "BL460c Gen8",
+  "signature": {
+    "personalityChecksum": 2015957748,
+    "serverHwChecksum": 508556751
+  },
+  "status": "OK",
+  "uri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D38",
+  "uuid": "31363636-3136-584D-5132-333230314D38",
+  "virtualSerialNumber": "VCGE9KB041",
+  "virtualUuid": "1c5e807d-acbe-4ee8-868b-2fb0b6504474"
+}

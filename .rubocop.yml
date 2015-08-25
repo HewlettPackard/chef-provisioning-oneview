@@ -36,6 +36,8 @@ Style/AlignParameters:
 
 Style/EmptyLinesAroundBlockBody:
   EnforcedStyle: no_empty_lines
+  Exclude:
+    - 'spec/**/*'
 
 
 # Disabled Cops:

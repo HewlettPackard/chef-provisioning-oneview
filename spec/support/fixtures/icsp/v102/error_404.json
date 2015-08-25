@@ -1,0 +1,14 @@
+{
+  "errorSource": null,
+  "nestedErrors": [
+
+  ],
+  "errorCode": "GENERIC_HTTP_404",
+  "data": {
+  },
+  "recommendedActions": [
+    "Check the request URI, then resend the request."
+  ],
+  "details": "The requested resource could not be found.",
+  "message": "Not Found"
+}
