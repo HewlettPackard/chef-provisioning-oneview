@@ -1,0 +1,369 @@
+{
+  "type": "ServerProfileListV4",
+  "members": [
+    {
+      "type": "ServerProfileV4",
+      "uri": "/rest/server-profiles/1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+      "name": "chef-web01",
+      "description": "Web server machine template",
+      "serialNumber": "VCGE9KB041",
+      "uuid": "1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+      "serverHardwareUri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D38",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "enclosureGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "enclosureUri": "/rest/enclosures/09SGH236PMVW",
+      "enclosureBay": 2,
+      "affinity": "Bay",
+      "associatedServer": null,
+      "hideUnusedFlexNics": true,
+      "firmware": {
+        "forceInstallFirmware": false,
+        "manageFirmware": true,
+        "firmwareBaselineUri": "/rest/firmware-drivers/bp-hp-service-pack-for-proliant-oneview-2014-11-30-05"
+      },
+      "macType": "Virtual",
+      "wwnType": "Virtual",
+      "serialNumberType": "Virtual",
+      "category": "server-profiles",
+      "created": "20150810T040139.738Z",
+      "modified": "20150810T042450.221Z",
+      "status": "OK",
+      "state": "Normal",
+      "inProgress": false,
+      "taskUri": "/rest/tasks/2A17C3F9-6DBF-40B1-B99E-E8BA40848B40",
+      "connections": [
+        {
+          "id": 1,
+          "name": "Altair PXE 1133",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/02b0b5c3-1a0a-4d5f-b5c9-0c7532cb1e5e",
+          "portId": "Flb 1:1-a",
+          "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:14",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "Primary"
+          }
+        },
+        {
+          "id": 2,
+          "name": "corpnet 10",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/7a4698ae-5933-4e2e-8af3-57893c23a2d2",
+          "portId": "Flb 1:2-a",
+          "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:15",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "NotBootable"
+          }
+        }
+      ],
+      "bootMode": null,
+      "boot": {
+        "manageBoot": true,
+        "order": [
+          "HardDisk",
+          "PXE",
+          "CD",
+          "Floppy",
+          "USB"
+        ]
+      },
+      "bios": {
+        "manageBios": true,
+        "overriddenSettings": [
+          {
+            "id": "158",
+            "value": "2"
+          },
+          {
+            "id": "181",
+            "value": "1"
+          },
+          {
+            "id": "176",
+            "value": "1"
+          }
+        ]
+      },
+      "localStorage": {
+        "logicalDrives": [
+          {
+            "raidLevel": "RAID0",
+            "bootable": true
+          }
+        ],
+        "manageLocalStorage": true,
+        "initialize": false
+      },
+      "sanStorage": {
+        "volumeAttachments": [
+
+        ],
+        "manageSanStorage": false
+      },
+      "eTag": "1439179303124/6"
+    },
+    {
+      "type": "ServerProfileV4",
+      "uri": "/rest/server-profiles/6c5e4e2b-5461-4978-9807-c96a7e0d445b",
+      "name": "chef-web02",
+      "description": "Web server machine template",
+      "serialNumber": "VCGE7KB963",
+      "uuid": "6c5e4e2b-5461-4978-9807-c96a7e0d445b",
+      "serverHardwareUri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D58",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "enclosureGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "enclosureUri": "/rest/enclosures/09SGH236PMVW",
+      "enclosureBay": 3,
+      "affinity": "Bay",
+      "associatedServer": null,
+      "hideUnusedFlexNics": true,
+      "firmware": {
+        "forceInstallFirmware": false,
+        "manageFirmware": true,
+        "firmwareBaselineUri": "/rest/firmware-drivers/bp-hp-service-pack-for-proliant-oneview-2014-11-30-05"
+      },
+      "macType": "Virtual",
+      "wwnType": "Virtual",
+      "serialNumberType": "Virtual",
+      "category": "server-profiles",
+      "created": "20150810T040150.548Z",
+      "modified": "20150810T042504.190Z",
+      "status": "OK",
+      "state": "Normal",
+      "inProgress": false,
+      "taskUri": "/rest/tasks/449E1A81-E6F2-45B7-AD11-AB398EFDC4D7",
+      "connections": [
+        {
+          "id": 1,
+          "name": "Altair PXE 1133",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/02b0b5c3-1a0a-4d5f-b5c9-0c7532cb1e5e",
+          "portId": "Flb 1:1-a",
+          "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:16",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "Primary"
+          }
+        },
+        {
+          "id": 2,
+          "name": "corpnet 10",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/7a4698ae-5933-4e2e-8af3-57893c23a2d2",
+          "portId": "Flb 1:2-a",
+          "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:17",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "NotBootable"
+          }
+        }
+      ],
+      "bootMode": null,
+      "boot": {
+        "manageBoot": true,
+        "order": [
+          "HardDisk",
+          "PXE",
+          "CD",
+          "Floppy",
+          "USB"
+        ]
+      },
+      "bios": {
+        "manageBios": true,
+        "overriddenSettings": [
+          {
+            "id": "181",
+            "value": "1"
+          },
+          {
+            "id": "176",
+            "value": "1"
+          },
+          {
+            "id": "158",
+            "value": "2"
+          }
+        ]
+      },
+      "localStorage": {
+        "logicalDrives": [
+          {
+            "raidLevel": "RAID0",
+            "bootable": true
+          }
+        ],
+        "manageLocalStorage": true,
+        "initialize": false
+      },
+      "sanStorage": {
+        "volumeAttachments": [
+
+        ],
+        "manageSanStorage": false
+      },
+      "eTag": "1439179313913/6"
+    },
+    {
+      "type": "ServerProfileV4",
+      "uri": "/rest/server-profiles/a16654c6-d12d-4e42-aa04-8868cf3dc31a",
+      "name": "Template - Web Server",
+      "description": "Web server machine template",
+      "serialNumber": "VCGE9KB035",
+      "uuid": "a16654c6-d12d-4e42-aa04-8868cf3dc31a",
+      "serverHardwareUri": null,
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "enclosureGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "enclosureUri": null,
+      "enclosureBay": null,
+      "affinity": "Bay",
+      "associatedServer": null,
+      "hideUnusedFlexNics": true,
+      "firmware": {
+        "forceInstallFirmware": false,
+        "manageFirmware": true,
+        "firmwareBaselineUri": "/rest/firmware-drivers/bp-hp-service-pack-for-proliant-oneview-2014-11-30-05"
+      },
+      "macType": "Virtual",
+      "wwnType": "Virtual",
+      "serialNumberType": "Virtual",
+      "category": "server-profiles",
+      "created": "20150730T115836.727Z",
+      "modified": "20150807T051446.275Z",
+      "status": "OK",
+      "state": "Normal",
+      "inProgress": false,
+      "taskUri": "/rest/tasks/26235118-827A-445D-9E5D-F2BBCAC8E9E8",
+      "connections": [
+        {
+          "id": 1,
+          "name": "Altair PXE 1133",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Reserved",
+          "networkUri": "/rest/ethernet-networks/02b0b5c3-1a0a-4d5f-b5c9-0c7532cb1e5e",
+          "portId": "Flb 1:1-a",
+          "interconnectUri": null,
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:00:D8",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "Primary"
+          }
+        },
+        {
+          "id": 2,
+          "name": "corpnet 10",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Reserved",
+          "networkUri": "/rest/ethernet-networks/7a4698ae-5933-4e2e-8af3-57893c23a2d2",
+          "portId": "Flb 1:2-a",
+          "interconnectUri": null,
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:00:D9",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "NotBootable"
+          }
+        }
+      ],
+      "bootMode": null,
+      "boot": {
+        "manageBoot": true,
+        "order": [
+          "HardDisk",
+          "PXE",
+          "CD",
+          "Floppy",
+          "USB"
+        ]
+      },
+      "bios": {
+        "manageBios": true,
+        "overriddenSettings": [
+          {
+            "id": "181",
+            "value": "1"
+          },
+          {
+            "id": "158",
+            "value": "2"
+          },
+          {
+            "id": "176",
+            "value": "1"
+          }
+        ]
+      },
+      "localStorage": {
+        "logicalDrives": [
+          {
+            "raidLevel": "RAID0",
+            "bootable": true
+          }
+        ],
+        "manageLocalStorage": true,
+        "initialize": true
+      },
+      "sanStorage": {
+        "volumeAttachments": [
+
+        ],
+        "manageSanStorage": false
+      },
+      "eTag": "1438924486161/12"
+    }
+  ],
+  "total": 3,
+  "start": 0,
+  "prevPageUri": null,
+  "nextPageUri": null,
+  "count": 3,
+  "category": "server-profiles",
+  "created": "20150810T223033.707Z",
+  "eTag": "20150810T223033.707Z",
+  "modified": "20150810T223033.707Z",
+  "uri": "/rest/server-profiles"
+}

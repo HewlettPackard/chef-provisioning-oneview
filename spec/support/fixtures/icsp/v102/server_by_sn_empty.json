@@ -1,0 +1,16 @@
+{
+  "type": "IndexPaginatedCollectionV4",
+  "start": 0,
+  "count": 0,
+  "total": 1,
+  "unFilteredTotal": 3,
+  "uri": "/rest/index/resources?category=osdserver&count=50&start=0&query='osdServerSerialNumber:%22FAKESN%22'",
+  "category": "resources",
+  "members": [
+  ],
+  "prevPageUri": null,
+  "nextPageUri": null,
+  "created": null,
+  "modified": null,
+  "eTag": null
+}

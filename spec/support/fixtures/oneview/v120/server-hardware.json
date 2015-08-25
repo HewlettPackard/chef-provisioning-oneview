@@ -1,0 +1,1476 @@
+{
+  "type": "server-hardware-list-3",
+  "category": "server-hardware",
+  "count": 9,
+  "created": "2015-08-10T22:30:02.367Z",
+  "eTag": "1439245802367",
+  "members": [
+    {
+      "type": "server-hardware-3",
+      "name": "172.18.6.15",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-07T23:12:02.642Z",
+      "description": null,
+      "eTag": "1438941364537",
+      "formFactor": "1U",
+      "licensingIntent": "OneView",
+      "locationUri": null,
+      "memoryMb": 2048,
+      "model": "ProLiant DL360p Gen8",
+      "modified": "2015-08-07T09:56:04.537Z",
+      "mpDnsName": "172.18.6.15",
+      "mpFirmwareVersion": "2.03 Jul 02 2014",
+      "mpIpAddress": "172.18.6.15",
+      "mpModel": "iLO4",
+      "partNumber": "603588-B21",
+      "portMap": null,
+      "position": 0,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 4,
+      "processorCount": 1,
+      "processorSpeedMhz": 2600,
+      "processorType": "Intel(R) Xeon(R) CPU E5620 @ 2.40GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "P71 02/10/2014",
+      "serialNumber": "MXQ1010218",
+      "serverGroupUri": null,
+      "serverHardwareTypeUri": "/rest/server-hardware-types/CDA0CA0D-8AC1-4D70-800F-257C31A422BA",
+      "serverProfileUri": null,
+      "shortModel": "DL360p Gen8",
+      "signature": null,
+      "status": "Disabled",
+      "uri": "/rest/server-hardware/37333036-3831-584D-5131-303030323037",
+      "uuid": "37333036-3831-584D-5131-303030323037",
+      "virtualSerialNumber": null,
+      "virtualUuid": null
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "172.18.6.16",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-07T23:13:49.414Z",
+      "description": null,
+      "eTag": "1436310976023",
+      "formFactor": "2U",
+      "licensingIntent": "OneView",
+      "locationUri": null,
+      "memoryMb": 2048,
+      "model": "ProLiant DL380p Gen8",
+      "modified": "2015-07-07T23:16:16.023Z",
+      "mpDnsName": "172.18.6.16",
+      "mpFirmwareVersion": "2.03 Jul 02 2014",
+      "mpIpAddress": "172.18.6.16",
+      "mpModel": "iLO4",
+      "partNumber": "603588-B21",
+      "portMap": null,
+      "position": 0,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 4,
+      "processorCount": 1,
+      "processorSpeedMhz": 2600,
+      "processorType": "Intel(R) Xeon(R) CPU E5620 @ 2.40GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "P70 02/10/2014",
+      "serialNumber": "MXQ1060397",
+      "serverGroupUri": null,
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2B2456C1-C018-4926-9F1A-60AD62560CD9",
+      "serverProfileUri": null,
+      "shortModel": "DL380p Gen8",
+      "signature": null,
+      "status": "Disabled",
+      "uri": "/rest/server-hardware/37333036-3831-584D-5131-303030333037",
+      "uuid": "37333036-3831-584D-5131-303030333037",
+      "virtualSerialNumber": null,
+      "virtualUuid": null
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 1",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:28.520Z",
+      "description": null,
+      "eTag": "1438941362346",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneViewNoiLO",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen8",
+      "modified": "2015-08-07T09:56:02.346Z",
+      "mpDnsName": "ILOMXQ2751HTK",
+      "mpFirmwareVersion": "1.50 May 07 2014",
+      "mpIpAddress": "172.125.24.231",
+      "mpModel": "iLO4",
+      "partNumber": "666161-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 20Gb 2-port 630FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 1,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:45:00",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:45:00",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:45:01",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:45:02",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:45:03",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 1,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:45:08",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:45:08",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:45:09",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:45:0A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:45:0B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "HP FlexFabric 20Gb 2-port 630M Adapter",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+              {
+                "interconnectPort": 1,
+                "interconnectUri": "/rest/interconnects/669fa73a-6b6f-47f5-a3b2-88044865f962",
+                "mac": "11:11:11:11:67:50",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:67:50",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:67:51",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:67:52",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:67:53",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 1,
+                "interconnectUri": "/rest/interconnects/4cc95344-bdcd-4e9f-aff6-3654950ff4ef",
+                "mac": "11:11:11:11:67:58",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:67:58",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:67:59",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:67:5A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:67:5B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 1,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2000,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I31 11/02/2014",
+      "serialNumber": "MXQ2751HTK",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/6F677D76-6A33-4694-B11F-E780E5AB2DA8",
+      "serverProfileUri": null,
+      "shortModel": "BL460c Gen8",
+      "signature": {
+        "personalityChecksum": -1611424677,
+        "serverHwChecksum": -1547701193
+      },
+      "status": "Disabled",
+      "uri": "/rest/server-hardware/31363636-3136-584D-5132-33353048544B",
+      "uuid": "31363636-3136-584D-5132-33353048544B",
+      "virtualSerialNumber": null,
+      "virtualUuid": null
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 10",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:24.018Z",
+      "description": null,
+      "eTag": "1439086907597",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneView",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen9",
+      "modified": "2015-08-09T02:21:47.597Z",
+      "mpDnsName": "ILOUSE337F3PB",
+      "mpFirmwareVersion": "2.03 Nov 07 2014",
+      "mpIpAddress": "172.125.25.113",
+      "mpModel": "iLO4",
+      "partNumber": "727021-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 20Gb 2-port 650FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 10,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:CF:00",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:CF:00",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:01",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:02",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:03",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:04",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:05",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:06",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:07",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 10,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:CF:08",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:CF:08",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:09",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0C",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0D",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0E",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:CF:0F",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 10,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 8,
+      "processorCount": 1,
+      "processorSpeedMhz": 2400,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I36 08/26/2014",
+      "serialNumber": "USE337F3PB",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/3A541ED9-A62C-4EC1-91F8-2E071F7FB8EA",
+      "serverProfileUri": null,
+      "shortModel": "BL460c Gen9",
+      "signature": {
+        "personalityChecksum": 288953178,
+        "serverHwChecksum": 78816696
+      },
+      "status": "Warning",
+      "uri": "/rest/server-hardware/30373237-3132-5355-4534-343746355042",
+      "uuid": "30373237-3132-5355-4534-343746355042",
+      "virtualSerialNumber": "",
+      "virtualUuid": null
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 2",
+      "state": "ProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "\n      ",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:23.447Z",
+      "description": null,
+      "eTag": "1439180722361",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneViewNoiLO",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen8",
+      "modified": "2015-08-10T04:25:22.361Z",
+      "mpDnsName": "ILOMAQ96601Z4",
+      "mpFirmwareVersion": "2.10 Jan 15 2015",
+      "mpIpAddress": "172.125.24.230",
+      "mpModel": "iLO4",
+      "partNumber": "666161-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 10Gb 2-port 554FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 2,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:31:28",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:14",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:31:29",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:31:2A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:31:2B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 2,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:31:2C",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:15",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:31:2D",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:31:2E",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:31:2F",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 2,
+      "powerLock": false,
+      "powerState": "On",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2000,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I31 11/02/2014",
+      "serialNumber": "MAQ96601Z4",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "serverProfileUri": "/rest/server-profiles/1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+      "shortModel": "BL460c Gen8",
+      "signature": {
+        "personalityChecksum": 2015957748,
+        "serverHwChecksum": 508556751
+      },
+      "status": "OK",
+      "uri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D38",
+      "uuid": "31363636-3136-584D-5132-333230314D38",
+      "virtualSerialNumber": "VCGE9KB041",
+      "virtualUuid": "1c5e807d-acbe-4ee8-868b-2fb0b6504474"
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 3",
+      "state": "ProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "\n      ",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:22.821Z",
+      "description": null,
+      "eTag": "1439180735274",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneViewNoiLO",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen8",
+      "modified": "2015-08-10T04:25:35.274Z",
+      "mpDnsName": "ILOMXQ73281MX",
+      "mpFirmwareVersion": "2.10 Jan 15 2015",
+      "mpIpAddress": "172.125.24.225",
+      "mpModel": "iLO4",
+      "partNumber": "666161-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 10Gb 2-port 554FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 3,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:DE:08",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:16",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:09",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:0A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:0B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 3,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:DE:0C",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:17",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:0D",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:0E",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:DE:0F",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 3,
+      "powerLock": false,
+      "powerState": "On",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2000,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I31 11/02/2014",
+      "serialNumber": "MXQ73281MX",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "serverProfileUri": "/rest/server-profiles/6c5e4e2b-5461-4978-9807-c96a7e0d445b",
+      "shortModel": "BL460c Gen8",
+      "signature": {
+        "personalityChecksum": 75174903,
+        "serverHwChecksum": 1795111769
+      },
+      "status": "OK",
+      "uri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D58",
+      "uuid": "31363636-3136-584D-5132-333230314D58",
+      "virtualSerialNumber": "VCGE7KB963",
+      "virtualUuid": "6c5e4e2b-5461-4978-9807-c96a7e0d445b"
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 4",
+      "state": "ProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:23.145Z",
+      "description": null,
+      "eTag": "1439180754060",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneViewNoiLO",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen8",
+      "modified": "2015-08-10T04:25:54.060Z",
+      "mpDnsName": "ILOMXQ83301M9",
+      "mpFirmwareVersion": "2.10 Jan 15 2015",
+      "mpIpAddress": "172.125.24.226",
+      "mpModel": "iLO4",
+      "partNumber": "666161-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 10Gb 2-port 554FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 4,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:EF:68",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:18",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:69",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:6A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:6B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 4,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:EF:6C",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:01:19",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:6D",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:6E",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:EF:6F",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 4,
+      "powerLock": false,
+      "powerState": "On",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2000,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I31 11/02/2014",
+      "serialNumber": "MXQ83301M9",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "serverProfileUri": "/rest/server-profiles/0fb9f546-3e70-4632-818e-0b26d091f66c",
+      "shortModel": "BL460c Gen8",
+      "signature": {
+        "personalityChecksum": -1431039297,
+        "serverHwChecksum": -2064753931
+      },
+      "status": "OK",
+      "uri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D37",
+      "uuid": "31363636-3136-584D-5132-333230314D37",
+      "virtualSerialNumber": "VCGE7KB146",
+      "virtualUuid": "0fb9f546-3e70-4632-818e-0b26d091f66c"
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 8",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:38.592Z",
+      "description": null,
+      "eTag": "1436312018769",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneViewNoiLO",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 8192,
+      "model": "ProLiant BL460c G7",
+      "modified": "2015-07-07T23:33:38.769Z",
+      "mpDnsName": "ILOUSE1249TD6",
+      "mpFirmwareVersion": "1.61 Aug 01 2013",
+      "mpIpAddress": "172.125.24.239",
+      "mpModel": "iLO3",
+      "partNumber": "603718-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "FlexFabric Embedded Ethernet",
+            "location": "Lom",
+            "oaSlotNumber": 15,
+            "physicalPorts": [
+              {
+                "interconnectPort": 8,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:36:88",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:36:88",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:36:89",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:36:8A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:36:8B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 8,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:36:8C",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:36:8C",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:36:8D",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:36:8E",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:36:8F",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 8,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2400,
+      "processorType": "Intel(R) Xeon(R) CPU E5645 @ 2.40GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I27 01/29/2011",
+      "serialNumber": "USE1249TD6",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/B6FB5F91-E021-4454-9A09-9771AC8A5AB6",
+      "serverProfileUri": null,
+      "shortModel": "BL460c G7",
+      "signature": {
+        "personalityChecksum": 1050425639,
+        "serverHwChecksum": -1151976376
+      },
+      "status": "Disabled",
+      "uri": "/rest/server-hardware/37333036-3831-5355-4531-313438544431",
+      "uuid": "37333036-3831-5355-4531-313438544431",
+      "virtualSerialNumber": "",
+      "virtualUuid": null
+    },
+    {
+      "type": "server-hardware-3",
+      "name": "dazzle, bay 9",
+      "state": "NoProfileApplied",
+      "stateReason": "NotApplicable",
+      "assetTag": "[Unknown]",
+      "category": "server-hardware",
+      "created": "2015-07-02T16:24:28.567Z",
+      "description": null,
+      "eTag": "1439086907747",
+      "formFactor": "HalfHeight",
+      "licensingIntent": "OneView",
+      "locationUri": "/rest/enclosures/09SGH236PMVW",
+      "memoryMb": 16384,
+      "model": "ProLiant BL460c Gen9",
+      "modified": "2015-08-09T02:21:47.747Z",
+      "mpDnsName": "ILOUSE135E4WW",
+      "mpFirmwareVersion": "2.03 Nov 07 2014",
+      "mpIpAddress": "172.125.24.107",
+      "mpModel": "iLO4",
+      "partNumber": "727021-B21",
+      "portMap": {
+        "deviceSlots": [
+          {
+            "deviceName": "HP FlexFabric 20Gb 2-port 650FLB Adapter",
+            "location": "Flb",
+            "oaSlotNumber": 9,
+            "physicalPorts": [
+              {
+                "interconnectPort": 9,
+                "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+                "mac": "11:11:11:11:84:18",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:84:18",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:19",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1C",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1D",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1E",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:1F",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 9,
+                "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+                "mac": "11:11:11:11:84:20",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:84:20",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:21",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:84:22",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:23",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:24",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:25",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:26",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:84:27",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "HP FlexFabric 20Gb 2-port 650M Adapter",
+            "location": "Mezz",
+            "oaSlotNumber": 1,
+            "physicalPorts": [
+              {
+                "interconnectPort": 9,
+                "interconnectUri": "/rest/interconnects/669fa73a-6b6f-47f5-a3b2-88044865f962",
+                "mac": "11:11:11:11:71:10",
+                "portNumber": 1,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:71:10",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:11",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:71:12",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:13",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:14",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:15",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:16",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:17",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              },
+              {
+                "interconnectPort": 9,
+                "interconnectUri": "/rest/interconnects/4cc95344-bdcd-4e9f-aff6-3654950ff4ef",
+                "mac": "11:11:11:11:71:18",
+                "portNumber": 2,
+                "type": "Ethernet",
+                "virtualPorts": [
+                  {
+                    "mac": "11:11:11:11:71:18",
+                    "portFunction": "a",
+                    "portNumber": 1,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:19",
+                    "portFunction": "b",
+                    "portNumber": 2,
+                    "wwnn": "11:11:11:11:11:11:11:11",
+                    "wwpn": "11:11:11:11:11:11:11:11"
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1A",
+                    "portFunction": "c",
+                    "portNumber": 3,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1B",
+                    "portFunction": "d",
+                    "portNumber": 4,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1C",
+                    "portFunction": null,
+                    "portNumber": 5,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1D",
+                    "portFunction": null,
+                    "portNumber": 6,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1E",
+                    "portFunction": null,
+                    "portNumber": 7,
+                    "wwnn": null,
+                    "wwpn": null
+                  },
+                  {
+                    "mac": "11:11:11:11:71:1F",
+                    "portFunction": null,
+                    "portNumber": 8,
+                    "wwnn": null,
+                    "wwpn": null
+                  }
+                ],
+                "wwn": null
+              }
+            ],
+            "slotNumber": 1
+          },
+          {
+            "deviceName": "",
+            "location": "Mezz",
+            "oaSlotNumber": 2,
+            "physicalPorts": [
+
+            ],
+            "slotNumber": 2
+          }
+        ]
+      },
+      "position": 9,
+      "powerLock": false,
+      "powerState": "Off",
+      "processorCoreCount": 6,
+      "processorCount": 1,
+      "processorSpeedMhz": 2400,
+      "processorType": "Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz",
+      "refreshState": "NotRefreshing",
+      "romVersion": "I36 08/26/2014",
+      "serialNumber": "USE135E4WW",
+      "serverGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/9E6B2238-A4BF-4A7B-BE1E-EBCE9F5BC4F8",
+      "serverProfileUri": null,
+      "shortModel": "BL460c Gen9",
+      "signature": {
+        "personalityChecksum": -1611424677,
+        "serverHwChecksum": 883214740
+      },
+      "status": "Warning",
+      "uri": "/rest/server-hardware/30373237-3132-5355-4534-343545395757",
+      "uuid": "30373237-3132-5355-4534-343545395757",
+      "virtualSerialNumber": "",
+      "virtualUuid": null
+    }
+  ],
+  "modified": "2015-08-10T22:30:02.367Z",
+  "nextPageUri": null,
+  "prevPageUri": null,
+  "start": 0,
+  "total": 9,
+  "uri": "/rest/server-hardware?sort=name:asc&start=0&count=100"
+}

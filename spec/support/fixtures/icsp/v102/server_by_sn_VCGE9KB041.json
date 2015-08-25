@@ -1,0 +1,45 @@
+{
+  "type": "IndexPaginatedCollectionV4",
+  "start": 0,
+  "count": 1,
+  "total": 1,
+  "unFilteredTotal": 3,
+  "uri": "/rest/index/resources?category=osdserver&count=50&start=0&query='osdServerSerialNumber:%22VCGE9KB041%22'",
+  "category": "resources",
+  "members": [
+    {
+      "type": "IndexResource",
+      "multiAttributes": {
+      },
+      "ownerId": "OsdServerIndex",
+      "eTag": "2015-08-10T04:55:27.017Z",
+      "attributes": {
+        "osdServerRack": "DemoRack",
+        "osdServerStage": "UNKNOWN",
+        "osdServerSerialNumber": "VCGE9KB041",
+        "osdServerIPAddress": "192.168.133.36",
+        "osdServerLifeCycle": "MANAGED",
+        "osdServerId": "1670001",
+        "osdServerRunning": "false",
+        "osdServerState": "OK",
+        "osdServerBay": "2",
+        "osdServerEnclosure": "dazzle",
+        "osdServerModel": "PROLIANT BL460C GEN8",
+        "osdServerHostName": "chef-web02.domain.com"
+      },
+      "description": null,
+      "name": "chef-web01.domain.com",
+      "state": null,
+      "status": "OK",
+      "created": "2015-08-10T04:35:40.000Z",
+      "modified": "2015-08-10T16:45:57.019Z",
+      "category": "osdserver",
+      "uri": "/rest/os-deployment-servers/1670001"
+    }
+  ],
+  "prevPageUri": null,
+  "nextPageUri": null,
+  "created": null,
+  "modified": null,
+  "eTag": null
+}

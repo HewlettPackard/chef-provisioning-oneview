@@ -124,15 +124,18 @@ module OneViewAPI
 
 
   def get_oneview_profile_by_sn(serialNumber)
+    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
     matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=serialNumber matches '#{serialNumber}'&sort=name:asc")
+    fail "Failed to get oneview profile by serialNumber: #{serialNumber}. Response: #{matching_profiles}" unless matching_profiles['count']
     return matching_profiles['members'].first if matching_profiles['count'] > 0
     nil
   end
 
   def get_icsp_server_by_sn(serialNumber)
+    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
     search_result = rest_api(:icsp, :get,
-      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
-    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serial_number
+      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serialNumber}\"'")['members'] rescue nil
+    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serialNumber
       my_server = search_result.first
     end
     unless my_server && my_server['uri']
