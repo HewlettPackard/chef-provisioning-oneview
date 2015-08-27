@@ -267,7 +267,7 @@ module OneViewAPI
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        fail "Server profile coudln't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        fail "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
     matching_profiles['members'].first
