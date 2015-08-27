@@ -239,8 +239,8 @@ module OneViewAPI
     power_off(action_handler, machine_spec, chosen_blade['uri'])
     # New-HPOVProfileFromTemplate
     # Create new profile instance from template
-    action_handler.perform_action "Initialize creation of server template for #{machine_spec.name}" do
-      action_handler.report_progress "INFO: Initializing creation of server template for #{machine_spec.name}"
+    action_handler.perform_action "Initialize creation of server profile for #{machine_spec.name}" do
+      action_handler.report_progress "INFO: Initializing creation of server profile for #{machine_spec.name}"
 
       new_template_profile = rest_api(:oneview, :get, "#{template_uri}")
 
@@ -267,7 +267,7 @@ module OneViewAPI
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        fail "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        fail "Server profile coudln't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
     matching_profiles['members'].first
@@ -410,7 +410,7 @@ module OneViewAPI
         fail "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
       end
     end
-    #   Get all, search for yours.  If not there or if it's in uninitialized state, pull again
+    # Get all, search for yours.  If not there or if it's in uninitialized state, pull again
     my_server_uri = my_server['uri']
     30.times do # Wait for up to 5 min
       my_server = rest_api(:icsp, :get, my_server_uri)
