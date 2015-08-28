@@ -124,6 +124,9 @@ fi
 Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
+### Swtiching to a deadnet after provisioning
+Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash per machine. 
+This will flip the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. Helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 
 # Doing a test run
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.

@@ -374,40 +374,96 @@ module OneViewAPI
     end
 
     # Perform network personalization
-    action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
-      action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
-      nics = []
-      if machine_options[:driver_options][:connections]
-        machine_options[:driver_options][:connections].each do |id, data|
-          c = data
-          c[:macAddress]   = profile['connections'].select {|x| x['id'] == id}.first['mac']
-          c[:mask]       ||= machine_options[:driver_options][:mask]
-          c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
-          c[:gateway]    ||= machine_options[:driver_options][:gateway]
-          c[:dns]        ||= machine_options[:driver_options][:dns]
-          c[:ip4Address] ||= machine_options[:driver_options][:ip_address]
-          nics.push c
+    if !machine_spec.reference["network_personalitation_finished"] 
+      action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
+        action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
+        nics = []
+        if machine_options[:driver_options][:connections]
+          machine_options[:driver_options][:connections].each do |id, data|
+            c = data
+            next if c[:dhcp] == false
+            c[:macAddress]   = profile['connections'].select {|c| c['id']==id}.first['mac']
+            c[:mask]       ||= machine_options[:driver_options][:mask]
+            c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
+            c[:gateway]    ||= machine_options[:driver_options][:gateway]
+            c[:dns]        ||= machine_options[:driver_options][:dns]
+            c[:ip4Address] ||= machine_options[:driver_options][:ip_address]              
+            nics.push c
+          end
         end
-      end
-      options = { 'body' => [{
-        'serverUri' => my_server['uri'],
-        'personalityData' => {
-          'hostName'   => machine_options[:driver_options][:host_name],
-          'domainType' => machine_options[:driver_options][:domainType],
-          'domainName' => machine_options[:driver_options][:domainName],
-          'nics'       => nics
-        }
-      }] }
-      network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
-      network_personalization_task_uri = network_personalization_task['uri']
-      60.times do # Wait for up to 10 min
-        network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
-        break if network_personalization_task['running'] == 'false'
-        print '.'
-        sleep 10
-      end
-      unless network_personalization_task['state'] == 'STATUS_SUCCESS'
-        fail "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
+        options = { 'body'=> [{
+          'serverUri' => my_server['uri'],
+          'personalityData' => {
+            'hostName'   => machine_options[:driver_options][:host_name],
+            'domainType' => machine_options[:driver_options][:domainType],
+            'domainName' => machine_options[:driver_options][:domainName],
+            'nics'       => nics
+          }
+        }] }
+        network_personalization_task = rest_api(:altair, :put, '/rest/os-deployment-apxs/personalizeserver', options)
+        network_personalization_task_uri = network_personalization_task['uri']
+        60.times do # Wait for up to 10 min
+          network_personalization_task = rest_api(:altair, :get, network_personalization_task_uri, options)
+          break if network_personalization_task['running'] == 'false'
+          print "."
+          sleep 10
+        end
+        unless network_personalization_task['state'] == 'STATUS_SUCCESS'
+          raise "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
+        end
+        #Add check to see if task reports success. Bail if not success. Check Altair IP configuration to see if it matches the machine options IP. Do in loop for "10 minutes" 
+        requested_ips = []
+        machine_options[:driver_options][:connections].each do |connection|
+          if connection[1][:dhcp] == false
+            requested_ips.push connection[1][:ip4Address]
+          end
+        end
+        60.times do 
+          my_server_connections = rest_api(:altair, :get, my_server['uri'])["interfaces"]
+          my_server_connections.each do |connection|
+            if requested_ips.include? connection["ipv4Addr"]
+              requested_ips.delete connection["ipv4Addr"]
+            end
+          end  
+
+          break if requested_ips.empty?  
+          print "."
+          sleep 10    
+        end
+
+        if !requested_ips.empty? 
+          raise "Error setting up ips correctly in Altair"
+        end
+        action_handler.perform_action "Perform network flipping on #{machine_spec.name}" do
+          action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}"
+          if machine_options[:driver_options][:connections]
+            machine_options[:driver_options][:connections].each do |id, data|
+              if data[:net] && data[:deployNet]
+                available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")
+                deploy_network = nil
+                new_network = nil
+                available_networks['ethernetNetworks'].each do |network|
+                  if network['name'] == data[:net]
+                    new_network = network
+                  elsif network['name'] == data[:deployNet]
+                    deploy_network = network
+                  end
+                end
+                if new_network && deploy_network
+                  profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+                  profile['connections'].each do |connection|
+                    if connection['networkUri'] == deploy_network['uri']
+                      connection['networkUri'] = new_network['uri']
+                      options = { 'body'=> profile }
+                      rest_api(:oneview, :put, profile['uri'], options )
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+        machine_spec.reference["network_personalitation_finished"] = true
       end
     end
     #   Get all, search for yours.  If not there or if it's in uninitialized state, pull again
