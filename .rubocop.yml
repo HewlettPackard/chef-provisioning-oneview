@@ -1,5 +1,6 @@
 # See default at https://github.com/bbatsov/rubocop/blob/master/config/default.yml
 
+
 # Common configuration.
 AllCops:
   Exclude:
@@ -90,5 +91,8 @@ Metrics/ModuleLength:
   Enabled: false
 
 Style/SpaceAroundOperators:
+  Enabled: false
+
+Style/ExtraSpacing:
   Enabled: false
 
