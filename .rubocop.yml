@@ -85,3 +85,10 @@ Style/RescueModifier:
 
 Style/SpaceInsideBlockBraces:
   Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/SpaceAroundOperators:
+  Enabled: false
+

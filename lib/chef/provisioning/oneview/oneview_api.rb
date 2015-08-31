@@ -380,7 +380,7 @@ module OneViewAPI
       if machine_options[:driver_options][:connections]
         machine_options[:driver_options][:connections].each do |id, data|
           c = data
-          c[:macAddress]   = profile['connections'].select {|x| x['id'] == id}.first['mac']
+          c[:macAddress]   = profile['connections'].find {|x| x['id'] == id}['mac']
           c[:mask]       ||= machine_options[:driver_options][:mask]
           c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
           c[:gateway]    ||= machine_options[:driver_options][:gateway]
