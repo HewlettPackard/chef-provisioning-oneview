@@ -400,10 +400,10 @@ module OneViewAPI
             'nics'       => nics
           }
         }] }
-        network_personalization_task = rest_api(:altair, :put, '/rest/os-deployment-apxs/personalizeserver', options)
+        network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
         network_personalization_task_uri = network_personalization_task['uri']
         60.times do # Wait for up to 10 min
-          network_personalization_task = rest_api(:altair, :get, network_personalization_task_uri, options)
+          network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
           break if network_personalization_task['running'] == 'false'
           print "."
           sleep 10
@@ -411,7 +411,7 @@ module OneViewAPI
         unless network_personalization_task['state'] == 'STATUS_SUCCESS'
           raise "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
         end
-        #Add check to see if task reports success. Bail if not success. Check Altair IP configuration to see if it matches the machine options IP. Do in loop for "10 minutes" 
+        #Add check to see if task reports success. Bail if not success. Check ICSP IP configuration to see if it matches the machine options IP. Do in loop for "10 minutes" 
         requested_ips = []
         machine_options[:driver_options][:connections].each do |connection|
           if connection[1][:dhcp] == false
@@ -419,7 +419,7 @@ module OneViewAPI
           end
         end
         60.times do 
-          my_server_connections = rest_api(:altair, :get, my_server['uri'])["interfaces"]
+          my_server_connections = rest_api(:icsp, :get, my_server['uri'])["interfaces"]
           my_server_connections.each do |connection|
             if requested_ips.include? connection["ipv4Addr"]
               requested_ips.delete connection["ipv4Addr"]
@@ -432,7 +432,7 @@ module OneViewAPI
         end
 
         if !requested_ips.empty? 
-          raise "Error setting up ips correctly in Altair"
+          raise "Error setting up ips correctly in ICSP"
         end
         action_handler.perform_action "Perform network flipping on #{machine_spec.name}" do
           action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}"
