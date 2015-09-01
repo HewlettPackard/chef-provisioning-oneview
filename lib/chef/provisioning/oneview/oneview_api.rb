@@ -435,8 +435,7 @@ module OneViewAPI
             new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
             unless new_network && deploy_network
               missing = new_network.nil? ? data[:net] : data[:deployNet]
-              action_handler.report_progress "WARN: Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{missing}' network not found"
-              next
+              fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{missing}' network not found"
             end
             profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
             profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
