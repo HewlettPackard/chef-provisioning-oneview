@@ -230,7 +230,7 @@ module OneViewAPI
         break
       end
     end
-    if chosen_blade.nil? # TODO
+    if chosen_blade.nil?
       # Every bay is full and no more machines can be allocated
       fail 'No more blades are available for provisioning!'
     end
@@ -238,8 +238,8 @@ module OneViewAPI
     power_off(action_handler, machine_spec, chosen_blade['uri'])
     # New-HPOVProfileFromTemplate
     # Create new profile instance from template
-    action_handler.perform_action "Initialize creation of server template for #{machine_spec.name}" do
-      action_handler.report_progress "INFO: Initializing creation of server template for #{machine_spec.name}"
+    action_handler.perform_action "Initialize creation of server profile for #{machine_spec.name}" do
+      action_handler.report_progress "INFO: Initializing creation of server profile for #{machine_spec.name}"
 
       new_template_profile = rest_api(:oneview, :get, "#{template_uri}")
 
@@ -266,7 +266,7 @@ module OneViewAPI
       end
       unless matching_profiles['count'] > 0
         task = rest_api(:oneview, :get, task_uri)
-        fail "Server template coudln't be applied! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+        fail "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
       end
     end
     matching_profiles['members'].first
@@ -381,7 +381,7 @@ module OneViewAPI
           machine_options[:driver_options][:connections].each do |id, data|
             c = data
             next if c[:dhcp] == true
-            c[:macAddress]   = profile['connections'].select {|x| x['id']==id}.first['mac']
+            c[:macAddress]   = profile['connections'].find {|x| x['id'] == id}['mac']
             c[:mask]       ||= machine_options[:driver_options][:mask]
             c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
             c[:gateway]    ||= machine_options[:driver_options][:gateway]
@@ -413,7 +413,7 @@ module OneViewAPI
 
         # Check if task succeeds and ICsp IP config matches machine options
         requested_ips = []
-        machine_options[:driver_options][:connections].each do |id, c|
+        machine_options[:driver_options][:connections].each do |_id, c|
           requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
         end
         60.times do
@@ -423,7 +423,7 @@ module OneViewAPI
           print '.'
           sleep 10
         end
-        fail "Error setting up ips correctly in ICSP" unless requested_ips.empty?
+        fail 'Error setting up ips correctly in ICSP' unless requested_ips.empty?
 
         # Switch deploy networks to post-deploy networks if specified
         if machine_options[:driver_options][:connections]
@@ -433,17 +433,15 @@ module OneViewAPI
             action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}, connection #{id}"
             deploy_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:deployNet] }
             new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
-            unless new_network && deploy_network
-              missing = new_network.nil? ? data[:net] : data[:deployNet]
-              fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{missing}' network not found"
-            end
+            fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
+            fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
             profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
             profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
             options = { 'body' => profile }
             rest_api(:oneview, :put, profile['uri'], options)
           end
         end
-        machine_spec.reference["network_personalitation_finished"] = true
+        machine_spec.reference['network_personalitation_finished'] = true
       end
     end
 

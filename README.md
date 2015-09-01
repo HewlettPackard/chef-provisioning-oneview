@@ -120,6 +120,20 @@ if [ -n "$authorized_keys"]; then
 fi
 ```
 
+### SSH Keys
+To use SSH keys insead of passwords to connect to nodes, you'll need to modify your transport_options to look something like:
+
+```ruby
+:transport_options => {
+  :ssh_options => {
+    :auth_methods => ['publickey'],
+    :keys => ['~/.ssh/id_rsa']
+  }
+}
+```
+
+You'll also need to put the corresponding public key(s) into the node's authorized_keys file during the OS setup. See the Custom Attributes section above for one way to do this.
+
 ### Behind a proxy
 Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
