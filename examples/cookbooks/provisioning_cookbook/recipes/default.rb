@@ -69,12 +69,12 @@ machine_batch 'oneview-machine-batch' do
         :domainType => 'workgroup',
         :domainName => domain_name,
         :gateway =>  gateway,
+        :mask => mask,
         :dns => dns,
         :connections => {
           #1 => { ... } (Reserved for PXE)
           2 => {
             :ip4Address => options['ip4'],
-            :mask => mask,
             :dhcp => false
           }
         }
@@ -82,7 +82,9 @@ machine_batch 'oneview-machine-batch' do
       :custom_attributes => {},
       :transport_options => {
         :ssh_options => {
-          :password => Chef::Config.knife[:node_root_password]
+          :password => Chef::Config.knife[:node_root_password],
+          :auth_methods => ['password', 'publickey'],
+          :keys => Chef::Config.knife[:node_root_ssh_keys] || []
         }
       },
       :convergence_options => {

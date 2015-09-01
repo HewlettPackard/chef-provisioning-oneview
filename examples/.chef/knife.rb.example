@@ -23,6 +23,7 @@ knife[:icsp_password]      = 'password123'
 knife[:icsp_ignore_ssl]    = true
 
 knife[:node_root_password] = 'password123'
+knife[:node_root_ssh_keys] = ['~/.ssh/id_rsa']
 
 # For self-signed Chef server cert
 verify_api_cert              false

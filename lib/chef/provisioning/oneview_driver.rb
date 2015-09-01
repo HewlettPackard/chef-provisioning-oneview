@@ -91,8 +91,8 @@ module Chef::Provisioning
       bootstrap_ip_address = machine_options[:driver_options][:ip_address]
       username = machine_options[:transport_options][:user] || 'root' rescue 'root'
       default_ssh_options = {
-        # auth_methods: ['publickey'],
-        # keys: ['/home/username/.vagrant.d/insecure_private_key'],
+        # auth_methods: ['password', 'publickey'],
+        # keys: ['~/.ssh/id_rsa'],
         password: Chef::Config.knife[:node_root_password]
       }
       ssh_options = machine_options[:transport_options][:ssh_options] || default_ssh_options rescue default_ssh_options
