@@ -193,7 +193,7 @@ module OneViewAPI
     hardware_uri
   end
 
-  #  Chef oneview provisioning
+  # Chef oneview provisioning
   def create_machine(action_handler, machine_spec, machine_options)
     host_name = machine_options[:driver_options][:host_name]
     server_template = machine_options[:driver_options][:server_template]
@@ -209,9 +209,8 @@ module OneViewAPI
       return profile
     end
 
-
-    #  Get HPOVProfile by name (to see if it already exists)
-    #  For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
+    # Get HPOVProfile by name (to see if it already exists)
+    # For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
     unless templates['members'] && templates['members'].count > 0
       fail "Template '#{server_template}' not found! Please match the template name with one that exists on OneView."
@@ -374,7 +373,7 @@ module OneViewAPI
     end
 
     # Perform network personalization
-    if !machine_spec.reference["network_personalitation_finished"] 
+    if !machine_spec.reference['network_personalitation_finished']
       action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
         action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
         nics = []
@@ -382,12 +381,12 @@ module OneViewAPI
           machine_options[:driver_options][:connections].each do |id, data|
             c = data
             next if c[:dhcp] == true
-            c[:macAddress]   = profile['connections'].select {|c| c['id']==id}.first['mac']
+            c[:macAddress]   = profile['connections'].select {|x| x['id']==id}.first['mac']
             c[:mask]       ||= machine_options[:driver_options][:mask]
             c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
             c[:gateway]    ||= machine_options[:driver_options][:gateway]
             c[:dns]        ||= machine_options[:driver_options][:dns]
-            c[:ip4Address] ||= machine_options[:driver_options][:ip_address]              
+            c[:ip4Address] ||= machine_options[:driver_options][:ip_address]
             nics.push c
           end
         end
@@ -405,68 +404,51 @@ module OneViewAPI
         60.times do # Wait for up to 10 min
           network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
           break if network_personalization_task['running'] == 'false'
-          print "."
+          print '.'
           sleep 10
         end
         unless network_personalization_task['state'] == 'STATUS_SUCCESS'
-          raise "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
+          fail "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
         end
-        #Add check to see if task reports success. Bail if not success. Check ICSP IP configuration to see if it matches the machine options IP. Do in loop for "10 minutes" 
+
+        # Check if task succeeds and ICsp IP config matches machine options
         requested_ips = []
-        machine_options[:driver_options][:connections].each do |connection|
-          if connection[1][:dhcp] == false
-            requested_ips.push connection[1][:ip4Address]
-          end
+        machine_options[:driver_options][:connections].each do |id, c|
+          requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
         end
-        60.times do 
-          my_server_connections = rest_api(:icsp, :get, my_server['uri'])["interfaces"]
-          my_server_connections.each do |connection|
-            if requested_ips.include? connection["ipv4Addr"]
-              requested_ips.delete connection["ipv4Addr"]
-            end
-          end  
+        60.times do
+          my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
+          my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
+          break if requested_ips.empty?
+          print '.'
+          sleep 10
+        end
+        fail "Error setting up ips correctly in ICSP" unless requested_ips.empty?
 
-          break if requested_ips.empty?  
-          print "."
-          sleep 10    
-        end
-
-        if !requested_ips.empty? 
-          raise "Error setting up ips correctly in ICSP"
-        end
-        action_handler.perform_action "Perform network flipping on #{machine_spec.name}" do
-          action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}"
-          if machine_options[:driver_options][:connections]
-            machine_options[:driver_options][:connections].each do |id, data|
-              if data[:net] && data[:deployNet]
-                available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")
-                deploy_network = nil
-                new_network = nil
-                available_networks['ethernetNetworks'].each do |network|
-                  if network['name'] == data[:net]
-                    new_network = network
-                  elsif network['name'] == data[:deployNet]
-                    deploy_network = network
-                  end
-                end
-                if new_network && deploy_network
-                  profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-                  profile['connections'].each do |connection|
-                    if connection['networkUri'] == deploy_network['uri']
-                      connection['networkUri'] = new_network['uri']
-                      options = { 'body'=> profile }
-                      rest_api(:oneview, :put, profile['uri'], options )
-                    end
-                  end
-                end
-              end
+        # Switch deploy networks to post-deploy networks if specified
+        if machine_options[:driver_options][:connections]
+          available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")
+          machine_options[:driver_options][:connections].each do |id, data|
+            next unless data[:net] && data[:deployNet]
+            action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}, connection #{id}"
+            deploy_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:deployNet] }
+            new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
+            unless new_network && deploy_network
+              missing = new_network.nil? ? data[:net] : data[:deployNet]
+              action_handler.report_progress "WARN: Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{missing}' network not found"
+              next
             end
+            profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+            profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
+            options = { 'body' => profile }
+            rest_api(:oneview, :put, profile['uri'], options)
           end
         end
         machine_spec.reference["network_personalitation_finished"] = true
       end
     end
-    #   Get all, search for yours.  If not there or if it's in uninitialized state, pull again
+
+    # Get all, search for yours.  If not there or if it's in uninitialized state, pull again
     my_server_uri = my_server['uri']
     30.times do # Wait for up to 5 min
       my_server = rest_api(:icsp, :get, my_server_uri)
