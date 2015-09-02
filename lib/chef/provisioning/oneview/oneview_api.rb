@@ -7,56 +7,6 @@ module OneViewAPI
   include OneViewAPIv1_20
   include OneViewAPIv2_0
 
-  # API calls for OneView and ICSP
-  def rest_api(host, type, path, options = {})
-    disable_ssl = false
-    case host
-    when 'icsp', :icsp
-      uri = URI.parse(URI.escape(@icsp_base_url + path))
-      options['X-API-Version'] ||= @icsp_api_version unless [:put, 'put'].include?(type.downcase)
-      options['auth'] ||= @icsp_key
-      disable_ssl = true if @icsp_disable_ssl
-    when 'oneview', :oneview
-      uri = URI.parse(URI.escape(@oneview_base_url + path))
-      options['X-API-Version'] ||= @oneview_api_version
-      options['auth'] ||= @oneview_key
-      disable_ssl = true if @oneview_disable_ssl
-    else
-      fail "Invalid rest host: #{host}"
-    end
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE if disable_ssl
-
-    case type.downcase
-    when 'get', :get
-      request = Net::HTTP::Get.new(uri.request_uri)
-    when 'post', :post
-      request = Net::HTTP::Post.new(uri.request_uri)
-    when 'put', :put
-      request = Net::HTTP::Put.new(uri.request_uri)
-    when 'delete', :delete
-      request = Net::HTTP::Delete.new(uri.request_uri)
-    else
-      fail "Invalid rest call: #{type}"
-    end
-    options['Content-Type'] ||= 'application/json'
-    options.delete('Content-Type')  if [:none, 'none', nil].include?(options['Content-Type'])
-    options.delete('X-API-Version') if [:none, 'none', nil].include?(options['X-API-Version'])
-    options.delete('auth')          if [:none, 'none', nil].include?(options['auth'])
-    options.each do |key, val|
-      if key.downcase == 'body'
-        request.body = val.to_json rescue val
-      else
-        request[key] = val
-      end
-    end
-
-    response = http.request(request)
-    JSON.parse(response.body) rescue response
-  end
-
   def get_oneview_api_version
     begin
       version = rest_api(:oneview, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
@@ -70,42 +20,6 @@ module OneViewAPI
       version = 120
     end
     version
-  end
-
-  def get_icsp_api_version
-    begin
-      version = rest_api(:icsp, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
-      fail "Couldn't get API version" unless version
-      if version.class != Fixnum
-        version = version.to_i
-        fail 'API version type mismatch' if !version > 0
-      end
-    rescue
-      puts 'Failed to get ICSP API version. Setting to default (102)'
-      version = 102
-    end
-    version
-  end
-
-  # Login functions
-  def auth_tokens
-    @icsp_key  ||= login_to_icsp
-    @oneview_key ||= login_to_oneview
-    { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
-  end
-
-  def login_to_icsp
-    path = '/rest/login-sessions'
-    options = {
-      'body' => {
-        'userName' => @icsp_username,
-        'password' => @icsp_password,
-        'authLoginDomain' => 'LOCAL'
-      }
-    }
-    response = rest_api(:icsp, :post, path, options)
-    return response['sessionID'] if response['sessionID']
-    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
   def login_to_oneview
@@ -122,7 +36,6 @@ module OneViewAPI
     fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
-
   def get_oneview_profile_by_sn(serialNumber)
     fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
     matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=serialNumber matches '#{serialNumber}'&sort=name:asc")
@@ -131,27 +44,22 @@ module OneViewAPI
     nil
   end
 
-  def get_icsp_server_by_sn(serialNumber)
-    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
-    search_result = rest_api(:icsp, :get,
-      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serialNumber}\"'")['members'] rescue nil
-    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serialNumber
-      my_server = search_result.first
-    end
-    unless my_server && my_server['uri']
-      os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
-      # Pick the relevant os deployment server from icsp
-      my_server = nil
-      os_deployment_servers['members'].each do |server|
-        if server['serialNumber'] == serialNumber
-          my_server = server
-          break
-        end
+  def oneview_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10)
+    fail 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
+    wait_iterations.times do
+      task = rest_api(:oneview, :get, task_uri)
+      case task['taskState'].downcase
+      when 'completed'
+        return true
+      when 'error', 'killed', 'terminated'
+        return task
+      else
+        print '.'
+        sleep sleep_seconds
       end
     end
-    my_server
+    false
   end
-
 
   def power_on(action_handler, machine_spec, hardware_uri = nil)
     set_power_state(action_handler, machine_spec, 'on', hardware_uri)
@@ -456,27 +364,6 @@ module OneViewAPI
 
     fail "Timeout waiting for server #{machine_spec.name} to finish network personalization" if my_server['opswLifecycle'] != 'MANAGED'
     my_server
-  end
-
-
-  def destroy_icsp_server(action_handler, machine_spec)
-    my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
-    return false if my_server.nil? || my_server['uri'].nil?
-
-    action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
-      task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
-
-      if task['uri']
-        task_uri = task['uri']
-        90.times do # Wait for up to 15 minutes
-          task = rest_api(:icsp, :get, task_uri)
-          break if task['taskState'].downcase == 'completed'
-          print '.'
-          sleep 10
-        end
-        fail "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == 'completed'
-      end
-    end
   end
 
 
