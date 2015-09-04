@@ -35,7 +35,8 @@ module ICspAPI
     search_result = rest_api(:icsp, :get,
       "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serialNumber}\"'")['members'] rescue nil
     if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serialNumber
-      my_server = search_result.first
+      my_server_uri = search_result.first['uri']
+      my_server = rest_api(:icsp, :get, my_server_uri)
     end
     unless my_server && my_server['uri']
       os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
@@ -55,15 +56,22 @@ module ICspAPI
     fail 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
     wait_iterations.times do
       task = rest_api(:icsp, :get, task_uri)
-      case task['taskState'].downcase
-      when 'completed'
-        return true
-      when 'error', 'killed', 'terminated'
-        return task
-      else
-        print '.'
-        sleep sleep_seconds
+      if task['taskState']
+        case task['taskState'].downcase
+        when 'completed'
+          return true
+        when 'error', 'killed', 'terminated'
+          return task
+        end
+      elsif task['running'] == 'false'
+        if task['state'] == 'STATUS_SUCCESS'
+          return true
+        else
+          return task
+        end
       end
+      print '.'
+      sleep sleep_seconds
     end
     false
   end

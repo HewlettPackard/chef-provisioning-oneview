@@ -7,13 +7,17 @@ require 'chef/provisioning/machine/unix_machine'
 require 'json'
 require 'ridley'
 require_relative 'driver_init/oneview'
-require_relative 'oneview/version'
-require_relative 'oneview/rest'
+require_relative 'version'
+require_relative 'rest'
+require_relative 'create_machine'
+require_relative 'customize_machine'
 require_relative 'oneview/oneview_api'
-require_relative 'oneview/icsp_api'
+require_relative 'icsp/icsp_api'
 
 module Chef::Provisioning
   class OneViewDriver < Chef::Provisioning::Driver
+    include CreateMachine
+    include CustomizeMachine
     include RestAPI
     include OneViewAPI
     include ICspAPI

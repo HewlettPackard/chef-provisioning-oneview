@@ -1,0 +1,9 @@
+{
+  "details"=>"",
+  "errorSource"=>nil,
+  "nestedErrors"=>[],
+  "recommendedActions"=>["Verify that the server has not been deleted."],
+  "errorCode"=>nil,
+  "data"=>{},
+  "message"=>"The server ID \"FAKESN\" is not valid."
+}
