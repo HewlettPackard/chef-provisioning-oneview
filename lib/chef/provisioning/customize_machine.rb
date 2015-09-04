@@ -87,7 +87,6 @@ module CustomizeMachine
       end
     end
 
-    require 'pry'
     # Perform network personalization
     if !machine_spec.reference['network_personalitation_finished']
       action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
