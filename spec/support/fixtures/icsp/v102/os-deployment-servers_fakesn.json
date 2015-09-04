@@ -1,9 +1,9 @@
 {
-  "details"=>"",
-  "errorSource"=>nil,
-  "nestedErrors"=>[],
-  "recommendedActions"=>["Verify that the server has not been deleted."],
-  "errorCode"=>nil,
-  "data"=>{},
-  "message"=>"The server ID \"FAKESN\" is not valid."
+  "details": "",
+  "errorSource": null,
+  "nestedErrors": [],
+  "recommendedActions": ["Verify that the server has not been deleted."],
+  "errorCode": null,
+  "data": {},
+  "message": "The server ID \"FAKESN\" is not valid."
 }
