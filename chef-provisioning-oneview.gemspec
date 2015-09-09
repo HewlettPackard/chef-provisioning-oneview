@@ -1,5 +1,5 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/lib')
-require 'chef/provisioning/oneview/version'
+require 'chef/provisioning/version'
 
 Gem::Specification.new do |s|
   s.name = 'chef-provisioning-oneview'

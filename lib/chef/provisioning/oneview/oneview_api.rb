@@ -1,61 +1,11 @@
-require_relative 'v1.20/api'
+require_relative 'v1.2/api'
 require_relative 'v2.0/api'
 
 module OneViewAPI
   private
 
-  include OneViewAPIv1_20
+  include OneViewAPIv1_2
   include OneViewAPIv2_0
-
-  # API calls for OneView and ICSP
-  def rest_api(host, type, path, options = {})
-    disable_ssl = false
-    case host
-    when 'icsp', :icsp
-      uri = URI.parse(URI.escape(@icsp_base_url + path))
-      options['X-API-Version'] ||= @icsp_api_version unless [:put, 'put'].include?(type.downcase)
-      options['auth'] ||= @icsp_key
-      disable_ssl = true if @icsp_disable_ssl
-    when 'oneview', :oneview
-      uri = URI.parse(URI.escape(@oneview_base_url + path))
-      options['X-API-Version'] ||= @oneview_api_version
-      options['auth'] ||= @oneview_key
-      disable_ssl = true if @oneview_disable_ssl
-    else
-      fail "Invalid rest host: #{host}"
-    end
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE if disable_ssl
-
-    case type.downcase
-    when 'get', :get
-      request = Net::HTTP::Get.new(uri.request_uri)
-    when 'post', :post
-      request = Net::HTTP::Post.new(uri.request_uri)
-    when 'put', :put
-      request = Net::HTTP::Put.new(uri.request_uri)
-    when 'delete', :delete
-      request = Net::HTTP::Delete.new(uri.request_uri)
-    else
-      fail "Invalid rest call: #{type}"
-    end
-    options['Content-Type'] ||= 'application/json'
-    options.delete('Content-Type')  if [:none, 'none', nil].include?(options['Content-Type'])
-    options.delete('X-API-Version') if [:none, 'none', nil].include?(options['X-API-Version'])
-    options.delete('auth')          if [:none, 'none', nil].include?(options['auth'])
-    options.each do |key, val|
-      if key.downcase == 'body'
-        request.body = val.to_json rescue val
-      else
-        request[key] = val
-      end
-    end
-
-    response = http.request(request)
-    JSON.parse(response.body) rescue response
-  end
 
   def get_oneview_api_version
     begin
@@ -72,42 +22,6 @@ module OneViewAPI
     version
   end
 
-  def get_icsp_api_version
-    begin
-      version = rest_api(:icsp, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
-      fail "Couldn't get API version" unless version
-      if version.class != Fixnum
-        version = version.to_i
-        fail 'API version type mismatch' if !version > 0
-      end
-    rescue
-      puts 'Failed to get ICSP API version. Setting to default (102)'
-      version = 102
-    end
-    version
-  end
-
-  # Login functions
-  def auth_tokens
-    @icsp_key  ||= login_to_icsp
-    @oneview_key ||= login_to_oneview
-    { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
-  end
-
-  def login_to_icsp
-    path = '/rest/login-sessions'
-    options = {
-      'body' => {
-        'userName' => @icsp_username,
-        'password' => @icsp_password,
-        'authLoginDomain' => 'LOCAL'
-      }
-    }
-    response = rest_api(:icsp, :post, path, options)
-    return response['sessionID'] if response['sessionID']
-    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
-  end
-
   def login_to_oneview
     path = '/rest/login-sessions'
     options = {
@@ -122,7 +36,6 @@ module OneViewAPI
     fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
-
   def get_oneview_profile_by_sn(serialNumber)
     fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
     matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=serialNumber matches '#{serialNumber}'&sort=name:asc")
@@ -131,27 +44,36 @@ module OneViewAPI
     nil
   end
 
-  def get_icsp_server_by_sn(serialNumber)
-    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
-    search_result = rest_api(:icsp, :get,
-      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serialNumber}\"'")['members'] rescue nil
-    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serialNumber
-      my_server = search_result.first
+  def available_hardware_for_template(template)
+    server_hardware_type_uri = template['serverHardwareTypeUri']
+    enclosure_group_uri      = template['enclosureGroupUri']
+    fail 'Template must specify a valid hardware type uri!' if server_hardware_type_uri.nil? || server_hardware_type_uri.empty?
+    fail 'Template must specify a valid hardware type uri!' if enclosure_group_uri.nil? || enclosure_group_uri.empty?
+    params = "sort=name:asc&filter=serverHardwareTypeUri='#{server_hardware_type_uri}'&filter=serverGroupUri='#{enclosure_group_uri}'"
+    blades = rest_api(:oneview, :get, "/rest/server-hardware?#{params}")
+    fail 'Error! No available blades that are compatible with the server template!' unless blades['count'] > 0
+    blades['members'].each do |member|
+      return member if member['state'] == 'NoProfileApplied'
     end
-    unless my_server && my_server['uri']
-      os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
-      # Pick the relevant os deployment server from icsp
-      my_server = nil
-      os_deployment_servers['members'].each do |server|
-        if server['serialNumber'] == serialNumber
-          my_server = server
-          break
-        end
-      end
-    end
-    my_server
+    fail 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
   end
 
+  def oneview_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10)
+    fail 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
+    wait_iterations.times do
+      task = rest_api(:oneview, :get, task_uri)
+      case task['taskState'].downcase
+      when 'completed'
+        return true
+      when 'error', 'killed', 'terminated'
+        return task
+      else
+        print '.'
+        sleep sleep_seconds
+      end
+    end
+    false
+  end
 
   def power_on(action_handler, machine_spec, hardware_uri = nil)
     set_power_state(action_handler, machine_spec, 'on', hardware_uri)
@@ -192,293 +114,6 @@ module OneViewAPI
     end
     hardware_uri
   end
-
-  # Chef oneview provisioning
-  def create_machine(action_handler, machine_spec, machine_options)
-    host_name = machine_options[:driver_options][:host_name]
-    server_template = machine_options[:driver_options][:server_template]
-
-    auth_tokens # Login (to both ICSP and OneView)
-
-    # Check if profile exists first
-    matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
-
-    if matching_profiles['count'] > 0
-      profile = matching_profiles['members'].first
-      power_on(action_handler, machine_spec, profile['serverHardwareUri']) # Make sure server is started
-      return profile
-    end
-
-    # Get HPOVProfile by name (to see if it already exists)
-    # For 120 verion of Oneview , we are going to retrive a predefined unassociated server profile
-    templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{server_template}'&sort=name:asc")
-    unless templates['members'] && templates['members'].count > 0
-      fail "Template '#{server_template}' not found! Please match the template name with one that exists on OneView."
-    end
-
-    template_uri             = templates['members'].first['uri']
-    server_hardware_type_uri = templates['members'].first['serverHardwareTypeUri']
-    enclosure_group_uri      = templates['members'].first['enclosureGroupUri']
-
-    # Get availabe (and compatible) HP OV server blades. Take first one.
-    blades = rest_api(:oneview, :get, "/rest/server-hardware?sort=name:asc&filter=serverHardwareTypeUri='#{server_hardware_type_uri}'&filter=serverGroupUri='#{enclosure_group_uri}'")
-    fail 'Error! No available blades that are compatible with the server profile!' unless blades['count'] > 0
-    chosen_blade = nil
-    blades['members'].each do |member|
-      if member['state'] != 'ProfileApplied' &&  member['state'] != 'ApplyingProfile'
-        chosen_blade = member
-        break
-      end
-    end
-    if chosen_blade.nil?
-      # Every bay is full and no more machines can be allocated
-      fail 'No more blades are available for provisioning!'
-    end
-
-    power_off(action_handler, machine_spec, chosen_blade['uri'])
-    # New-HPOVProfileFromTemplate
-    # Create new profile instance from template
-    action_handler.perform_action "Initialize creation of server profile for #{machine_spec.name}" do
-      action_handler.report_progress "INFO: Initializing creation of server profile for #{machine_spec.name}"
-
-      new_template_profile = rest_api(:oneview, :get, "#{template_uri}")
-
-      # Take response, add name & hardware uri, and post back to /rest/server-profiles
-      new_template_profile['name'] = host_name
-      new_template_profile['uri'] = nil
-      new_template_profile['serialNumber'] = nil
-      new_template_profile['uuid'] = nil
-      new_template_profile['connections'].each do |c|
-        c['wwnn'] = nil
-        c['wwpn'] = nil
-        c['mac']  = nil
-      end
-
-      new_template_profile['serverHardwareUri'] = chosen_blade['uri']
-      task = rest_api(:oneview, :post, '/rest/server-profiles', { 'body' => new_template_profile })
-      task_uri = task['uri']
-      # Poll task resource to see when profile has finished being applied
-      60.times do # Wait for up to 5 min
-        matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
-        break if matching_profiles['count'] > 0
-        print '.'
-        sleep 5
-      end
-      unless matching_profiles['count'] > 0
-        task = rest_api(:oneview, :get, task_uri)
-        fail "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
-      end
-    end
-    matching_profiles['members'].first
-  end
-
-
-  # Use ICSP to install OS
-  def customize_machine(action_handler, machine_spec, machine_options, profile)
-    auth_tokens # Login (to both ICSP and OneView)
-
-    # Wait for server profile to finish building
-    unless profile['state'] == 'Normal'
-      action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
-        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
-        task_uri = profile['taskUri']
-        build_server_template_task = rest_api(:oneview, :get, task_uri)
-        # Poll task resource to see when profile has finished being applied
-        240.times do # Wait for up to 40 min
-          build_server_template_task = rest_api(:oneview, :get, task_uri)
-          break if build_server_template_task['taskState'].downcase == 'completed'
-          if build_server_template_task['taskState'].downcase == 'error'
-            server_template = machine_options[:driver_options][:server_template]
-            fail "Error creating server profile from template #{server_template}: #{build_server_template_task['taskErrors'].first['message']}"
-          end
-          print '.'
-          sleep 10
-        end
-        fail 'Timed out waiting for server to start and profile to be applied' unless build_server_template_task['taskState'].downcase == 'completed'
-      end
-      profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
-      fail "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
-    end
-
-    # Make sure server is started
-    power_on(action_handler, machine_spec, profile['serverHardwareUri'])
-
-    # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
-    my_server = nil
-    action_handler.perform_action "Wait for #{machine_spec.name} to boot" do
-      action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to PXE boot. This may take a while..."
-      360.times do # Wait for up to 1 hr
-        os_deployment_servers = rest_api(:icsp, :get, '/rest/os-deployment-servers')
-
-        # TODO: Maybe check for opswLifecycle = 'UNPROVISIONED' instead of serialNumber existance
-        os_deployment_servers['members'].each do |server|
-          if server['serialNumber'] == profile['serialNumber']
-            my_server = server
-            break
-          end
-        end
-        break if !my_server.nil?
-        print '.'
-        sleep 10
-      end
-      fail "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
-    end
-
-    # Consume any custom attributes that were specified
-    if machine_options[:driver_options][:custom_attributes]
-      curr_server = rest_api(:icsp, :get, my_server['uri'])
-      machine_options[:driver_options][:custom_attributes].each do |key, val|
-        curr_server['customAttributes'].push({
-          'values' => [{ 'scope' => 'server',  'value' => val.to_s }],
-          'key' => key.to_s
-        })
-      end
-      options = { 'body' => curr_server }
-      rest_api(:icsp, :put, my_server['uri'], options)
-    end
-
-    # Run OS install on a server
-    unless my_server['opswLifecycle'] == 'MANAGED' # Skip if already in MANAGED state
-      os_build = machine_options[:driver_options][:os_build]
-      action_handler.perform_action "Install OS: #{os_build} on #{machine_spec.name}" do
-        action_handler.report_progress "INFO: Installing OS: #{os_build} on #{machine_spec.name}"
-        # Get os-deployment-build-plans
-        build_plan_uri = nil
-        os_deployment_build_plans = rest_api(:icsp, :get, '/rest/os-deployment-build-plans')
-        os_deployment_build_plans['members'].each do |bp|
-          if bp['name'] == os_build
-            build_plan_uri = bp['uri']
-            break
-          end
-        end
-        fail "OS build plan #{os_build} not found!" if build_plan_uri.nil?
-
-        # Do the OS deployment
-        options = { 'body' => {
-          'osbpUris' => [build_plan_uri],
-          'serverData' => [{ 'serverUri' => my_server['uri'] }]
-        } }
-        os_deployment_task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
-        os_deployment_task_uri = os_deployment_task['uri']
-        720.times do # Wait for up to 2 hr
-          os_deployment_task = rest_api(:icsp, :get, os_deployment_task_uri, options) # TODO: Need options?
-          break if os_deployment_task['running'] == 'false'
-          print '.'
-          sleep 10
-        end
-        unless os_deployment_task['state'] == 'STATUS_SUCCESS'
-          fail "Error running OS build plan #{os_build}: #{os_deployment_task['jobResult'].first['jobMessage']}\n#{os_deployment_task['jobResult'].first['jobResultErrorDetails']}"
-        end
-      end
-    end
-
-    # Perform network personalization
-    if !machine_spec.reference['network_personalitation_finished']
-      action_handler.perform_action "Perform network personalization on #{machine_spec.name}" do
-        action_handler.report_progress "INFO: Performing network personalization on #{machine_spec.name}"
-        nics = []
-        if machine_options[:driver_options][:connections]
-          machine_options[:driver_options][:connections].each do |id, data|
-            c = data
-            next if c[:dhcp] == true
-            c[:macAddress]   = profile['connections'].find {|x| x['id'] == id}['mac']
-            c[:mask]       ||= machine_options[:driver_options][:mask]
-            c[:dhcp]       ||= machine_options[:driver_options][:dhcp] || false
-            c[:gateway]    ||= machine_options[:driver_options][:gateway]
-            c[:dns]        ||= machine_options[:driver_options][:dns]
-            c[:ip4Address] ||= machine_options[:driver_options][:ip_address]
-            nics.push c
-          end
-        end
-        options = { 'body'=> [{
-          'serverUri' => my_server['uri'],
-          'personalityData' => {
-            'hostName'   => machine_options[:driver_options][:host_name],
-            'domainType' => machine_options[:driver_options][:domainType],
-            'domainName' => machine_options[:driver_options][:domainName],
-            'nics'       => nics
-          }
-        }] }
-        network_personalization_task = rest_api(:icsp, :put, '/rest/os-deployment-apxs/personalizeserver', options)
-        network_personalization_task_uri = network_personalization_task['uri']
-        60.times do # Wait for up to 10 min
-          network_personalization_task = rest_api(:icsp, :get, network_personalization_task_uri, options)
-          break if network_personalization_task['running'] == 'false'
-          print '.'
-          sleep 10
-        end
-        unless network_personalization_task['state'] == 'STATUS_SUCCESS'
-          fail "Error performing network personalization: #{network_personalization_task['jobResult'].first['jobResultLogDetails']}\n#{network_personalization_task['jobResult'].first['jobResultErrorDetails']}"
-        end
-
-        # Check if task succeeds and ICsp IP config matches machine options
-        requested_ips = []
-        machine_options[:driver_options][:connections].each do |_id, c|
-          requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
-        end
-        60.times do
-          my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
-          my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
-          break if requested_ips.empty?
-          print '.'
-          sleep 10
-        end
-        fail 'Error setting up ips correctly in ICSP' unless requested_ips.empty?
-
-        # Switch deploy networks to post-deploy networks if specified
-        if machine_options[:driver_options][:connections]
-          available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")
-          machine_options[:driver_options][:connections].each do |id, data|
-            next unless data[:net] && data[:deployNet]
-            action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}, connection #{id}"
-            deploy_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:deployNet] }
-            new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
-            fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
-            fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
-            profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-            profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
-            options = { 'body' => profile }
-            rest_api(:oneview, :put, profile['uri'], options)
-          end
-        end
-        machine_spec.reference['network_personalitation_finished'] = true
-      end
-    end
-
-    # Get all, search for yours.  If not there or if it's in uninitialized state, pull again
-    my_server_uri = my_server['uri']
-    30.times do # Wait for up to 5 min
-      my_server = rest_api(:icsp, :get, my_server_uri)
-      break if my_server['opswLifecycle'] == 'MANAGED'
-      print '.'
-      sleep 10
-    end
-
-    fail "Timeout waiting for server #{machine_spec.name} to finish network personalization" if my_server['opswLifecycle'] != 'MANAGED'
-    my_server
-  end
-
-
-  def destroy_icsp_server(action_handler, machine_spec)
-    my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
-    return false if my_server.nil? || my_server['uri'].nil?
-
-    action_handler.perform_action "Delete server #{machine_spec.name} from ICSP" do
-      task = rest_api(:icsp, :delete, my_server['uri']) # TODO: This returns nil instead of task info
-
-      if task['uri']
-        task_uri = task['uri']
-        90.times do # Wait for up to 15 minutes
-          task = rest_api(:icsp, :get, task_uri)
-          break if task['taskState'].downcase == 'completed'
-          print '.'
-          sleep 10
-        end
-        fail "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == 'completed'
-      end
-    end
-  end
-
 
   def destroy_oneview_profile(action_handler, machine_spec, profile = nil)
     profile ||= get_oneview_profile_by_sn(machine_spec.reference['serial_number'])

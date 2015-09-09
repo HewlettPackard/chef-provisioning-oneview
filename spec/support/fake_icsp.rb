@@ -25,6 +25,15 @@ class FakeIcsp < Sinatra::Base
     json_response(200, 'os-deployment-servers.json', version)
   end
 
+  get '/rest/os-deployment-servers/:id' do
+    version = env['HTTP_X_API_VERSION']
+    if params[:id] == '1670001'
+      return json_response(200, 'os-deployment-servers_1670001.json', version)
+    else
+      return json_response(200, 'os-deployment-servers_fakesn.json', version)
+    end
+  end
+
   post '/rest/login-sessions' do
     version = env['HTTP_X_API_VERSION']
     json_response(200, 'login.json', version)

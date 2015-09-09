@@ -7,12 +7,20 @@ require 'chef/provisioning/machine/unix_machine'
 require 'json'
 require 'ridley'
 require_relative 'driver_init/oneview'
-require_relative 'oneview/version'
+require_relative 'version'
+require_relative 'rest'
+require_relative 'create_machine'
+require_relative 'customize_machine'
 require_relative 'oneview/oneview_api'
+require_relative 'icsp/icsp_api'
 
 module Chef::Provisioning
   class OneViewDriver < Chef::Provisioning::Driver
+    include CreateMachine
+    include CustomizeMachine
+    include RestAPI
     include OneViewAPI
+    include ICspAPI
 
     def self.canonicalize_url(url, config)
       _scheme, oneview_url = url.split(':', 2)
@@ -37,7 +45,8 @@ module Chef::Provisioning
       @oneview_password    = config[:knife][:oneview_password]
       fail 'Must set the knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
       @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
-      @oneview_api_version = 120 # get_oneview_api_version
+      @oneview_api_version = 120 # Use this version for all calls that don't override it
+      @current_oneview_api_version = get_oneview_api_version
       @oneview_key         = login_to_oneview
 
       @icsp_base_url       = config[:knife][:icsp_url]
@@ -47,7 +56,8 @@ module Chef::Provisioning
       @icsp_password       = config[:knife][:icsp_password]
       fail 'Must set the knife[:icsp_password] attribute!' if @icsp_password.nil? || @icsp_password.empty?
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
-      @icsp_api_version    = 102 # get_icsp_api_version
+      @icsp_api_version    = 102 # Use this version for all calls that don't override it
+      @current_icsp_api_version = get_icsp_api_version
       @icsp_key            = login_to_icsp
     end
 
@@ -167,6 +177,15 @@ module Chef::Provisioning
 
     def connect_to_machine(machine_spec, machine_options)
       machine_for(machine_spec, machine_options)
+    end
+
+    private
+
+    # Login to both OneView and ICsp
+    def auth_tokens
+      @icsp_key  ||= login_to_icsp
+      @oneview_key ||= login_to_oneview
+      { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
     end
 
   end # class end
