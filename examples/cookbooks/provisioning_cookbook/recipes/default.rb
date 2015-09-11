@@ -75,7 +75,7 @@ machine_batch 'oneview-machine-batch' do
           #1 => { ... } (Reserved for PXE)
           2 => {
             :ip4Address => options['ip4'],
-            :dhcp => false
+            :dhcp => options['dhcp'] || false
           }
         }
       },

@@ -32,7 +32,7 @@ ssl_verify_mode              :verify_none
 # If you're behind a proxy
 my_proxy = 'http://proxy.domain.com:8080'
 
-# Define your infrastructure here. This info gets populated into the recepe. Leave blank if you want to edit the recipe directly.
+# Define your infrastructure here. This info gets populated into the recipe. Leave blank if you want to edit the recipe directly.
 # Recipe location: chef-provisioning-oneview/examples/cookbooks/provisioning_cookbook/recipes/default.rb
 knife[:example_recipe_options] = {
   'action'      => :converge,  # :stop and :destroy are other options
@@ -47,7 +47,7 @@ knife[:example_recipe_options] = {
       'ip4' => 'xxx.xx.xx.xx'
     },
     'chef-web02' => {
-      'ip4' => 'xxx.xx.xx.xx'
+      'dhcp' => true
     }
   }
 }
