@@ -1,5 +1,4 @@
-require_relative 'v1.2/api'
-require_relative 'v2.0/api'
+Dir[File.dirname(__FILE__) + '/**/*.rb'].each {|file| require file } # Include all helper files in this directory & subdirectories
 
 module OneViewAPI
   private

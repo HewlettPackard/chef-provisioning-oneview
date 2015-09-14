@@ -77,6 +77,11 @@ machine 'web01' do
           :dhcp => false            # Optional. Overrides dhcp property above
           :gateway => 'xx.xx.xx.1'  # Optional. Overrides gateway property above
           :dns => 'xx.xx.xx.xx'     # Optional. Overrides dns property above
+        },
+        3 => {
+          :dhcp => true             # Optional. Overrides dhcp property above
+          :gateway => :none         # Optional. Overrides gateway property above
+          :dns => :none             # Optional. Overrides dns property above
         }
       },
       :custom_attributes => {
@@ -100,6 +105,8 @@ end
 ```
 
 See https://github.com/chef/chef-provisioning-ssh for more transport_options.
+
+NOTE: Some basic connection settings such as :ip4Address and :dhcp are shown in the example recipe, but you can pass in any interface/nic options that exist in the ICsp api for POST requests to /rest/os-deployment-jobs
 
 ### Custom Attributes
 Insided the custom attributes hash, you can specify any data that you would like to pass into your ICsp build plan scripts or configuration files. For example, to specify a list of trusted public keys to be placed into the node's .ssh/authorized_keys file, add a custom attribute to the machine resource definition:
@@ -139,8 +146,8 @@ Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_opt
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
 ### Swtiching to a deadnet after provisioning
-Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash per machine. 
-This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. Helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
+Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash. 
+This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 
 # Doing a test run
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.

@@ -6,10 +6,10 @@ This directory contains everything you need to start provisioning with OneView a
  3. Then from this (examples) directory, run: 
 
 ```bash
-$ bundle
+$ chef exec bundle
 $ berks install
 $ berks upload
-$ bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/default.rb
+$ chef exec bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/default.rb
 ```
 
 ## Usage with Chef Zero
@@ -18,10 +18,10 @@ $ bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/default.rb
  2. Then from this (examples) directory, run: 
  
   ```bash
-  $ bundle
+  $ chef exec bundle
   $ berks install
   $ berks upload
-  $ bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/zero.rb
+  $ chef exec bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/zero.rb
   ```
  
  4. If you want to continue and bootstrap the machine, you'll have two options: (1) set up a Chef Server and bootstrap it like normal or (2) copy the cookbooks onto the node and run chef-client in local (zero) mode from there.
