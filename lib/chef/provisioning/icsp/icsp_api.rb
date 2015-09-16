@@ -100,15 +100,15 @@ module ICspAPI
 
     # Wait for my_server['state'] to be in MAINTENANCE mode
     if my_server['state'] != 'MAINTENANCE'
-      action_handler.perform_action "Wait for #{machine_spec.name} to go into maintenance mode" do
-        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to go into maintenance mode"
+      action_handler.perform_action "Wait for #{machine_spec.name} to go into maintenance mode in ICsp" do
+        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to go into maintenance mode in ICsp"
         120.times do # Wait for up to 20 min
           my_server = get_icsp_server_by_sn(profile['serialNumber'])
           break if my_server['state'] != 'MAINTENANCE'
           print '.'
           sleep 10
         end
-        fail "Timed out waiting for #{machine_spec.name} to go into maintenance mode. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
+        fail "Timed out waiting for #{machine_spec.name} to go into maintenance mode in ICsp. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
       end
     end
 
