@@ -40,6 +40,11 @@ Style/EmptyLinesAroundBlockBody:
   Exclude:
     - 'spec/**/*'
 
+Style/GlobalVars:
+  AllowedVariables: [
+    $server_created  # For Spec testing: (required to allow 2 different responses when searching for a server profile)
+  ]
+
 
 # Disabled Cops:
 Style/AlignHash:
