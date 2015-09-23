@@ -1,0 +1,125 @@
+{
+  "type": "ServerProfileV5",
+  "uri": null,
+  "name": null,
+  "description": "web server template",
+  "serialNumber": null,
+  "uuid": null,
+  "serverProfileTemplateUri": "/rest/server-profile-templates/d64da635-f08a-41d4-b6eb-6517206a8bae",
+  "templateCompliance": "Unknown",
+  "serverHardwareUri": null,
+  "serverHardwareTypeUri": "/rest/server-hardware-types/5B42EABE-5140-4E38-91F0-68367B529DE9",
+  "enclosureGroupUri": "/rest/enclosure-groups/c0f86584-5a82-4480-ad13-8ed6544d6c98",
+  "enclosureUri": null,
+  "enclosureBay": null,
+  "affinity": "Bay",
+  "associatedServer": null,
+  "hideUnusedFlexNics": true,
+  "firmware": {
+    "firmwareInstallType": null,
+    "forceInstallFirmware": false,
+    "manageFirmware": false,
+    "firmwareBaselineUri": null
+  },
+  "macType": "Virtual",
+  "wwnType": "Virtual",
+  "serialNumberType": "Virtual",
+  "category": "server-profiles",
+  "created": null,
+  "modified": null,
+  "status": "OK",
+  "state": "Creating",
+  "inProgress": false,
+  "taskUri": null,
+  "connections": [
+    {
+      "id": 7,
+      "name": "Altair PXE",
+      "functionType": "Ethernet",
+      "deploymentStatus": null,
+      "networkUri": "/rest/ethernet-networks/7984a764-69ae-48c0-aec2-780d4f0366f8",
+      "portId": "Flb 1:1-a",
+      "requestedVFs": "Auto",
+      "allocatedVFs": null,
+      "interconnectUri": null,
+      "macType": null,
+      "wwpnType": null,
+      "mac": null,
+      "wwnn": null,
+      "wwpn": null,
+      "requestedMbps": "1000",
+      "allocatedMbps": 0,
+      "maximumMbps": 0,
+      "boot": {
+        "priority": "Primary"
+      }
+    },
+    {
+      "id": 8,
+      "name": "Corpnet",
+      "functionType": "Ethernet",
+      "deploymentStatus": null,
+      "networkUri": "/rest/ethernet-networks/52b6f044-f51b-4d4c-8d59-497c14c4681c",
+      "portId": "Flb 1:1-c",
+      "requestedVFs": "Auto",
+      "allocatedVFs": null,
+      "interconnectUri": null,
+      "macType": null,
+      "wwpnType": null,
+      "mac": null,
+      "wwnn": null,
+      "wwpn": null,
+      "requestedMbps": "2500",
+      "allocatedMbps": 0,
+      "maximumMbps": 0,
+      "boot": {
+        "priority": "NotBootable"
+      }
+    }
+  ],
+  "bootMode": null,
+  "boot": {
+    "order": [
+      "HardDisk",
+      "PXE",
+      "CD",
+      "Floppy",
+      "USB"
+    ],
+    "manageBoot": true
+  },
+  "bios": {
+    "overriddenSettings": [
+
+    ],
+    "manageBios": false
+  },
+  "localStorage": {
+    "controllers": [
+      {
+        "slotNumber": "0",
+        "managed": true,
+        "mode": "RAID",
+        "initialize": true,
+        "importConfiguration": false,
+        "logicalDrives": [
+          {
+            "driveNumber": null,
+            "raidLevel": "RAID1",
+            "numPhysicalDrives": 2,
+            "driveTechnology": null,
+            "bootable": true,
+            "driveName": "boot"
+          }
+        ]
+      }
+    ]
+  },
+  "sanStorage": {
+    "volumeAttachments": [
+
+    ],
+    "manageSanStorage": false
+  },
+  "eTag": null
+}

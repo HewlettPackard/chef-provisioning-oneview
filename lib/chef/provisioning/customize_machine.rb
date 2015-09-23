@@ -41,7 +41,7 @@ module CustomizeMachine
     icsp_run_os_install(action_handler, machine_spec, machine_options, my_server, profile)
 
     # Customize networking
-    if !machine_spec.reference['network_personalitation_finished']
+    if !machine_spec.reference['network_personalitation_finished'] || machine_options[:driver_options][:force_network_update]
       icsp_configure_networking(action_handler, machine_spec, machine_options, my_server, profile)
 
       # Switch deploy networks to post-deploy networks if specified
@@ -57,7 +57,11 @@ module CustomizeMachine
           profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
           profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
           options = { 'body' => profile }
-          rest_api(:oneview, :put, profile['uri'], options)
+          task = rest_api(:oneview, :put, profile['uri'], options)
+          fail "Failed to perform network flipping on #{machine_spec.name}. Details: #{task['message'] || task}" unless task['uri']
+          task = oneview_wait_for(task['uri']) # Wait up to 10 min
+          fail 'Timed out waiting for network flipping on #{machine_spec.name}' if task == false
+          fail "Error performing network flip on #{machine_spec.name}. Response: #{task}" unless task == true
         end
       end
       machine_spec.reference['network_personalitation_finished'] = true
