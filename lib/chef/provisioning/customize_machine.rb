@@ -36,6 +36,9 @@ module CustomizeMachine
       fail "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
 
+    
+    icsp_configure_nic_teams(machine_options, my_server, profile)
+
     icsp_set_custom_attributes(machine_options, my_server)
 
     icsp_run_os_install(action_handler, machine_spec, machine_options, my_server, profile)
@@ -43,7 +46,8 @@ module CustomizeMachine
     # Customize networking
     if !machine_spec.reference['network_personalitation_finished']
       icsp_configure_networking(action_handler, machine_spec, machine_options, my_server, profile)
-
+      
+      icsp_configure_nic_teams(machine_options, my_server)
       # Switch deploy networks to post-deploy networks if specified
       if machine_options[:driver_options][:connections]
         available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")

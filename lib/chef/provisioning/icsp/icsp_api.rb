@@ -233,4 +233,50 @@ module ICspAPI
       end
     end
   end
+
+  require 'pry'
+  def icsp_configure_nic_teams(machine_options, my_server, profile)
+    #TODO add more teams and do error checks
+    teams = {}
+    machine_options[:driver_options][:connections].each do | connection |
+      connection.each do |option|
+        if option.is_a?(Hash) and option[:team]
+         profile["connections"].each do | oneview_connection |
+            if connection[0] == oneview_connection["id"]
+              if teams.keys.include? option[:team]
+                teams[option[:team]].push oneview_connection["mac"]
+              else
+                teams[option[:team]] = [oneview_connection["mac"]]
+              end
+            end
+          end
+        end
+      end
+    end
+    finalTeams = ""
+    if teams.keys.size > 0
+      teams.keys.each do |key|
+        if teams[key].size >= 2
+          finalTeams << key + '-'
+          teams[key].each do |mac|
+            finalTeams << mac
+            if mac != teams[key][-1]
+              finalTeams << ','
+            end
+          end
+          if key != teams.keys[-1]
+            finalTeams << '|'
+          end
+        end
+      end
+    end
+    if machine_options[:driver_options].has_key?(:custom_attributes)
+      machine_options[:driver_options][:custom_attributes][:teams] = finalTeams
+    else
+      machine_options[:driver_options][:custom_attributes] = {:teams => finalTeams}
+    end
+    
+  end
 end # End module
+
+

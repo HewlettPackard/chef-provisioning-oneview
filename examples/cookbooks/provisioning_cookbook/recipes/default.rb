@@ -72,10 +72,12 @@ machine_batch 'oneview-machine-batch' do
         :mask => mask,
         :dns => dns,
         :connections => {
-          #1 => { ... } (Reserved for PXE)
-          2 => {
+          7 => { :team => "Team1" },
+          8 => {
             :ip4Address => options['ip4'],
-            :dhcp => options['dhcp'] || false
+            :dhcp => options['dhcp'] || false,
+            :team => "Team1"
+
           }
         }
       },
