@@ -21,7 +21,7 @@ $ chef exec bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/d
   $ chef exec bundle
   $ berks install
   $ berks upload
-  $ chef exec bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/zero.rb
+  $ bundle exec chef-client -z cookbooks/provisioning_cookbook/recipes/zero.rb
   ```
  
  4. If you want to continue and bootstrap the machine, you'll have two options: (1) set up a Chef Server and bootstrap it like normal or (2) copy the cookbooks onto the node and run chef-client in local (zero) mode from there.
