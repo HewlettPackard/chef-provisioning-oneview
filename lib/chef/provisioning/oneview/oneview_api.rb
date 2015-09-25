@@ -43,24 +43,6 @@ module OneViewAPI
     nil
   end
 
-  # Search for OneView Template by name
-  def get_oneview_template(template_name)
-    if @current_oneview_api_version >= 200
-      # Look for Server Profile Template (OneView 2.0 or higher)
-      options = { 'X-API-Version' => 200 }
-      templates = rest_api(:oneview, :get, "/rest/server-profile-templates?filter=\"name matches '#{template_name}'\"&sort=name:asc", options)['members']
-      return rest_api(:oneview, :get, "#{templates.first['uri']}/new-profile", options) if templates && templates.count == 1
-      fail "'#{template_name}' matches multiple templates! Please use a unique template name." if templates && templates.count > 1
-    end
-
-    # Look for Server Profile as second option
-    templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=\"name matches '#{template_name}'\"&sort=name:asc")['members']
-    return templates.first if templates && templates.count == 1
-    fail "'#{template_name}' matches multiple profiles! Please use a unique template name." if templates && templates.count > 1
-
-    fail "Template '#{template_name}' not found! Please match the template name with one that exists on OneView."
-  end
-
   def available_hardware_for_template(template)
     server_hardware_type_uri = template['serverHardwareTypeUri']
     enclosure_group_uri      = template['enclosureGroupUri']
