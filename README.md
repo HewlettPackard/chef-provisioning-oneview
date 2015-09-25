@@ -1,9 +1,7 @@
 # chef-provisioning-oneview
 Chef Provisioning driver for HP OneView
 
-Currently supports:
-- OneView v1.2.0 - 2.0.0
-- ICsp v7.4.0 - 7.5.0
+Currently supports OneView v1.2.0 and ICsp v7.4.0
 
 # Installation
 
@@ -147,7 +145,7 @@ You'll also need to put the corresponding public key(s) into the node's authoriz
 Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
-### Switching to a different network after provisioning
+### Swtiching to a deadnet after provisioning
 Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash. 
 This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 

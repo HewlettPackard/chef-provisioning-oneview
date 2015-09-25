@@ -34,7 +34,7 @@ RSpec.shared_context 'shared context', a: :b do
       driver_options: {
         server_template: 'Template - Web Server',
         os_build: 'CHEF-RHEL-6.5-x64',
-        host_name: 'chef-web01',
+        host_name: 'chef-web03',
         ip_address: '192.168.1.2',
         domainType: 'workgroup',
         domainName: domain,

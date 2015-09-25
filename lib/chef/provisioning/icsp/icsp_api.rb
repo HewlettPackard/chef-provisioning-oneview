@@ -100,15 +100,15 @@ module ICspAPI
 
     # Wait for my_server['state'] to be in MAINTENANCE mode
     if my_server['state'] != 'MAINTENANCE'
-      action_handler.perform_action "Wait for #{machine_spec.name} to go into maintenance mode in ICsp" do
-        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to go into maintenance mode in ICsp"
+      action_handler.perform_action "Wait for #{machine_spec.name} to go into maintenance mode" do
+        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} to go into maintenance mode"
         120.times do # Wait for up to 20 min
           my_server = get_icsp_server_by_sn(profile['serialNumber'])
           break if my_server['state'] != 'MAINTENANCE'
           print '.'
           sleep 10
         end
-        fail "Timed out waiting for #{machine_spec.name} to go into maintenance mode in ICsp. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
+        fail "Timed out waiting for #{machine_spec.name} to go into maintenance mode. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
       end
     end
 
@@ -141,7 +141,7 @@ module ICspAPI
       action_handler.report_progress "INFO: Running: #{os_builds} OS Build Plan(s) on #{machine_spec.name}"
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
-      fail "Failed to start OS Deployment Job. Details: #{task['details'] || task['message'] || task}" unless task_uri
+      fail "Failed to start OS Deployment Job. Details: #{task['details']}" unless task_uri
       task = icsp_wait_for(task_uri, 720)
       fail "Error running OS build plan(s) #{os_builds}: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
     end
@@ -164,21 +164,16 @@ module ICspAPI
       fail "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
       task = icsp_wait_for(task_uri, 60) # Wait for up to 10 min
       fail "Error running network personalization job: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
-
-      # Check if ICsp IP config matches machine options
-      requested_ips = []
-      machine_options[:driver_options][:connections].each do |_id, c|
-        requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
-      end
-      10.times do
-        my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
-        my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
-        break if requested_ips.empty?
-        print ','
-        sleep 10
-      end
-      puts "\nWARN: The following IPs are not visible on ICsp, so they may not have gotten configured correctly: #{requested_ips}" unless requested_ips.empty?
     end
+
+    # Check if ICsp IP config matches machine options
+    requested_ips = []
+    machine_options[:driver_options][:connections].each do |_id, c|
+      requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
+    end
+    my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
+    my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
+    puts "\nWARN: The following IPs might not have gotten configured correctly on ICsp: #{requested_ips}" unless requested_ips.empty?
   end
 
   # Build options for the network configuration

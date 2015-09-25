@@ -24,30 +24,4 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
     end
   end
 
-  describe '#get_oneview_template' do
-
-    context 'OneView 120' do
-      it 'gets profile template by name' do
-        ret_val = @instance.instance_eval { get_oneview_template('Template - Web Server') }
-        expect(ret_val['uri']).to_not be_nil
-      end
-    end
-
-    context 'OneView 200' do
-      before :each do
-        @instance.instance_variable_set('@current_oneview_api_version', 200)
-      end
-
-      it 'gets template by name' do
-        ret_val = @instance.instance_eval { get_oneview_template('Web Server Template') }
-        expect(ret_val['uri']).to be_nil
-        expect(ret_val['serverProfileTemplateUri']).to_not be_nil
-      end
-
-      it 'gets profile template by name' do
-        ret_val = @instance.instance_eval { get_oneview_template('Template - Web Server') }
-        expect(ret_val['uri']).to_not be_nil
-      end
-    end
-  end
 end
