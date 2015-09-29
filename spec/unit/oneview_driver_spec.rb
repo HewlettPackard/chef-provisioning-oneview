@@ -34,6 +34,8 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
     it 'uses the correct api versions' do
       expect(@instance.instance_variable_get('@oneview_api_version')).to eq(120)
       expect(@instance.instance_variable_get('@icsp_api_version')).to eq(102)
+      expect(@instance.instance_variable_get('@current_oneview_api_version')).to eq(120)
+      expect(@instance.instance_variable_get('@current_icsp_api_version')).to eq(102)
     end
 
     it 'requires the oneview_url knife param' do
