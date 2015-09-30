@@ -235,7 +235,6 @@ module ICspAPI
     end
   end
 
-  require 'pry'
   def icsp_configure_nic_teams(machine_options, my_server, profile)
     #TODO add more teams and do error checks
     teams = {}
