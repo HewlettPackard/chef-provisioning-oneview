@@ -1,0 +1,133 @@
+{
+  "type": "ServerProfileListV4",
+  "members": [
+    {
+      "type": "ServerProfileV4",
+      "uri": "/rest/server-profiles/1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+      "name": "chef-web03",
+      "description": "Web server machine template",
+      "serialNumber": "VCGE9KB041",
+      "uuid": "1c5e807d-acbe-4ee8-868b-2fb0b6504474",
+      "serverHardwareUri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D38",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+      "enclosureGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+      "enclosureUri": "/rest/enclosures/09SGH236PMVW",
+      "enclosureBay": 2,
+      "affinity": "Bay",
+      "associatedServer": null,
+      "hideUnusedFlexNics": true,
+      "firmware": {
+        "forceInstallFirmware": false,
+        "manageFirmware": true,
+        "firmwareBaselineUri": "/rest/firmware-drivers/bp-hp-service-pack-for-proliant-oneview-2014-11-30-05"
+      },
+      "macType": "Virtual",
+      "wwnType": "Virtual",
+      "serialNumberType": "Virtual",
+      "category": "server-profiles",
+      "created": "20150810T040139.738Z",
+      "modified": "20150810T042450.221Z",
+      "status": "OK",
+      "state": "Normal",
+      "inProgress": false,
+      "taskUri": "/rest/tasks/2A17C3F9-6DBF-40B1-B99E-E8BA40848B40",
+      "connections": [
+        {
+          "id": 1,
+          "name": "Altair PXE 1133",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/02b0b5c3-1a0a-4d5f-b5c9-0c7532cb1e5e",
+          "portId": "Flb 1:1-a",
+          "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:14",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "Primary"
+          }
+        },
+        {
+          "id": 2,
+          "name": "corpnet 10",
+          "functionType": "Ethernet",
+          "deploymentStatus": "Deployed",
+          "networkUri": "/rest/ethernet-networks/7a4698ae-5933-4e2e-8af3-57893c23a2d2",
+          "portId": "Flb 1:2-a",
+          "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+          "macType": "Virtual",
+          "wwpnType": "Virtual",
+          "mac": "11:11:11:11:01:15",
+          "wwnn": null,
+          "wwpn": null,
+          "requestedMbps": "2500",
+          "allocatedMbps": 2500,
+          "maximumMbps": 10000,
+          "boot": {
+            "priority": "NotBootable"
+          }
+        }
+      ],
+      "bootMode": null,
+      "boot": {
+        "manageBoot": true,
+        "order": [
+          "HardDisk",
+          "PXE",
+          "CD",
+          "Floppy",
+          "USB"
+        ]
+      },
+      "bios": {
+        "manageBios": true,
+        "overriddenSettings": [
+          {
+            "id": "158",
+            "value": "2"
+          },
+          {
+            "id": "181",
+            "value": "1"
+          },
+          {
+            "id": "176",
+            "value": "1"
+          }
+        ]
+      },
+      "localStorage": {
+        "logicalDrives": [
+          {
+            "raidLevel": "RAID0",
+            "bootable": true
+          }
+        ],
+        "manageLocalStorage": true,
+        "initialize": false
+      },
+      "sanStorage": {
+        "volumeAttachments": [
+
+        ],
+        "manageSanStorage": false
+      },
+      "eTag": "1439179303124/6"
+    }
+  ],
+  "total": 1,
+  "start": 0,
+  "prevPageUri": null,
+  "nextPageUri": null,
+  "count": 1,
+  "category": "server-profiles",
+  "created": "20150810T223058.112Z",
+  "eTag": "20150810T223058.112Z",
+  "modified": "20150810T223058.112Z",
+  "uri": "/rest/server-profiles?filter=name%20matches%20'chef-web01'&sort=name:asc"
+}

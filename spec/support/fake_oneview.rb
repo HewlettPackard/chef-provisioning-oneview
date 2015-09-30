@@ -12,6 +12,26 @@ class FakeOneView < Sinatra::Base
     json_response(200, 'login.json', version)
   end
 
+  get '/rest/server-profile-templates' do
+    version = env['HTTP_X_API_VERSION']
+    file_name = 'server-profile-templates_invalid.json'
+    if params['filter'] && params['filter'].match('name matches')
+      if params['filter'].match('Web Server Template')
+        file_name = 'server-profile-templates_WebServerTemplate.json'
+      end
+    end
+    json_response(200, file_name, version)
+  end
+
+  get '/rest/server-profile-templates/:id/new-profile' do |id|
+    version = env['HTTP_X_API_VERSION']
+    if id == 'd64da635-f08a-41d4-b6eb-6517206a8bae'
+      json_response(200, 'server-profile-templates_new-profile_WebServerTemplate.json', version)
+    else
+      json_response(404, 'error_404.json', '120')
+    end
+  end
+
   get '/rest/server-profiles' do
     version = env['HTTP_X_API_VERSION']
     file_name = 'server-profiles.json'
@@ -27,6 +47,10 @@ class FakeOneView < Sinatra::Base
       elsif params['filter'].match('name matches')
         if params['filter'].match('Template - Web Server')
           file_name = 'server-profiles_name_Template-WebServer.json'
+        elsif params['filter'].match('chef-web01')
+          file_name = 'server-profiles_name_chef-web01.json'
+        elsif $server_created == 'chef-web03'
+          file_name = 'server-profiles_name_chef-web03.json'
         else
           file_name = 'server-profiles_name_empty.json'
         end
@@ -35,13 +59,28 @@ class FakeOneView < Sinatra::Base
     json_response(200, file_name, version)
   end
 
+  post '/rest/server-profiles' do
+    body = JSON.parse(request.body.read.to_s)
+    $server_created = body['name']
+    { 'uri' => '/rest/tasks/FAKETASK' }.to_json
+  end
+
   delete '/rest/server-profiles/:id' do |_id|
     { 'uri' => '/rest/tasks/FAKETASK' }.to_json
   end
 
+  get '/rest/server-hardware' do
+    version = env['HTTP_X_API_VERSION']
+    file_name = 'server-hardware.json'
+    if params['filter'].match('enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39') # && params['filter'].match('') # TODO
+      file_name = 'server-hardware_Template-WebServer.json'
+    end
+    json_response(200, file_name, version)
+  end
+
   get '/rest/server-hardware/:id' do |id|
     version = env['HTTP_X_API_VERSION']
-    if id == '31363636-3136-584D-5132-333230314D38'
+    if id == '31363636-3136-584D-5132-333230314D38' || id == '37333036-3831-584D-5131-303030323037'
       json_response(200, 'server-hardware_specific.json', version)
     else
       json_response(404, 'error_404.json', '120')
