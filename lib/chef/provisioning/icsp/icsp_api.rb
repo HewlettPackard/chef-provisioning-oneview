@@ -159,18 +159,19 @@ module ICspAPI
           'personalityData' => personality_data
         }]
       }
+      
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
       fail "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
       task = icsp_wait_for(task_uri, 60) # Wait for up to 10 min
       fail "Error running network personalization job: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
     end
-
     # Check if ICsp IP config matches machine options
     requested_ips = []
     machine_options[:driver_options][:connections].each do |_id, c|
       requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
     end
+    
     my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
     my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
     puts "\nWARN: The following IPs might not have gotten configured correctly on ICsp: #{requested_ips}" unless requested_ips.empty?
@@ -267,6 +268,8 @@ module ICspAPI
           if key != teams.keys[-1]
             finalTeams << '|'
           end
+        else
+          fail "#{key} has one value associated with it. Must have at least 2 to form a NIC team"
         end
       end
     end
@@ -275,7 +278,6 @@ module ICspAPI
     else
       machine_options[:driver_options][:custom_attributes] = {:teams => finalTeams}
     end
-    
   end
 end # End module
 
