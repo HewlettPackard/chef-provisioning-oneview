@@ -1,4 +1,7 @@
 # chef-provisioning-oneview
+
+[![Build Status](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview.svg?branch=master)](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview)
+
 Chef Provisioning driver for HP OneView
 
 Currently supports:
