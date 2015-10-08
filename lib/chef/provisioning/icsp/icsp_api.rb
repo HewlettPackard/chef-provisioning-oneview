@@ -159,7 +159,7 @@ module ICspAPI
           'personalityData' => personality_data
         }]
       }
-      
+
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
       fail "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
@@ -240,49 +240,42 @@ module ICspAPI
     end
   end
 
-  def icsp_configure_nic_teams(machine_options, my_server, profile)
-    #TODO add more teams and do error checks
+  def icsp_configure_nic_teams(machine_options, profile)
     teams = {}
-    machine_options[:driver_options][:connections].each do | connection |
+    machine_options[:driver_options][:connections].each do |connection|
       connection.each do |option|
-        if option.is_a?(Hash) and option[:team]
-         profile["connections"].each do | oneview_connection |
-            if connection[0] == oneview_connection["id"]
+        if option.is_a?(Hash) && option[:team]
+          profile['connections'].each do |oneview_connection|
+            if connection[0] == oneview_connection['id']
               if teams.keys.include? option[:team]
-                teams[option[:team]].push oneview_connection["mac"]
+                teams[option[:team]].push oneview_connection['mac']
               else
-                teams[option[:team]] = [oneview_connection["mac"]]
+                teams[option[:team]] = [oneview_connection['mac']]
               end
             end
           end
         end
       end
     end
-    finalTeams = ""
+    final_teams = ''
     if teams.keys.size > 0
       teams.keys.each do |key|
         if teams[key].size >= 2
-          finalTeams << key + '-'
+          final_teams << key + '-'
           teams[key].each do |mac|
-            finalTeams << mac
-            if mac != teams[key][-1]
-              finalTeams << ','
-            end
+            final_teams << mac
+            final_teams << ',' if mac != teams[key][-1]
           end
-          if key != teams.keys[-1]
-            finalTeams << '|'
-          end
+          final_teams << '|' if key != teams.keys[-1]
         else
           fail "#{key} has one value associated with it. Must have at least 2 to form a NIC team"
         end
       end
     end
-    if machine_options[:driver_options].has_key?(:custom_attributes)
-      machine_options[:driver_options][:custom_attributes][:teams] = finalTeams
+    if machine_options[:driver_options].key?(:custom_attributes)
+      machine_options[:driver_options][:custom_attributes][:teams] = final_teams
     else
-      machine_options[:driver_options][:custom_attributes] = {:teams => finalTeams}
+      machine_options[:driver_options][:custom_attributes] = { teams: final_teams }
     end
   end
 end # End module
-
-

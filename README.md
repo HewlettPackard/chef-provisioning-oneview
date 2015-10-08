@@ -151,6 +151,9 @@ Also, make sure your OS build plans set up the proxy configuration in a post OS 
 Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash. 
 This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 
+### Adding Nic Teams
+Add :team => "TeamName" into a connection in your connections hash. Make sure that you have 2 connections in a team.
+
 # Doing a test run
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.
 
