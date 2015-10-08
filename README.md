@@ -152,7 +152,7 @@ Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` t
 This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 
 ### Adding Nic Teams
-Add :team => "TeamName" into a connection in your connections hash. Make sure that you have 2 connections in a team.
+Add `:team => 'TeamName'` into a connection in your connections hash. Make sure that you have 2 connections in a team and the name does not include hyphens. This information will be passed to ISCP as the 'teams' custom attribute in the format: `"TeamName1-mac1,mac2|TeamName2-mac6,mac7,mac8"` to be consumed in a custom build plan script.
 
 # Doing a test run
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.
