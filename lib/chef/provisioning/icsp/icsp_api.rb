@@ -159,7 +159,7 @@ module ICspAPI
           'personalityData' => personality_data
         }]
       }
-      
+
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
       fail "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
@@ -240,49 +240,29 @@ module ICspAPI
     end
   end
 
-  def icsp_configure_nic_teams(machine_options, my_server, profile)
-    #TODO add more teams and do error checks
+  def icsp_configure_nic_teams(machine_options, profile)
+    return false if machine_options[:driver_options][:connections].nil?
     teams = {}
-    machine_options[:driver_options][:connections].each do | connection |
-      connection.each do |option|
-        if option.is_a?(Hash) and option[:team]
-         profile["connections"].each do | oneview_connection |
-            if connection[0] == oneview_connection["id"]
-              if teams.keys.include? option[:team]
-                teams[option[:team]].push oneview_connection["mac"]
-              else
-                teams[option[:team]] = [oneview_connection["mac"]]
-              end
-            end
-          end
-        end
+
+    machine_options[:driver_options][:connections].each do |id, options|
+      next unless options.is_a?(Hash) && options[:team]
+      fail "#{options[:team]}: Team names must not include hyphens" if options[:team].to_s.match('-')
+      teams[options[:team].to_s] ||= []
+      begin
+        mac = profile['connections'].find {|x| x['id'] == id}['mac']
+        teams[options[:team].to_s].push mac
+      rescue NoMethodError
+        ids = []
+        profile['connections'].each {|x| ids.push x['id']}
+        raise "Failed to configure nic teams: Could not find connection id #{id} for #{profile['name']}. Available connection ids are: #{ids}. Please make sure the connection ids map to those on OneView."
       end
     end
-    finalTeams = ""
-    if teams.keys.size > 0
-      teams.keys.each do |key|
-        if teams[key].size >= 2
-          finalTeams << key + '-'
-          teams[key].each do |mac|
-            finalTeams << mac
-            if mac != teams[key][-1]
-              finalTeams << ','
-            end
-          end
-          if key != teams.keys[-1]
-            finalTeams << '|'
-          end
-        else
-          fail "#{key} has one value associated with it. Must have at least 2 to form a NIC team"
-        end
-      end
+    team_strings = []
+    teams.each do |name, macs|
+      fail "Team '#{name}' must have at least 2 associated connections to form a NIC team" unless macs.size >= 2
+      team_strings.push "#{name}-#{macs.join(',')}"
     end
-    if machine_options[:driver_options].has_key?(:custom_attributes)
-      machine_options[:driver_options][:custom_attributes][:teams] = finalTeams
-    else
-      machine_options[:driver_options][:custom_attributes] = {:teams => finalTeams}
-    end
+    machine_options[:driver_options][:custom_attributes] ||= {}
+    machine_options[:driver_options][:custom_attributes][:teams] = team_strings.join('|')
   end
 end # End module
-
-
