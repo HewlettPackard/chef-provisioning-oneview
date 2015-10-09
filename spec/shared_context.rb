@@ -41,7 +41,8 @@ RSpec.shared_context 'shared context', a: :b do
         gateway: '192.168.1.1',
         dns: '192.168.1.1,10.1.1.1',
         connections: {
-          2 => { ip4Address: '192.168.1.2', mask: '255.255.254.0', dhcp: false }
+          1 => { dhcp: true, team: 'team1' },
+          2 => { ip4Address: '192.168.1.2', mask: '255.255.254.0', dhcp: false, team: 'team1' }
         }
       },
       custom_attributes: {
