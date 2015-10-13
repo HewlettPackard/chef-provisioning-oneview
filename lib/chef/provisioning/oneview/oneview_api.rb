@@ -5,6 +5,7 @@ module OneViewAPI
 
   include OneViewAPIv1_2
   include OneViewAPIv2_0
+  include OneViewSanStorage
 
   def get_oneview_api_version
     begin
@@ -55,7 +56,14 @@ module OneViewAPI
 
     # Look for Server Profile as second option
     templates = rest_api(:oneview, :get, "/rest/server-profiles?filter=\"name matches '#{template_name}'\"&sort=name:asc")['members']
-    return templates.first if templates && templates.count == 1
+    if templates && templates.count == 1
+      # Remove unwanted fields
+      %w(uri serialNumber uuid taskUri).each {|key| templates.first[key] = nil}
+      templates.first['connections'].each do |c|
+        %w(wwnn wwpn mac deploymentStatus interconnectUri wwpnType macType).each {|key| c[key] = nil}
+      end
+      return templates.first
+    end
     fail "'#{template_name}' matches multiple profiles! Please use a unique template name." if templates && templates.count > 1
 
     fail "Template '#{template_name}' not found! Please match the template name with one that exists on OneView."
@@ -75,7 +83,7 @@ module OneViewAPI
     fail 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
   end
 
-  def oneview_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10)
+  def oneview_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10) # Default time is 10 min
     fail 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
     wait_iterations.times do
       task = rest_api(:oneview, :get, task_uri)
@@ -111,6 +119,7 @@ module OneViewAPI
 
     if hardware_uri.nil?
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+      fail "Could not power #{state} #{machine_spec.name}: Profile with serial number '#{machine_spec.reference['serial_number']}' not found!" unless profile
       hardware_uri = profile['serverHardwareUri']
     end
 

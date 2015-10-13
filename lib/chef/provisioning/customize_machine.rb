@@ -20,6 +20,9 @@ module CustomizeMachine
       fail "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
     end
 
+    # Configure SAN storage (if applicable)
+    enable_boot_from_san(action_handler, machine_spec, profile) unless machine_spec.reference['network_personalitation_finished']
+
     # Make sure server is started
     power_on(action_handler, machine_spec, profile['serverHardwareUri'])
 
@@ -60,7 +63,7 @@ module CustomizeMachine
           task = rest_api(:oneview, :put, profile['uri'], options)
           fail "Failed to perform network flipping on #{machine_spec.name}. Details: #{task['message'] || task}" unless task['uri']
           task = oneview_wait_for(task['uri']) # Wait up to 10 min
-          fail 'Timed out waiting for network flipping on #{machine_spec.name}' if task == false
+          fail "Timed out waiting for network flipping on #{machine_spec.name}" if task == false
           fail "Error performing network flip on #{machine_spec.name}. Response: #{task}" unless task == true
         end
       end

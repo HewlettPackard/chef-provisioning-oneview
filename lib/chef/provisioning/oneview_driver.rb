@@ -92,6 +92,7 @@ module Chef::Provisioning
 
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+      fail "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
       customize_machine(action_handler, machine_spec, machine_options, profile)
       machine_for(machine_spec, machine_options) # Return the Machine object
     end

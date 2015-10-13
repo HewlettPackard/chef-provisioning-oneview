@@ -2,10 +2,10 @@
   "type": "ServerProfileV5",
   "uri": null,
   "name": null,
-  "description": "web server template",
+  "description": "Web server template with SAN",
   "serialNumber": null,
   "uuid": null,
-  "serverProfileTemplateUri": "/rest/server-profile-templates/d64da635-f08a-41d4-b6eb-6517206a8bae",
+  "serverProfileTemplateUri": "/rest/server-profile-templates/d64da635-f08a-41d4-b6eb-6517206a8baf",
   "templateCompliance": "Unknown",
   "serverHardwareUri": null,
   "serverHardwareTypeUri": "/rest/server-hardware-types/5B42EABE-5140-4E38-91F0-68367B529DE9",
@@ -75,6 +75,50 @@
       "boot": {
         "priority": "NotBootable"
       }
+    },
+    {
+      "id": 9,
+      "name": "san1",
+      "functionType": "FibreChannel",
+      "deploymentStatus": null,
+      "networkUri": "/rest/fc-networks/2c04a682-66b4-4a64-8c2d-3095937a8e7e",
+      "portId": "Flb 1:1-b",
+      "requestedVFs": null,
+      "allocatedVFs": null,
+      "interconnectUri": null,
+      "macType": null,
+      "wwpnType": null,
+      "mac": null,
+      "wwnn": null,
+      "wwpn": null,
+      "requestedMbps": "4000",
+      "allocatedMbps": 0,
+      "maximumMbps": 0,
+      "boot": {
+        "priority": "Primary"
+      }
+    },
+    {
+      "id": 10,
+      "name": "san2",
+      "functionType": "FibreChannel",
+      "deploymentStatus": null,
+      "networkUri": "/rest/fc-networks/93c97ad9-3e6d-4cc4-8b37-3ef3a6a9cf77",
+      "portId": "Flb 1:2-b",
+      "requestedVFs": null,
+      "allocatedVFs": null,
+      "interconnectUri": null,
+      "macType": null,
+      "wwpnType": null,
+      "mac": null,
+      "wwnn": null,
+      "wwpn": null,
+      "requestedMbps": "4000",
+      "allocatedMbps": 0,
+      "maximumMbps": 0,
+      "boot": {
+        "priority": "Secondary"
+      }
     }
   ],
   "bootMode": null,
@@ -95,31 +139,40 @@
     "manageBios": false
   },
   "localStorage": {
-    "controllers": [
-      {
-        "slotNumber": "0",
-        "managed": true,
-        "mode": "RAID",
-        "initialize": true,
-        "importConfiguration": false,
-        "logicalDrives": [
-          {
-            "driveNumber": null,
-            "raidLevel": "RAID1",
-            "numPhysicalDrives": 2,
-            "driveTechnology": null,
-            "bootable": true,
-            "driveName": "boot"
-          }
-        ]
-      }
-    ]
+    "controllers": []
   },
   "sanStorage": {
     "volumeAttachments": [
-
+      {
+        "permanent": false,
+        "storagePaths": [
+          {
+            "storageTargets": [],
+            "storageTargetType": "Auto",
+            "connectionId": 3,
+            "isEnabled": true
+          },
+          {
+            "storageTargets": [],
+            "storageTargetType": "Auto",
+            "connectionId": 4,
+            "isEnabled": true
+          }
+        ],
+        "volumeStoragePoolUri": "/rest/storage-pools/707E383B-56F6-48A1-BFF1-782BB2AC6BA7",
+        "volumeStorageSystemUri": "/rest/storage-systems/1405534",
+        "volumeDescription": "",
+        "volumeShareable": false,
+        "volumeProvisionType": "Thin",
+        "volumeProvisionedCapacityBytes": "53687091200",
+        "lun": "0",
+        "lunType": "Manual",
+        "volumeName": "bootVol",
+        "id": 1
+      }
     ],
-    "manageSanStorage": false
+    "hostOSType": "RHE Linux (5.x, 6.x)",
+    "manageSanStorage": true
   },
   "eTag": null
 }

@@ -147,6 +147,9 @@ You'll also need to put the corresponding public key(s) into the node's authoriz
 Add `:bootstrap_proxy => 'http://proxy.domain.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
+### SAN Storage
+In order to attach a SAN volume as a bootable volume, the volume name must start with 'boot'; it will be appended with the the profile name on creation.
+
 ### Switching to a different network after provisioning
 Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash. 
 This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 

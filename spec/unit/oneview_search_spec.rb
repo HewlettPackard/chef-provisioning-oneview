@@ -29,7 +29,16 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
     context 'OneView 120' do
       it 'gets profile template by name' do
         ret_val = @instance.instance_eval { get_oneview_template('Template - Web Server') }
-        expect(ret_val['uri']).to_not be_nil
+        expect(ret_val['name']).to eq('Template - Web Server')
+      end
+
+      it 'clears necessary attributes from profile' do
+        ret_val = @instance.instance_eval { get_oneview_template('Template - Web Server') }
+        expect(ret_val['name']).to_not be_nil
+        %w(uri serialNumber uuid taskUri).each { |key| expect(ret_val[key]).to be_nil }
+        ret_val['connections'].each do |c|
+          %w(wwnn wwpn mac deploymentStatus interconnectUri wwpnType macType).each { |key| expect(c[key]).to be_nil }
+        end
       end
     end
 
@@ -46,7 +55,8 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
 
       it 'gets profile template by name' do
         ret_val = @instance.instance_eval { get_oneview_template('Template - Web Server') }
-        expect(ret_val['uri']).to_not be_nil
+        expect(ret_val['name']).to eq('Template - Web Server')
+        expect(ret_val['uri']).to be_nil
       end
     end
   end
