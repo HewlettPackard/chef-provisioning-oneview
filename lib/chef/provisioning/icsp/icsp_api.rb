@@ -118,9 +118,15 @@ module ICspAPI
     build_plan_uris = []
     action_handler.perform_action "Get OS Build Plan(s) info for #{machine_spec.name}" do
       action_handler.report_progress "INFO: Getting OS Build Plan(s) for #{machine_spec.name}"
-      os_deployment_build_plans = rest_api(:icsp, :get, '/rest/os-deployment-build-plans')
       os_builds.each do |os_build|
-        build_plan_uri = os_deployment_build_plans['members'].find {|bp| bp['name'] == os_build}['uri'] rescue nil
+        uri = "/rest/index/resources?userQuery=\"'#{os_build}'\"&category=osdbuildplan"
+        while uri
+          matching_plans = rest_api(:icsp, :get, uri)
+          fail "Search failed for OSBP '#{os_build}'. Response: #{matching_plans}" unless matching_plans['members']
+          build_plan_uri = matching_plans['members'].find {|bp| bp['name'] == os_build}['uri'] rescue nil
+          break unless build_plan_uri.nil?
+          uri = URI.unescape(matching_plans['nextPageUri']) rescue nil
+        end
         fail "OS build plan #{os_build} not found!" if build_plan_uri.nil?
         build_plan_uris.push build_plan_uri
       end
