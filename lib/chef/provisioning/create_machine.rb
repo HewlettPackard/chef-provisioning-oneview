@@ -11,7 +11,6 @@ module CreateMachine
     matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
     if matching_profiles['count'] > 0
       profile = matching_profiles['members'].first
-      power_on(action_handler, machine_spec, profile['serverHardwareUri']) # Make sure server is started
       return profile
     end
 
@@ -27,19 +26,13 @@ module CreateMachine
     action_handler.perform_action "Initialize creation of server profile for #{machine_spec.name}" do
       action_handler.report_progress "INFO: Initializing creation of server profile for #{machine_spec.name}"
 
-      # Take template, add name & hardware uri, and post back to /rest/server-profiles
+      # Add name & hardware uri to template
       template['name'] = host_name
-      template['uri'] = nil
-      template['serialNumber'] = nil
-      template['uuid'] = nil
-      template['taskUri'] = nil
-      template['connections'].each do |c|
-        c['wwnn'] = nil
-        c['wwpn'] = nil
-        c['mac']  = nil
-      end
-
       template['serverHardwareUri'] = chosen_blade['uri']
+
+      update_san_info(machine_spec, template)
+
+      # Post back to /rest/server-profiles
       options = { 'body' => template }
       options['X-API-Version'] = 200 if @current_oneview_api_version >= 200 && template['type'] == 'ServerProfileV5'
       task = rest_api(:oneview, :post, '/rest/server-profiles', options)

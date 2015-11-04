@@ -1,0 +1,144 @@
+{
+  "type": "ServerProfileTemplateListV1",
+  "members": [
+    {
+      "type": "ServerProfileTemplateV1",
+      "uri": "/rest/server-profile-templates/d64da635-f08a-41d4-b6eb-6517206a8baf",
+      "name": "Web Server Template with SAN",
+      "description": "",
+      "serverProfileDescription": "Web Server Template with SAN",
+      "serverHardwareTypeUri": "/rest/server-hardware-types/5B42EABE-5140-4E38-91F0-68367B529DE9",
+      "enclosureGroupUri": "/rest/enclosure-groups/c0f86584-5a82-4480-ad13-8ed6544d6c98",
+      "affinity": "Bay",
+      "hideUnusedFlexNics": true,
+      "macType": "Virtual",
+      "wwnType": "Virtual",
+      "serialNumberType": "Virtual",
+      "firmware": {
+        "manageFirmware": false,
+        "firmwareInstallType": null,
+        "forceInstallFirmware": false,
+        "firmwareBaselineUri": null
+      },
+      "connections": [
+        {
+          "id": 7,
+          "name": "Altair PXE",
+          "functionType": "Ethernet",
+          "networkUri": "/rest/ethernet-networks/7984a764-69ae-48c0-aec2-780d4f0366f8",
+          "portId": "Flb 1:1-a",
+          "requestedVFs": "Auto",
+          "requestedMbps": "1000",
+          "boot": {
+            "priority": "Primary"
+          }
+        },
+        {
+          "id": 8,
+          "name": "Corpnet",
+          "functionType": "Ethernet",
+          "networkUri": "/rest/ethernet-networks/52b6f044-f51b-4d4c-8d59-497c14c4681c",
+          "portId": "Flb 1:1-c",
+          "requestedVFs": "Auto",
+          "requestedMbps": "2500",
+          "boot": {
+            "priority": "NotBootable"
+          }
+        },
+        {
+          "id": 9,
+          "name": "san1",
+          "functionType": "FibreChannel",
+          "networkUri": "/rest/fc-networks/2c04a682-66b4-4a64-8c2d-3095937a8e7e",
+          "portId": "Flb 1:1-b",
+          "requestedVFs": null,
+          "requestedMbps": "4000",
+          "boot": {
+            "priority": "Primary",
+            "specifyBootTarget": false
+          }
+        },
+        {
+          "id": 10,
+          "name": "san2",
+          "functionType": "FibreChannel",
+          "networkUri": "/rest/fc-networks/93c97ad9-3e6d-4cc4-8b37-3ef3a6a9cf77",
+          "portId": "Flb 1:2-b",
+          "requestedVFs": null,
+          "requestedMbps": "4000",
+          "boot": {
+            "priority": "Secondary",
+            "specifyBootTarget": false
+          }
+        }
+      ],
+      "bootMode": null,
+      "boot": {
+        "manageBoot": true,
+        "order": [
+          "HardDisk",
+          "PXE",
+          "CD",
+          "Floppy",
+          "USB"
+        ]
+      },
+      "bios": {
+        "manageBios": false,
+        "overriddenSettings": [
+
+        ]
+      },
+      "localStorage": {
+        "controllers": []
+      },
+      "sanStorage": {
+        "manageSanStorage": true,
+        "hostOSType": "RHE Linux (5.x, 6.x)",
+        "volumeAttachments": [
+          {
+            "id": 1,
+            "lun": "0",
+            "lunType": "Manual",
+            "permanent": false,
+            "storagePaths": [
+              {
+                "connectionId": 9,
+                "isEnabled": true,
+                "storageTargetType": "Auto"
+              },
+              {
+                "connectionId": 10,
+                "isEnabled": true,
+                "storageTargetType": "Auto"
+              }
+            ],
+            "volumeName": "bootVol",
+            "volumeDescription": "",
+            "volumeStoragePoolUri": "/rest/storage-pools/707E383B-56F6-48A1-BFF1-782BB2AC6BA7",
+            "volumeProvisionedCapacityBytes": "53687091200",
+            "volumeProvisionType": "Thin",
+            "volumeShareable": false,
+            "volumeStorageSystemUri": "/rest/storage-systems/1405534"
+          }
+        ]
+      },
+      "category": "server-profile-templates",
+      "created": "2015-09-04T17:15:39.249Z",
+      "modified": "2015-09-04T17:41:44.999Z",
+      "status": "OK",
+      "state": null,
+      "eTag": "1441388504999/3"
+    }
+  ],
+  "nextPageUri": null,
+  "start": 0,
+  "prevPageUri": null,
+  "total": 1,
+  "count": 1,
+  "modified": "2015-09-15T23:18:39.561Z",
+  "eTag": "2015-09-15T23:18:39.561Z",
+  "created": "2015-09-15T23:18:39.561Z",
+  "category": "server-profile-templates",
+  "uri": "/rest/server-profile-templates?filter=%22name%20matches%20'Web%20Server%20Template%20with%20SAN'%22&sort=name:asc&start=0&count=64"
+}

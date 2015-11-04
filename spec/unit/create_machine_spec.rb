@@ -27,24 +27,6 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
         expect(a_request(:post, %r{/rest/server-profiles})).to have_been_made.times(1)
       end
 
-      it 'removes the necessary attributes to create a machine if it does not exist' do
-        a = action_handler
-        m = machine_spec
-        o = valid_machine_options
-        o[:driver_options][:host_name] = 'chef-web03'
-        @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles}).with do |req|
-          req.body.match('"name":"chef-web03"') && # name is set
-          !req.body.match('"uri":"')            && # uri must be cleared
-          !req.body.match('"serialNumber":"')   && # serialNumber must be cleared
-          !req.body.match('"uuid":"')           && # uuid must be cleared
-          !req.body.match('"taskUri":"')        && # taskUri must be cleared
-          !req.body.match('"mac":"')            && # mac must be cleared
-          !req.body.match('"wwnn":"')           && # wwnn must be cleared
-          !req.body.match('"wwpn":"')              # wwpn must be cleared
-        end).to have_been_made
-      end
-
       it 'sets the correct HW uri to create a machine if it does not exist' do
         a = action_handler
         m = machine_spec

@@ -16,7 +16,9 @@ class FakeOneView < Sinatra::Base
     version = env['HTTP_X_API_VERSION']
     file_name = 'server-profile-templates_invalid.json'
     if params['filter'] && params['filter'].match('name matches')
-      if params['filter'].match('Web Server Template')
+      if params['filter'].match('Web Server Template with SAN')
+        file_name = 'server-profile-templates_WebServerTemplateWithSAN.json'
+      elsif params['filter'].match('Web Server Template')
         file_name = 'server-profile-templates_WebServerTemplate.json'
       end
     end
@@ -27,6 +29,8 @@ class FakeOneView < Sinatra::Base
     version = env['HTTP_X_API_VERSION']
     if id == 'd64da635-f08a-41d4-b6eb-6517206a8bae'
       json_response(200, 'server-profile-templates_new-profile_WebServerTemplate.json', version)
+    elsif id == 'd64da635-f08a-41d4-b6eb-6517206a8baf'
+      json_response(200, 'server-profile-templates_new-profile_WebServerTemplateWithSAN.json', version)
     else
       json_response(404, 'error_404.json', '120')
     end
@@ -41,11 +45,15 @@ class FakeOneView < Sinatra::Base
       elsif params['filter'].match('serialNumber matches')
         if params['filter'].match('VCGE9KB041')
           file_name = 'server-profiles_sn_VCGE9KB041.json'
+        elsif params['filter'].match('VCGE9KB042')
+          file_name = 'server-profiles_sn_VCGE9KB042.json'
         else
           file_name = 'server-profiles_sn_empty.json'
         end
       elsif params['filter'].match('name matches')
-        if params['filter'].match('Template - Web Server')
+        if params['filter'].match('Template - Web Server with SAN')
+          file_name = 'server-profiles_name_Template-WebServerWithSAN.json'
+        elsif params['filter'].match('Template - Web Server')
           file_name = 'server-profiles_name_Template-WebServer.json'
         elsif params['filter'].match('chef-web01')
           file_name = 'server-profiles_name_chef-web01.json'
@@ -87,6 +95,11 @@ class FakeOneView < Sinatra::Base
     end
   end
 
+  get '/rest/storage-volumes/:id' do |id|
+    version = env['HTTP_X_API_VERSION']
+    json_response(200, "storage-volumes_#{id}.json", version)
+  end
+
   put '/rest/server-hardware/:id/powerState' do |_id|
     { 'uri' => '/rest/tasks/FAKETASK' }.to_json
   end
@@ -126,5 +139,10 @@ class FakeOneView < Sinatra::Base
     content_type :json
     status response_code
     File.open(File.dirname(__FILE__) + "/fixtures/oneview/v#{version}/" + file_name, 'rb').read
+  rescue Errno::ENOENT
+    puts "ERROR: FakeOneView: File not found:\n '#{File.dirname(__FILE__) + "/fixtures/oneview/v#{version}/" + file_name}'"
+    content_type :json
+    status 404
+    File.open(File.dirname(__FILE__) + '/fixtures/oneview/v120/error_404.json', 'rb').read
   end
 end
