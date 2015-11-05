@@ -103,12 +103,12 @@ module Chef::Provisioning
     def machine_for(machine_spec, machine_options)
       bootstrap_ip_address = machine_options[:driver_options][:ip_address]
       unless bootstrap_ip_address
-        profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-        my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
         id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
         fail 'Must specify a connection to use to bootstrap!' unless id && connection
         bootstrap_ip_address = connection[:ip4Address] # For static IPs
         unless bootstrap_ip_address # Look for dhcp address given to this connection
+          profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+          my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
           mac = profile['connections'].find {|x| x['id'] == id}['mac']
           interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
           bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
