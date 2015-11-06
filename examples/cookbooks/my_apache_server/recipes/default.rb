@@ -35,6 +35,7 @@ remote_directory document_root do
   files_mode '0755'
   source 'oneview'
   notifies :restart, 'service[httpd]', :delayed
+  sensitive true
 end
 
 service 'httpd' do

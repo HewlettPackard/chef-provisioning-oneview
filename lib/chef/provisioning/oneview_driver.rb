@@ -68,6 +68,9 @@ module Chef::Provisioning
         if get_oneview_profile_by_sn(machine_spec.reference['serial_number']).nil? # It doesn't really exist
           action_handler.report_progress "Machine #{host_name} does not really exist.  Recreating ..."
           machine_spec.reference = nil
+        else # Update reference data
+          machine_spec.reference['driver_url'] = driver_url
+          machine_spec.reference['driver_version'] = ONEVIEW_DRIVER_VERSION
         end
       end
       if !machine_spec.reference
@@ -100,6 +103,20 @@ module Chef::Provisioning
 
     def machine_for(machine_spec, machine_options)
       bootstrap_ip_address = machine_options[:driver_options][:ip_address]
+      unless bootstrap_ip_address
+        id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
+        fail 'Must specify a connection to use to bootstrap!' unless id && connection
+        bootstrap_ip_address = connection[:ip4Address] # For static IPs
+        unless bootstrap_ip_address # Look for dhcp address given to this connection
+          profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+          my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
+          mac = profile['connections'].find {|x| x['id'] == id}['mac']
+          interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
+          bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
+        end
+        bootstrap_ip_address ||= my_server['hostName'] # Fall back on hostName
+      end
+      fail 'Server IP address not specified and could not be retrieved!' unless bootstrap_ip_address
       username = machine_options[:transport_options][:user] || 'root' rescue 'root'
       default_ssh_options = {
         # auth_methods: ['password', 'publickey'],

@@ -177,6 +177,7 @@ module ICspAPI
       machine_options[:driver_options][:connections].each do |_id, c|
         requested_ips.push c[:ip4Address] if c[:ip4Address] && c[:dhcp] == false
       end
+      my_server_connections = []
       10.times do
         my_server_connections = rest_api(:icsp, :get, my_server['uri'])['interfaces']
         my_server_connections.each { |c| requested_ips.delete c['ipv4Addr'] }
@@ -185,6 +186,13 @@ module ICspAPI
         sleep 10
       end
       puts "\nWARN: The following IPs are not visible on ICsp, so they may not have gotten configured correctly: #{requested_ips}" unless requested_ips.empty?
+
+      # Set interface data as normal node attributes
+      my_server_connections.each do |c|
+        c['oneViewId'] = profile['connections'].find {|x| x['mac'] == c['macAddr']}['id'] rescue nil
+      end
+      machine_spec.data['normal']['icsp'] ||= {}
+      machine_spec.data['normal']['icsp']['interfaces'] = my_server_connections
     end
   end
 

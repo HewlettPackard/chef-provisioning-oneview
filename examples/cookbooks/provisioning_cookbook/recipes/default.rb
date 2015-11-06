@@ -64,7 +64,7 @@ machine_batch 'oneview-machine-batch' do
         :server_template => my_template,
         :os_build => os_build,
         :host_name => m_name,
-        :ip_address => options['ip4'], # For bootstrapping only.
+        # :ip_address => options['ip4'], # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection
 
         :domainType => 'workgroup',
         :domainName => domain_name,
@@ -72,10 +72,11 @@ machine_batch 'oneview-machine-batch' do
         :mask => mask,
         :dns => dns,
         :connections => {
-          #1 => { ... } (Reserved for PXE)
+          # 1 => { dhcp: true }, # (Reserved for PXE)
           2 => {
             :ip4Address => options['ip4'],
-            :dhcp => options['dhcp'] || false
+            :dhcp => options['dhcp'] || false,
+            :bootstrap => true
           }
         }
       },

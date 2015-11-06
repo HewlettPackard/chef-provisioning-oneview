@@ -49,7 +49,7 @@ Currently supports:
   ```
 
 - Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See [examples/ssl_issues.md](examples/ssl_issues.md) for more info on how to do this.
-- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too. See the wiki pages [OneView Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/OneView-Configuration) and [ICsp Configuration](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/ICsp-Configuration) for details about how to set them up.
+- Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
 
 # Usage
 
@@ -70,7 +70,7 @@ machine 'web01' do
       :server_template => 'Web Server Template',
       :os_build => 'CHEF-RHEL-6.5-x64',
       :host_name => 'chef-web01',
-      :ip_address => 'xx.xx.xx.xx', # For bootstrapping only.
+      :ip_address => 'xx.xx.xx.xx', # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection; see below
       
       :domainType => 'workgroup',
       :domainName => 'sub.domain.com',
@@ -86,6 +86,7 @@ machine 'web01' do
           :dhcp => false            # Optional. Overrides dhcp property above
           :gateway => 'xx.xx.xx.1'  # Optional. Overrides gateway property above
           :dns => 'xx.xx.xx.xx'     # Optional. Overrides dns property above
+          :bootstrap => true        # Set this on 1 connection only. Tells Chef which connection to use to bootstrap.
         },
         3 => {
           :dhcp => true             # Optional. Overrides dhcp property above
