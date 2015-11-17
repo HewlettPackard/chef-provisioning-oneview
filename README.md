@@ -94,6 +94,7 @@ machine 'web01' do
           :dns => :none             # Optional. Overrides dns property above
         }
       },
+      :skip_network_configuration => false, # Default. Set to true for EXSi hosts, etc.
       :custom_attributes => {
         :chefCert => 'ssh-rsa AA...' # Optional
       }
