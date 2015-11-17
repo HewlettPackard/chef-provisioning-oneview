@@ -36,10 +36,10 @@ module OneViewAPI
     fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
-  def get_oneview_profile_by_sn(serialNumber)
-    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
-    matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=serialNumber matches '#{serialNumber}'&sort=name:asc")
-    fail "Failed to get oneview profile by serialNumber: #{serialNumber}. Response: #{matching_profiles}" unless matching_profiles['count']
+  def get_oneview_profile_by_sn(serial_number)
+    fail 'Must specify a serialNumber!' if serial_number.nil? || serial_number.empty?
+    matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=serialNumber matches '#{serial_number}'&sort=name:asc")
+    fail "Failed to get oneview profile by serialNumber: #{serial_number}. Response: #{matching_profiles}" unless matching_profiles['count']
     return matching_profiles['members'].first if matching_profiles['count'] > 0
     nil
   end
