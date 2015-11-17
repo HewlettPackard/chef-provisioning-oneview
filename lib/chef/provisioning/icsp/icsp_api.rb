@@ -34,11 +34,11 @@ module ICspAPI
     fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
-  def get_icsp_server_by_sn(serialNumber)
-    fail 'Must specify a serialNumber!' if serialNumber.nil? || serialNumber.empty?
+  def get_icsp_server_by_sn(serial_number)
+    fail 'Must specify a serialNumber!' if serial_number.nil? || serial_number.empty?
     search_result = rest_api(:icsp, :get,
-      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serialNumber}\"'")['members'] rescue nil
-    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serialNumber
+      "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
+    if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serial_number
       my_server_uri = search_result.first['uri']
       my_server = rest_api(:icsp, :get, my_server_uri)
     end
@@ -47,7 +47,7 @@ module ICspAPI
       # Pick the relevant os deployment server from icsp
       my_server = nil
       os_deployment_servers['members'].each do |server|
-        if server['serialNumber'] == serialNumber
+        if server['serialNumber'] == serial_number
           my_server = server
           break
         end
@@ -154,6 +154,7 @@ module ICspAPI
   end
 
   def icsp_configure_networking(action_handler, machine_spec, machine_options, my_server, profile)
+    return if machine_options[:driver_options][:skip_network_configuration] == true
     action_handler.perform_action "Configure networking on #{machine_spec.name}" do
       action_handler.report_progress "INFO: Configuring networking on #{machine_spec.name}"
       personality_data = icsp_build_personality_data(machine_options, profile)
