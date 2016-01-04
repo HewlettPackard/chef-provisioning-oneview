@@ -9,7 +9,7 @@ module CustomizeMachine
     unless profile['state'] == 'Normal'
       action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
         action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
-        task = oneview_wait_for(profile['taskUri'], 240) # Wait up to 40 min for profile to be created
+        task = oneview_wait_for(profile['taskUri'], 360) # Wait up to 60 min for profile to be created
         fail 'Timed out waiting for server to start and profile to be applied' if task == false
         unless task == true
           server_template = machine_options[:driver_options][:server_template]

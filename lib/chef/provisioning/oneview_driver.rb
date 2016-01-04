@@ -1,5 +1,6 @@
 require 'chef/json_compat'
 require 'chef/knife'
+require 'chef/provisioning'
 require 'chef/provisioning/convergence_strategy/install_sh'
 require 'chef/provisioning/driver'
 require 'chef/provisioning/transport/ssh'
