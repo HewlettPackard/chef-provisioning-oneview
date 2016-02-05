@@ -5,9 +5,6 @@ rvm:
   - 2.1
   - 2.2
 
-before_install:
-  - sudo dpkg --get-selections | grep -v deinstall
-
 bundler_args: --verbose
 
 script:
