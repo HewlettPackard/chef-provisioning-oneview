@@ -1,6 +1,10 @@
 language: ruby
+sudo: false
+
 rvm:
+  - 2.0
   - 2.1
+  - 2.2
 
 script:
   - rake build
