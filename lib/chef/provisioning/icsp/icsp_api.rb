@@ -31,7 +31,7 @@ module ICspAPI
     }
     response = rest_api(:icsp, :post, path, options)
     return response['sessionID'] if response['sessionID']
-    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
+    fail("\nERROR! Couldn't log into ICSP server at #{@icsp_base_url}. Response:\n#{response}")
   end
 
   def get_icsp_server_by_sn(serial_number)
