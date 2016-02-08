@@ -8,10 +8,10 @@ module ICspAPI
   def get_icsp_api_version
     begin
       version = rest_api(:icsp, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
-      fail "Couldn't get API version" unless version
+      raise "Couldn't get API version" unless version
       if version.class != Fixnum
         version = version.to_i
-        fail 'API version type mismatch' if !version > 0
+        raise 'API version type mismatch' if !version > 0
       end
     rescue
       puts 'Failed to get ICSP API version. Setting to default (102)'
@@ -31,11 +31,11 @@ module ICspAPI
     }
     response = rest_api(:icsp, :post, path, options)
     return response['sessionID'] if response['sessionID']
-    fail("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
+    raise("\nERROR! Couldn't log into OneView server at #{@oneview_base_url}. Response:\n#{response}")
   end
 
   def get_icsp_server_by_sn(serial_number)
-    fail 'Must specify a serialNumber!' if serial_number.nil? || serial_number.empty?
+    raise 'Must specify a serialNumber!' if serial_number.nil? || serial_number.empty?
     search_result = rest_api(:icsp, :get,
       "/rest/index/resources?category=osdserver&query='osdServerSerialNumber:\"#{serial_number}\"'")['members'] rescue nil
     if search_result && search_result.size == 1 && search_result.first['attributes']['osdServerSerialNumber'] == serial_number
@@ -57,7 +57,7 @@ module ICspAPI
   end
 
   def icsp_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10)
-    fail 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
+    raise 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
     wait_iterations.times do
       task = rest_api(:icsp, :get, task_uri)
       if task['taskState']
@@ -108,7 +108,7 @@ module ICspAPI
           print '.'
           sleep 10
         end
-        fail "Timed out waiting for #{machine_spec.name} to go into maintenance mode in ICsp. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
+        raise "Timed out waiting for #{machine_spec.name} to go into maintenance mode in ICsp. State: #{my_server['state']}" unless my_server['state'] == 'MAINTENANCE'
       end
     end
 
@@ -122,12 +122,12 @@ module ICspAPI
         uri = "/rest/index/resources?userQuery=\"'#{os_build}'\"&category=osdbuildplan"
         while uri
           matching_plans = rest_api(:icsp, :get, uri)
-          fail "Search failed for OSBP '#{os_build}'. Response: #{matching_plans}" unless matching_plans['members']
+          raise "Search failed for OSBP '#{os_build}'. Response: #{matching_plans}" unless matching_plans['members']
           build_plan_uri = matching_plans['members'].find {|bp| bp['name'] == os_build}['uri'] rescue nil
           break unless build_plan_uri.nil?
           uri = URI.unescape(matching_plans['nextPageUri']) rescue nil
         end
-        fail "OS build plan #{os_build} not found!" if build_plan_uri.nil?
+        raise "OS build plan #{os_build} not found!" if build_plan_uri.nil?
         build_plan_uris.push build_plan_uri
       end
     end
@@ -147,9 +147,9 @@ module ICspAPI
       action_handler.report_progress "INFO: Running: #{os_builds} OS Build Plan(s) on #{machine_spec.name}"
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
-      fail "Failed to start OS Deployment Job. Details: #{task['details'] || task['message'] || task}" unless task_uri
+      raise "Failed to start OS Deployment Job. Details: #{task['details'] || task['message'] || task}" unless task_uri
       task = icsp_wait_for(task_uri, 720)
-      fail "Error running OS build plan(s) #{os_builds}: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
+      raise "Error running OS build plan(s) #{os_builds}: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
     end
   end
 
@@ -169,9 +169,9 @@ module ICspAPI
 
       task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
       task_uri = task['uri']
-      fail "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
+      raise "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
       task = icsp_wait_for(task_uri, 60) # Wait for up to 10 min
-      fail "Error running network personalization job: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
+      raise "Error running network personalization job: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
 
       # Check if ICsp IP config matches machine options
       requested_ips = []
@@ -246,11 +246,11 @@ module ICspAPI
         task_uri = task['uri']
         90.times do # Wait for up to 15 minutes
           task = rest_api(:icsp, :get, task_uri)
-          break if task['taskState'].downcase == 'completed'
+          break if task['taskState'].casecmp('completed') == 0
           print '.'
           sleep 10
         end
-        fail "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].downcase == 'completed'
+        raise "Deleting os deployment server #{machine_spec.name} at icsp failed!" unless task['taskState'].casecmp('completed') == 0
       end
     end
   end
@@ -261,7 +261,7 @@ module ICspAPI
 
     machine_options[:driver_options][:connections].each do |id, options|
       next unless options.is_a?(Hash) && options[:team]
-      fail "#{options[:team]}: Team names must not include hyphens" if options[:team].to_s.match('-')
+      raise "#{options[:team]}: Team names must not include hyphens" if options[:team].to_s.include?('-')
       teams[options[:team].to_s] ||= []
       begin
         mac = profile['connections'].find {|x| x['id'] == id}['mac']
@@ -274,7 +274,7 @@ module ICspAPI
     end
     team_strings = []
     teams.each do |name, macs|
-      fail "Team '#{name}' must have at least 2 associated connections to form a NIC team" unless macs.size >= 2
+      raise "Team '#{name}' must have at least 2 associated connections to form a NIC team" unless macs.size >= 2
       team_strings.push "#{name}-#{macs.join(',')}"
     end
     machine_options[:driver_options][:custom_attributes] ||= {}

@@ -18,20 +18,20 @@ def install_cert(url, cert_file = ENV['SSL_CERT_FILE'], name = 'Chef Server')
     http.peer_cert.to_pem
   end
 
-  fail "Could not download cert from #{url}. You may have to do it manually, and append it to '#{cert_file}'" if pem.nil?
+  raise "Could not download cert from #{url}. You may have to do it manually, and append it to '#{cert_file}'" if pem.nil?
 
   print "  Writing #{uri.host} cert to '#{cert_file}'..."
   open(cert_file, 'ab') do |f|
     s = "\n#{name} at #{uri.host}"
     f.write "#{s}\n"
     f.write "#{'=' * (s.length - 1)}\n"
-    f.write "#{pem}"
+    f.write pem
   end
   puts " Done! \n"
 end
 
 knife_location = File.expand_path("#{script_dir}/.chef/knife.rb")
-fail "Error! knife.rb file not found at '#{knife_location}'!" unless File.exist?(knife_location)
+raise "Error! knife.rb file not found at '#{knife_location}'!" unless File.exist?(knife_location)
 config = Ridley::Chef::Config.new(knife_location).to_hash
 chef_server_url = config[:chef_server_url]
 chef_server_url.sub! ':443', '' if chef_server_url

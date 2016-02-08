@@ -37,7 +37,7 @@ module CreateMachine
       options['X-API-Version'] = 200 if @current_oneview_api_version >= 200 && template['type'] == 'ServerProfileV5'
       task = rest_api(:oneview, :post, '/rest/server-profiles', options)
       task_uri = task['uri']
-      fail "Failed to create OneView server profile #{host_name}. Details: " unless task_uri
+      raise "Failed to create OneView server profile #{host_name}. Details: " unless task_uri
       # Wait for profile to be created
       60.times do # Wait for up to 5 min
         matching_profiles = rest_api(:oneview, :get, "/rest/server-profiles?filter=name matches '#{host_name}'&sort=name:asc")
@@ -46,7 +46,7 @@ module CreateMachine
         sleep 5
       end
       task = rest_api(:oneview, :get, task_uri)
-      fail "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
+      raise "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message']}"
     end
   end
 end

@@ -14,7 +14,7 @@ module RestAPI
       options['auth'] ||= @oneview_key
       disable_ssl = true if @oneview_disable_ssl
     else
-      fail "Invalid rest host: #{host}"
+      raise "Invalid rest host: #{host}"
     end
 
     http = Net::HTTP.new(uri.host, uri.port)
@@ -31,14 +31,14 @@ module RestAPI
     when 'delete', :delete
       request = Net::HTTP::Delete.new(uri.request_uri)
     else
-      fail "Invalid rest call: #{type}"
+      raise "Invalid rest call: #{type}"
     end
     options['Content-Type'] ||= 'application/json'
     options.delete('Content-Type')  if [:none, 'none', nil].include?(options['Content-Type'])
     options.delete('X-API-Version') if [:none, 'none', nil].include?(options['X-API-Version'])
     options.delete('auth')          if [:none, 'none', nil].include?(options['auth'])
     options.each do |key, val|
-      if key.downcase == 'body'
+      if key.casecmp('body') == 0
         request.body = val.to_json rescue val
       else
         request[key] = val
