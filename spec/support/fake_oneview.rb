@@ -15,10 +15,10 @@ class FakeOneView < Sinatra::Base
   get '/rest/server-profile-templates' do
     version = env['HTTP_X_API_VERSION']
     file_name = 'server-profile-templates_invalid.json'
-    if params['filter'] && params['filter'].match('name matches')
-      if params['filter'].match('Web Server Template with SAN')
+    if params['filter'] && params['filter'] =~ /name matches/
+      if params['filter'] =~ /Web Server Template with SAN/
         file_name = 'server-profile-templates_WebServerTemplateWithSAN.json'
-      elsif params['filter'].match('Web Server Template')
+      elsif params['filter'] =~ /Web Server Template/
         file_name = 'server-profile-templates_WebServerTemplate.json'
       end
     end
@@ -40,28 +40,28 @@ class FakeOneView < Sinatra::Base
     version = env['HTTP_X_API_VERSION']
     file_name = 'server-profiles.json'
     if params['filter']
-      if params['filter'].match('matches \'\'') || params['filter'].match('INVALIDFILTER')
+      if params['filter'].match('matches \'\'') || params['filter'] =~ /INVALIDFILTER/
         file_name = 'server-profiles_invalid_filter.json'
-      elsif params['filter'].match('serialNumber matches')
-        if params['filter'].match('VCGE9KB041')
-          file_name = 'server-profiles_sn_VCGE9KB041.json'
-        elsif params['filter'].match('VCGE9KB042')
-          file_name = 'server-profiles_sn_VCGE9KB042.json'
-        else
-          file_name = 'server-profiles_sn_empty.json'
-        end
-      elsif params['filter'].match('name matches')
-        if params['filter'].match('Template - Web Server with SAN')
-          file_name = 'server-profiles_name_Template-WebServerWithSAN.json'
-        elsif params['filter'].match('Template - Web Server')
-          file_name = 'server-profiles_name_Template-WebServer.json'
-        elsif params['filter'].match('chef-web01')
-          file_name = 'server-profiles_name_chef-web01.json'
-        elsif $server_created == 'chef-web03'
-          file_name = 'server-profiles_name_chef-web03.json'
-        else
-          file_name = 'server-profiles_name_empty.json'
-        end
+      elsif params['filter'] =~ /serialNumber matches/
+        file_name = if params['filter'] =~ /VCGE9KB041/
+                      'server-profiles_sn_VCGE9KB041.json'
+                    elsif params['filter'] =~ /VCGE9KB042/
+                      'server-profiles_sn_VCGE9KB042.json'
+                    else
+                      'server-profiles_sn_empty.json'
+                    end
+      elsif params['filter'] =~ /name matches/
+        file_name = if params['filter'] =~ /Template - Web Server with SAN/
+                      'server-profiles_name_Template-WebServerWithSAN.json'
+                    elsif params['filter'] =~ /Template - Web Server/
+                      'server-profiles_name_Template-WebServer.json'
+                    elsif params['filter'] =~ /chef-web01/
+                      'server-profiles_name_chef-web01.json'
+                    elsif $server_created == 'chef-web03'
+                      'server-profiles_name_chef-web03.json'
+                    else
+                      'server-profiles_name_empty.json'
+                    end
       end
     end
     json_response(200, file_name, version)
@@ -80,7 +80,7 @@ class FakeOneView < Sinatra::Base
   get '/rest/server-hardware' do
     version = env['HTTP_X_API_VERSION']
     file_name = 'server-hardware.json'
-    if params['filter'].match('enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39') # && params['filter'].match('') # TODO
+    if params['filter'] =~ %r{enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39}
       file_name = 'server-hardware_Template-WebServer.json'
     end
     json_response(200, file_name, version)

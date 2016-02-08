@@ -14,6 +14,8 @@ Currently supports:
 
 # Installation
 
+- Install Ruby and the `ruby-devel` or `ruby-dev` package for your system.
+  
 - Require the gem in your Gemfile: `gem 'chef-provisioning-oneview'`
   
   Then run `$ bundle install`

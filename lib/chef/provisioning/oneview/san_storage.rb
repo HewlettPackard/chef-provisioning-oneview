@@ -20,10 +20,10 @@ module OneViewSanStorage
     boot_vols = []
     san_storage['volumeAttachments'].each do |v|
       fill_volume_details(v) unless profile['serverProfileTemplateUri']
-      fail "#{machine_spec.name}: Should know if volume is sharable:\n#{v}" unless v.key?('volumeShareable')
+      raise "#{machine_spec.name}: Should know if volume is sharable:\n#{v}" unless v.key?('volumeShareable')
 
       # Match boot disks by name
-      boot_vols.push(v['volumeName']) if v['volumeName'].downcase.match(/^boot/)
+      boot_vols.push(v['volumeName']) if v['volumeName'] =~ /^boot/i
       v['volumeName'] += " #{profile['name']}" unless v['volumeShareable'] # Append profile name to volume name
 
       unless profile['serverProfileTemplateUri'] # Only needed when coppied from profile
@@ -37,11 +37,11 @@ module OneViewSanStorage
 
           # Assumes all cloned volumes are non-permanet. Might want some global config to control this
           v['permanent'] = false
-          v['lun'] = nil if v['lunType'].downcase == 'auto'
+          v['lun'] = nil if v['lunType'].casecmp('auto') == 0
         end
       end
     end
-    fail "#{machine_spec.name}: There should only be 1 SAN boot volume. Boot volumes: #{boot_vols}" if boot_vols.size > 1
+    raise "#{machine_spec.name}: There should only be 1 SAN boot volume. Boot volumes: #{boot_vols}" if boot_vols.size > 1
     profile
   end
 
@@ -53,15 +53,15 @@ module OneViewSanStorage
     update_needed = false
     profile['sanStorage']['volumeAttachments'].each do |v|
       vol_details = rest_api(:oneview, :get, v['volumeUri'])
-      next unless vol_details['name'].downcase.match(/^boot/)
+      next unless vol_details['name'] =~ /^boot/i
       # Find the enabled path(s), get target wwpn, and then update connection, setting boot targets
       v['storagePaths'].each do |s|
         next if !s['isEnabled'] || s['storageTargets'].nil? || s['storageTargets'].empty?
         connection = profile['connections'].find { |c| c['id'] == s['connectionId'] }
-        fail "#{machine_spec.name}: Connection #{s['connectionId']} not found! Check SAN settings" unless connection
+        raise "#{machine_spec.name}: Connection #{s['connectionId']} not found! Check SAN settings" unless connection
         if connection['boot'].nil? || connection['boot']['priority'] == 'NotBootable'
           msg = "#{machine_spec.name}: Connection #{s['connectionId']} is labeled for boot, but the connection is not marked as bootable."
-          fail "#{msg} Set the connection boot target to Primary or Secondary"
+          raise "#{msg} Set the connection boot target to Primary or Secondary"
         end
         target = {}
         target['arrayWwpn'] = s['storageTargets'].first.delete(':')
@@ -81,8 +81,8 @@ module OneViewSanStorage
         power_off(action_handler, machine_spec, profile['serverHardwareUri'])
         task = rest_api(:oneview, :put, profile['uri'], { 'body' => profile })
         task = oneview_wait_for(task['uri'], 90) # Wait for up to 15 min for profile to be updated
-        fail "Timed out waiting for enabling SAN-bootable connections on #{machine_spec.name}" if task == false
-        fail "Error enabling SAN-bootable connections on #{machine_spec.name}. Response: #{task}" unless task == true
+        raise "Timed out waiting for enabling SAN-bootable connections on #{machine_spec.name}" if task == false
+        raise "Error enabling SAN-bootable connections on #{machine_spec.name}. Response: #{task}" unless task == true
       end
       profile = rest_api(:oneview, :get, profile['uri'])
     end

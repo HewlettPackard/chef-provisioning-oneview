@@ -10,14 +10,14 @@ module CustomizeMachine
       action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
         action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
         task = oneview_wait_for(profile['taskUri'], 360) # Wait up to 60 min for profile to be created
-        fail 'Timed out waiting for server to start and profile to be applied' if task == false
+        raise 'Timed out waiting for server to start and profile to be applied' if task == false
         unless task == true
           server_template = machine_options[:driver_options][:server_template]
-          fail "Error creating server profile from template #{server_template}: #{task['taskErrors'].first['message']}"
+          raise "Error creating server profile from template #{server_template}: #{task['taskErrors'].first['message']}"
         end
       end
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
-      fail "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
+      raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
     end
 
     # Configure SAN storage (if applicable)
@@ -36,7 +36,7 @@ module CustomizeMachine
         print '.'
         sleep 10
       end
-      fail "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
+      raise "Timeout waiting for server #{machine_spec.name} to register with ICSP" if my_server.nil?
     end
 
     icsp_configure_nic_teams(machine_options, profile)
@@ -58,16 +58,16 @@ module CustomizeMachine
           action_handler.report_progress "INFO: Performing network flipping on #{machine_spec.name}, connection #{id}"
           deploy_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:deployNet] }
           new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
-          fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
-          fail "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
+          raise "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
+          raise "Failed to perform network flipping on #{machine_spec.name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
           profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
           profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
           options = { 'body' => profile }
           task = rest_api(:oneview, :put, profile['uri'], options)
-          fail "Failed to perform network flipping on #{machine_spec.name}. Details: #{task['message'] || task}" unless task['uri']
+          raise "Failed to perform network flipping on #{machine_spec.name}. Details: #{task['message'] || task}" unless task['uri']
           task = oneview_wait_for(task['uri']) # Wait up to 10 min
-          fail "Timed out waiting for network flipping on #{machine_spec.name}" if task == false
-          fail "Error performing network flip on #{machine_spec.name}. Response: #{task}" unless task == true
+          raise "Timed out waiting for network flipping on #{machine_spec.name}" if task == false
+          raise "Error performing network flip on #{machine_spec.name}. Response: #{task}" unless task == true
         end
       end
       machine_spec.reference['network_personalitation_finished'] = true
