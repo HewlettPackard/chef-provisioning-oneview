@@ -69,17 +69,17 @@ machine 'web01' do
   recipe 'my_server_cookbook::default'
 
   machine_options :driver_options => {
-      :server_template => 'Web Server Template',
-      :os_build => 'CHEF-RHEL-6.5-x64',
+      :server_template => 'Web Server Template', # Name of Template OR Server Profile
+      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP
+      
       :host_name => 'chef-web01',
       :ip_address => 'xx.xx.xx.xx', # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection; see below
-      
       :domainType => 'workgroup',
       :domainName => 'sub.domain.com',
       :mask => '255.255.255.0', # Can set here or in individual connections below
-      :dhcp => false,
-      :gateway =>  'xx.xx.xx.1',
-      :dns => 'xx.xx.xx.xx,xx.xx.xx.xx,xx.xx.xx.xx',
+      :dhcp => false, # Can set here or in individual connections below
+      :gateway =>  'xx.xx.xx.1', # Can set here or in individual connections below
+      :dns => 'xx.xx.xx.xx,xx.xx.xx.xx,xx.xx.xx.xx', # Can set here or in individual connections below
       :connections => {
         #1 => { ... } (Reserved for PXE on our setup)
         2 => {
