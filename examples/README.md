@@ -39,3 +39,5 @@ This directory contains everything you need to start provisioning with OneView a
 ## Troubleshooting
 
 - One of the most common problems people run into is ssl certificate verification issues with private Chef servers. See [ssl_issues.md](ssl_issues.md) to fix these errors.
+
+- Also see the [Trouleshooting wiki page](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/Troubleshooting)

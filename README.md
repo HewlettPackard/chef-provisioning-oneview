@@ -171,6 +171,10 @@ Add `:team => 'TeamName'` into a connection in your connections hash. Make sure 
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.
 
 
+# Troubleshooting
+See the [Trouleshooting wiki page](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/Troubleshooting)
+
+
 # Contributing
 You know the drill. Fork it, branch it, change it, commit it, pull-request it. We're passionate about improving this driver, and glad to accept help to make it better.
 
