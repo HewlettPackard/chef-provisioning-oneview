@@ -1,5 +1,5 @@
 # chef-provisioning-oneview
-Chef Provisioning driver for HP OneView
+Chef Provisioning driver for HPE OneView
 
 
 [![Build Status](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview.svg?branch=master)](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview)
@@ -14,17 +14,16 @@ Currently supports:
 
 # Installation
 
-- Install Ruby and the `ruby-devel` or `ruby-dev` package for your system.
-  
-- Require the gem in your Gemfile: `gem 'chef-provisioning-oneview'`
-  
-  Then run `$ bundle install`
-- Or run the command:
-  
+- This program is meant to run inside the chef-client, so to install it, add the following to a Chef recipe and run it:
   ```ruby
-  $ gem install chef-provisioning-oneview
+  chef_gem 'chef-provisioning-oneview'
   ```
-
+  
+- To install it on your system Ruby for development purposes:
+  - Install Ruby and the `ruby-devel` or `ruby-dev` package for your system.
+    
+  - Option 1: Require the gem in your Gemfile: `gem 'chef-provisioning-oneview'`, then run `$ bundle install`
+  - Option 2: Run the command: `$ gem install chef-provisioning-oneview`
 
 
 # Prerequisites
@@ -170,6 +169,10 @@ Add `:team => 'TeamName'` into a connection in your connections hash. Make sure 
 
 # Doing a test run
 This repo contains everything you need to get started, including example recipes and knife configuration files. See the README in the [examples](examples/) directory for how to begin provisioning.
+
+
+# Troubleshooting
+See the [Trouleshooting wiki page](https://github.com/HewlettPackard/chef-provisioning-oneview/wiki/Troubleshooting)
 
 
 # Contributing

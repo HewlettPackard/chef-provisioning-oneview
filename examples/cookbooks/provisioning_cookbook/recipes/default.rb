@@ -2,7 +2,7 @@
 # Cookbook Name:: provisioning_cookbook
 # Recipe:: default
 #
-# Copyright (C) 2015 HP
+# Copyright (C) Hewlett Packard Enterprise
 #
 # All rights reserved - Do Not Redistribute
 #

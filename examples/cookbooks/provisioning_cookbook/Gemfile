@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'berkshelf'
-gem "test-kitchen"
-gem "kitchen-vagrant"
+gem 'test-kitchen'
+gem 'kitchen-vagrant'
 gem 'chefspec'
 gem 'foodcritic'
-gem "chef-provisioning-oneview"
+gem 'chef-provisioning-oneview'
