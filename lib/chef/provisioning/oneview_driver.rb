@@ -111,20 +111,35 @@ module Chef::Provisioning
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
       if @icsp_key.nil?
-        puts '/n WARNING: Not using ICSP/n'
+        Chef::Log.warn " WARNING: Not using ICSP"
+        transport = OneViewTransport.new
+        convergence = OneViewConvergence.new
+        Machine::BasicMachine.new(machine_spec, transport, convergence)
       else
         # This function takes care of installing the operating system etc. to the machine (blade)
         customize_machine(action_handler, machine_spec, machine_options, profile)
-      end
-	#This is a provisining function and handles installing a chef-client
-      machine_for(machine_spec, machine_options) # Return the Machine object
+           #This is a provisining function and handles installing a chef-client
+        machine_for(machine_spec, machine_options) # Return the Machine object 
+     end
+    end
+
+    class OneViewTransport
+     def disconnect(*args, &block)
+      nil
+     end
+    end 
+
+    class OneViewConvergence
+     def setup_convergence(*args, &block)
+      nil
+     end
+     def converge(*args, &block)
+      nil
+     end
     end
 
 
     def machine_for(machine_spec, machine_options)
-      if @icsp_key.nil?
-        puts 'Not installing client as no OS, not used ICSP'
-      else
         bootstrap_ip_address = machine_options[:driver_options][:ip_address]
         unless bootstrap_ip_address
           id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
@@ -156,7 +171,6 @@ module Chef::Provisioning
         transport = Chef::Provisioning::Transport::SSH.new(bootstrap_ip_address, username, ssh_options, options, config)
         convergence_strategy = Chef::Provisioning::ConvergenceStrategy::InstallSh.new(
           machine_options[:convergence_options], {})
-      end  
       Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport, convergence_strategy)
   end
 
