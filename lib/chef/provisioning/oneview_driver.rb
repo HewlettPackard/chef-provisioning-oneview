@@ -47,20 +47,33 @@ module Chef::Provisioning
       raise 'Must set the knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
       @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
       @oneview_api_version = 120 # Use this version for all calls that don't override it
+      @api_timeout = 5 # default timeout
+      @api_timeout = config[:knife][:api_timeout] #get the timeout from the knife.rb config
       @current_oneview_api_version = get_oneview_api_version
       @oneview_key         = login_to_oneview
 
       @icsp_base_url       = config[:knife][:icsp_url]
-      raise 'Must set the knife[:icsp_url] attribute!' if @icsp_base_url.nil? || @icsp_base_url.empty?
+      #puts 'WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!' if @icsp_base_url.nil? || @icsp_base_url.empty?
       @icsp_username       = config[:knife][:icsp_username]
-      raise 'Must set the knife[:icsp_username] attribute!' if @icsp_username.nil? || @icsp_username.empty?
+      #puts 'WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!' if @icsp_username.nil? || @icsp_username.empty?
       @icsp_password       = config[:knife][:icsp_password]
-      raise 'Must set the knife[:icsp_password] attribute!' if @icsp_password.nil? || @icsp_password.empty?
+      #puts 'WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!' if @icsp_password.nil? || @icsp_password.empty?
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
-      @current_icsp_api_version = get_icsp_api_version
-      @icsp_key            = login_to_icsp
-    end
+      if @icsp_base_url.nil?
+        puts 'WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!'
+        if @icsp_username.nil?
+          puts 'WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!'
+          if @icsp_password.nil?
+            puts 'WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!'
+          else 
+            puts 'Logging into ICSP'
+            @current_icsp_api_version = get_icsp_api_version
+            @icsp_key            = login_to_icsp
+          end
+        end
+     end 
+   end
 
 
     def allocate_machine(action_handler, machine_spec, machine_options)
@@ -97,45 +110,55 @@ module Chef::Provisioning
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
-      customize_machine(action_handler, machine_spec, machine_options, profile)
+      if @icsp_key.nil?
+        puts '/n WARNING: Not using ICSP/n'
+      else
+        # This function takes care of installing the operating system etc. to the machine (blade)
+        customize_machine(action_handler, machine_spec, machine_options, profile)
+      end
+	#This is a provisining function and handles installing a chef-client
       machine_for(machine_spec, machine_options) # Return the Machine object
     end
 
 
     def machine_for(machine_spec, machine_options)
-      bootstrap_ip_address = machine_options[:driver_options][:ip_address]
-      unless bootstrap_ip_address
-        id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
-        raise 'Must specify a connection to use to bootstrap!' unless id && connection
-        bootstrap_ip_address = connection[:ip4Address] # For static IPs
-        unless bootstrap_ip_address # Look for dhcp address given to this connection
-          profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
-          my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
-          mac = profile['connections'].find {|x| x['id'] == id}['mac']
-          interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
-          bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
+      if @icsp_key.nil?
+        puts 'Not installing client as no OS, not used ICSP'
+      else
+        bootstrap_ip_address = machine_options[:driver_options][:ip_address]
+        unless bootstrap_ip_address
+          id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
+          raise 'Must specify a connection to use to bootstrap!' unless id && connection
+          bootstrap_ip_address = connection[:ip4Address] # For static IPs
+          unless bootstrap_ip_address # Look for dhcp address given to this connection
+            profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+            my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
+            mac = profile['connections'].find {|x| x['id'] == id}['mac']
+            interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
+            bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
+          end
+          bootstrap_ip_address ||= my_server['hostName'] # Fall back on hostName
         end
-        bootstrap_ip_address ||= my_server['hostName'] # Fall back on hostName
-      end
-      raise 'Server IP address not specified and could not be retrieved!' unless bootstrap_ip_address
-      username = machine_options[:transport_options][:user] || 'root' rescue 'root'
-      default_ssh_options = {
-        # auth_methods: ['password', 'publickey'],
-        # keys: ['~/.ssh/id_rsa'],
-        password: Chef::Config.knife[:node_root_password]
-      }
-      ssh_options = machine_options[:transport_options][:ssh_options] || default_ssh_options rescue default_ssh_options
-      default_options = {
-        prefix: 'sudo ',
-        ssh_pty_enable: true
-      }
-      options = machine_options[:transport_options][:options] || default_options rescue default_options
+        raise 'Server IP address not specified and could not be retrieved!' unless bootstrap_ip_address
+        username = machine_options[:transport_options][:user] || 'root' rescue 'root'
+        default_ssh_options = {
+          # auth_methods: ['password', 'publickey'],
+          # keys: ['~/.ssh/id_rsa'],
+          password: Chef::Config.knife[:node_root_password]
+        }
+        ssh_options = machine_options[:transport_options][:ssh_options] || default_ssh_options rescue default_ssh_options
+        default_options = {
+          prefix: 'sudo ',
+          ssh_pty_enable: true
+        }
+        options = machine_options[:transport_options][:options] || default_options rescue default_options
 
-      transport = Chef::Provisioning::Transport::SSH.new(bootstrap_ip_address, username, ssh_options, options, config)
-      convergence_strategy = Chef::Provisioning::ConvergenceStrategy::InstallSh.new(
-        machine_options[:convergence_options], {})
+        transport = Chef::Provisioning::Transport::SSH.new(bootstrap_ip_address, username, ssh_options, options, config)
+        convergence_strategy = Chef::Provisioning::ConvergenceStrategy::InstallSh.new(
+          machine_options[:convergence_options], {})
+      end  
       Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport, convergence_strategy)
-    end
+  end
 
 
     def stop_machine(action_handler, machine_spec, _machine_options)
@@ -146,7 +169,11 @@ module Chef::Provisioning
     def destroy_machine(action_handler, machine_spec, machine_options)
       if machine_spec.reference
         power_off(action_handler, machine_spec) # Power off server
-        destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
+        if @icsp_key.nil?
+           puts 'No Profile to delete from ICSP'
+        else
+           destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
+        end
         destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
 
         name = machine_spec.name # Save for next steps
@@ -160,6 +187,7 @@ module Chef::Provisioning
         # Delete client from the Chef server
         action_handler.perform_action "Delete client '#{name}' from Chef server" do
           begin
+            Ridely::Logging.logger.level = Logger.const_get 'ERROR'
             ridley = Ridley.new(
               server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
               client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
@@ -202,7 +230,11 @@ module Chef::Provisioning
 
     # Login to both OneView and ICsp
     def auth_tokens
-      @icsp_key  ||= login_to_icsp
+      if @icsp_key.nil? 
+        puts 'Not using ICSP'
+      else
+        @icsp_key  ||= login_to_icsp
+      end
       @oneview_key ||= login_to_oneview
       { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
     end
