@@ -23,6 +23,28 @@ module Chef::Provisioning
     include OneViewAPI
     include ICspAPI
 
+
+    # Additional No-Op classes to nil return when a :converge is called
+    # Returns a OneViewTransport::disconnect (nil)
+    class OneViewTransport
+     def disconnect(*args, &block)
+      nil
+     end
+    end
+
+   # Additional Converge class that nils the called methods under a :converge action
+    class OneViewConvergence
+     def setup_convergence(*args, &block)
+      nil
+     end
+     def converge(*args, &block)
+      nil
+     end
+    end
+
+
+
+
     def self.canonicalize_url(url, config)
       _scheme, oneview_url = url.split(':', 2)
       if oneview_url.nil? || oneview_url == ''
@@ -60,7 +82,11 @@ module Chef::Provisioning
       #puts 'WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!' if @icsp_password.nil? || @icsp_password.empty?
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
+
+
+      # Additional Checks to see if there is an ICSP server specified
       if @icsp_base_url.nil?
+        puts ''
         puts 'WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!'
         if @icsp_username.nil?
           puts 'WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!'
@@ -107,10 +133,28 @@ module Chef::Provisioning
     end
 
 
+    def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
+      # Wait for server profile to finish building
+      unless profile['state'] == 'Normal'
+        action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
+          action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
+          task = oneview_wait_for(profile['taskUri'], 360) # Wait up to 60 min for profile to be created
+          raise 'Timed out waiting for server to start and profile to be applied' if task == false
+          unless task == true
+            server_template = machine_options[:driver_options][:server_template]
+            raise "Error creating server profile from template #{server_template}: #{task['taskErrors'].first['message']}"
+          end
+        end
+        profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
+        raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
+      end
+    end
+
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
       if @icsp_key.nil?
+        wait_for_profile(action_handler, machine_spec, machine_options, profile)
         Chef::Log.warn " WARNING: Not using ICSP"
         transport = OneViewTransport.new
         convergence = OneViewConvergence.new
@@ -120,21 +164,6 @@ module Chef::Provisioning
         customize_machine(action_handler, machine_spec, machine_options, profile)
            #This is a provisining function and handles installing a chef-client
         machine_for(machine_spec, machine_options) # Return the Machine object 
-     end
-    end
-
-    class OneViewTransport
-     def disconnect(*args, &block)
-      nil
-     end
-    end 
-
-    class OneViewConvergence
-     def setup_convergence(*args, &block)
-      nil
-     end
-     def converge(*args, &block)
-      nil
      end
     end
 
