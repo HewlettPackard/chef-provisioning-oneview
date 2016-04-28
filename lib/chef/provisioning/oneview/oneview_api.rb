@@ -100,6 +100,23 @@ module OneViewAPI
     false
   end
 
+  def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
+    unless profile['state'] == 'Normal'
+      action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
+        action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
+        task = oneview_wait_for(profile['taskUri'], 360) # Wait up to 60 min for profile to be created
+        raise 'Timed out waiting for server to start and profile to be applied' if task == false
+        unless task == true
+          server_template = machine_options[:driver_options][:server_template]
+          raise "Error creating server profile from template #{server_template}: #{task['taskErrors'].first['message']}"
+        end
+      end
+      profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
+      raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
+    end
+  end
+
+
   def power_on(action_handler, machine_spec, hardware_uri = nil)
     set_power_state(action_handler, machine_spec, 'on', hardware_uri)
   end
