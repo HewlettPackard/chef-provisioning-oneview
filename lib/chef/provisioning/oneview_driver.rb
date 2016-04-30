@@ -132,24 +132,6 @@ module Chef::Provisioning
       end
     end
 
-
-    def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
-      # Wait for server profile to finish building
-      unless profile['state'] == 'Normal'
-        action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
-          action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
-          task = oneview_wait_for(profile['taskUri'], 360) # Wait up to 60 min for profile to be created
-          raise 'Timed out waiting for server to start and profile to be applied' if task == false
-          unless task == true
-            server_template = machine_options[:driver_options][:server_template]
-            raise "Error creating server profile from template #{server_template}: #{task['taskErrors'].first['message']}"
-          end
-        end
-        profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
-        raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
-      end
-    end
-
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile

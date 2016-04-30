@@ -17,8 +17,14 @@ module CreateMachine
     # Search for OneView Template by name
     template = get_oneview_template(machine_options[:driver_options][:server_template])
 
-    # Get first availabe (and compatible) HP OV server blade
-    chosen_blade = available_hardware_for_template(template)
+    # Get first availabe (and compatible) HP OV server blade or if a 
+    # Server location has been specified, use that blade
+    if machine_options[:driver_options][:server_location].nil?
+       chosen_blade = available_hardware_for_template(template)
+    else
+       puts 'Specific Blade'
+       chosen_blade = hardware_for_template_with_location(template, machine_options[:driver_options][:server_location])
+    end
 
     power_off(action_handler, machine_spec, chosen_blade['uri'])
 
