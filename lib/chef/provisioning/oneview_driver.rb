@@ -85,21 +85,30 @@ module Chef::Provisioning
 
       # Added newline to make reading of output easier
       puts ''
-
+      @icsp_ignore = false
       # Additional Checks to see if there is an ICSP server specified
       if @icsp_base_url.nil?
 	Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!")
-        if @icsp_username.nil?
-	  Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!")
-          if @icsp_password.nil?
-            Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!")
-          else
+        @icsp_ignore = true
+      end
+      
+      if @icsp_username.nil?
+        Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!")
+        @icsp_ignore = true
+      end
+      
+      if @icsp_password.nil?
+        Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!")
+        @icsp_ignore = true 
+      end
+      
+      if @icsp_ignore == false
 	    Chef::Log.info("ICSP configuration complete, logging into ICSP") 
             @current_icsp_api_version = get_icsp_api_version
             @icsp_key            = login_to_icsp
-          end
-        end
-     end 
+      end
+      
+   
    end
 
 
