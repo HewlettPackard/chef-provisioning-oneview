@@ -1,3 +1,9 @@
+# FORK from original release for testing of new features to be added into Master
+
+ICSP is no longer required, so skip it from your knife.rb config if you want to use the DCS
+To use specific blades, in your recipe use a line like e.g. `:server_location => 'Encl1, bay 16',`
+
+
 # chef-provisioning-oneview
 Chef Provisioning driver for HPE OneView
 
