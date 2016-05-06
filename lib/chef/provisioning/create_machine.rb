@@ -22,7 +22,7 @@ module CreateMachine
     if machine_options[:driver_options][:server_location].nil?
        chosen_blade = available_hardware_for_template(template)
     else
-       puts 'Specific Blade'
+       Chef::Log.warn "Specific hardware is being allocated"
        chosen_blade = hardware_for_template_with_location(template, machine_options[:driver_options][:server_location])
     end
 

@@ -83,17 +83,18 @@ module Chef::Provisioning
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
 
+      # Added newline to make reading of output easier
+      puts ''
 
       # Additional Checks to see if there is an ICSP server specified
       if @icsp_base_url.nil?
-        puts ''
-        puts 'WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!'
+	Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!")
         if @icsp_username.nil?
-          puts 'WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!'
+	  Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!")
           if @icsp_password.nil?
-            puts 'WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!'
-          else 
-            puts 'Logging into ICSP'
+            Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!")
+          else
+	    Chef::Log.info("ICSP configuration complete, logging into ICSP") 
             @current_icsp_api_version = get_icsp_api_version
             @icsp_key            = login_to_icsp
           end
@@ -137,7 +138,7 @@ module Chef::Provisioning
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
       if @icsp_key.nil?
         wait_for_profile(action_handler, machine_spec, machine_options, profile)
-        Chef::Log.warn " WARNING: Not using ICSP"
+        Chef::Log.warn " WARNING: Converge action being used"
         transport = OneViewTransport.new
         convergence = OneViewConvergence.new
         Machine::BasicMachine.new(machine_spec, transport, convergence)
@@ -195,7 +196,8 @@ module Chef::Provisioning
       if machine_spec.reference
         power_off(action_handler, machine_spec) # Power off server
         if @icsp_key.nil?
-           puts 'No Profile to delete from ICSP'
+	   puts ''
+	   Chef::Log.warn "Not deleting a profile from ICSP"
         else
            destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
         end
@@ -212,7 +214,7 @@ module Chef::Provisioning
         # Delete client from the Chef server
         action_handler.perform_action "Delete client '#{name}' from Chef server" do
           begin
-            Ridely::Logging.logger.level = Logger.const_get 'ERROR'
+            #Ridely::Logging.logger.level = Logger.const_get 'ERROR'
             ridley = Ridley.new(
               server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
               client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
@@ -256,7 +258,8 @@ module Chef::Provisioning
     # Login to both OneView and ICsp
     def auth_tokens
       if @icsp_key.nil? 
-        puts 'Not using ICSP'
+	puts ''
+	Chef::Log.warn "ICSP isn't being used to provisiong OS"
       else
         @icsp_key  ||= login_to_icsp
       end
