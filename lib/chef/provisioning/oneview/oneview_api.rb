@@ -98,8 +98,6 @@ module OneViewAPI
     raise 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
   end
 
-  
-
   def oneview_wait_for(task_uri, wait_iterations = 60, sleep_seconds = 10) # Default time is 10 min
     raise 'Must specify a task_uri!' if task_uri.nil? || task_uri.empty?
     wait_iterations.times do
@@ -117,7 +115,7 @@ module OneViewAPI
     false
   end
 
-  def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
+  def wait_for_profile(action_handler, machine_spec, machine_options,  profile)
     unless profile['state'] == 'Normal'
       action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
         action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"
