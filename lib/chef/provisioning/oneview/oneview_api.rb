@@ -115,6 +115,7 @@ module OneViewAPI
       end
     end
     false
+    puts ''
   end
 
   def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
@@ -131,6 +132,7 @@ module OneViewAPI
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
       raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
     end
+    puts ''
   end
 
 
@@ -172,6 +174,7 @@ module OneViewAPI
         raise "Powering #{state} machine #{machine_spec.name} failed!" unless task['taskState'].casecmp('completed') == 0
       end
     end
+    puts ''
     hardware_uri
   end
 

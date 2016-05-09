@@ -88,17 +88,17 @@ module Chef::Provisioning
       @icsp_ignore = false
       # Additional Checks to see if there is an ICSP server specified
       if @icsp_base_url.nil?
-	Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_url] in knife.rb!")
+	Chef::Log.warn("knife.rb is missing knife[:icsp_url]")
         @icsp_ignore = true
       end
       
       if @icsp_username.nil?
-        Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_username] in knife.rb!")
+        Chef::Log.warn("knife.rb is missing knife[:icsp_username]")
         @icsp_ignore = true
       end
       
       if @icsp_password.nil?
-        Chef::Log.warn("WARNING: Haven\'t set the knife[:icsp_password] in knife.rb!")
+        Chef::Log.warn("knife.rb is missing knife[:icsp_password]")
         @icsp_ignore = true 
       end
       
@@ -145,9 +145,9 @@ module Chef::Provisioning
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
-      if @icsp_key.nil?
+      if @icsp_ignore == true
         wait_for_profile(action_handler, machine_spec, machine_options, profile)
-        Chef::Log.warn " WARNING: Converge action being used"
+        Chef::Log.warn "Action converge action being used, without an ICSP configuration"
         transport = OneViewTransport.new
         convergence = OneViewConvergence.new
         Machine::BasicMachine.new(machine_spec, transport, convergence)
@@ -219,20 +219,22 @@ module Chef::Provisioning
           machine_spec.reference = nil
           machine_spec.delete(action_handler)
         end
-
-        # Delete client from the Chef server
-        action_handler.perform_action "Delete client '#{name}' from Chef server" do
-          begin
-            #Ridely::Logging.logger.level = Logger.const_get 'ERROR'
-            ridley = Ridley.new(
-              server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
-              client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
-              client_key:  machine_options[:convergence_options][:chef_server][:options][:signing_key_filename]
-            )
-            ridley.client.delete(name)
-          rescue  Exception => e
-            action_handler.report_progress "WARN: Failed to delete client #{name} from server!"
-            puts "Error: #{e.message}"
+	
+        if @icsp_ignore == false
+           # Delete client from the Chef server
+            action_handler.perform_action "Delete client '#{name}' from Chef server" do
+             begin
+                #Ridely::Logging.logger.level = Logger.const_get 'ERROR'
+               ridley = Ridley.new(
+                 server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
+                 client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
+                 client_key:  machine_options[:convergence_options][:chef_server][:options][:signing_key_filename]
+               )
+               ridley.client.delete(name)
+             rescue  Exception => e
+               action_handler.report_progress "WARN: Failed to delete client #{name} from server!"
+               puts "Error: #{e.message}"
+             end
           end
         end
 
