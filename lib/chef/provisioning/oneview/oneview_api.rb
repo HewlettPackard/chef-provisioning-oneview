@@ -83,7 +83,7 @@ module OneViewAPI
     raise 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
   end
 
-    def hardware_for_template_with_location(template, location)
+  def hardware_for_template_with_location(template, location)
     server_hardware_type_uri = template['serverHardwareTypeUri']
     enclosure_group_uri      = template['enclosureGroupUri']
     raise 'Template must specify a valid hardware type uri!' if server_hardware_type_uri.nil? || server_hardware_type_uri.empty?
@@ -115,7 +115,6 @@ module OneViewAPI
       end
     end
     false
-    puts ''
   end
 
   def wait_for_profile(action_handler, machine_spec,machine_options,  profile)
@@ -132,7 +131,6 @@ module OneViewAPI
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number']) # Refresh profile
       raise "Server profile state '#{profile['state']}' not 'Normal'" unless profile['state'] == 'Normal'
     end
-    puts ''
   end
 
 
@@ -174,7 +172,6 @@ module OneViewAPI
         raise "Powering #{state} machine #{machine_spec.name} failed!" unless task['taskState'].casecmp('completed') == 0
       end
     end
-    puts ''
     hardware_uri
   end
 

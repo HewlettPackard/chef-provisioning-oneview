@@ -27,17 +27,17 @@ module Chef::Provisioning
     # Additional No-Op classes to nil return when a :converge is called
     # Returns a OneViewTransport::disconnect (nil)
     class OneViewTransport
-     def disconnect(*args, &block)
+     def disconnect(*_args, &_block)
       nil
      end
     end
 
    # Additional Converge class that nils the called methods under a :converge action
     class OneViewConvergence
-     def setup_convergence(*args, &block)
+     def setup_convergence(*_args, &_block)
       nil
      end
-     def converge(*args, &block)
+     def converge(*_args, &_block)
       nil
      end
     end
@@ -109,7 +109,7 @@ module Chef::Provisioning
       end
       
    
-   end
+    end
 
 
     def allocate_machine(action_handler, machine_spec, machine_options)
@@ -156,7 +156,7 @@ module Chef::Provisioning
         customize_machine(action_handler, machine_spec, machine_options, profile)
            #This is a provisining function and handles installing a chef-client
         machine_for(machine_spec, machine_options) # Return the Machine object 
-     end
+      end
     end
 
 
@@ -193,8 +193,7 @@ module Chef::Provisioning
         convergence_strategy = Chef::Provisioning::ConvergenceStrategy::InstallSh.new(
           machine_options[:convergence_options], {})
       Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport, convergence_strategy)
-  end
-
+    end
 
     def stop_machine(action_handler, machine_spec, _machine_options)
       power_off(action_handler, machine_spec) if machine_spec.reference
@@ -235,7 +234,7 @@ module Chef::Provisioning
                action_handler.report_progress "WARN: Failed to delete client #{name} from server!"
                puts "Error: #{e.message}"
              end
-          end
+            end
         end
 
         # Remove entry from known_hosts file(s)
