@@ -53,19 +53,5 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:oneview_password] attribute!')
     end
 
-    it 'requires the icsp_url knife param' do
-      knife_config[:knife].delete(:icsp_url)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_url] attribute!')
-    end
-
-    it 'requires the icsp_username knife param' do
-      knife_config[:knife].delete(:icsp_username)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_username] attribute!')
-    end
-
-    it 'requires the icsp_password knife param' do
-      knife_config[:knife].delete(:icsp_password)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_password] attribute!')
-    end
   end
 end
