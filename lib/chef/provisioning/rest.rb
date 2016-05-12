@@ -18,9 +18,10 @@ module RestAPI
     end
 
     http = Net::HTTP.new(uri.host, uri.port)
+    http.read_timeout = @api_timeout # timeout for a request
+    http.open_timeout = @api_timeout # timeout for a connection
     http.use_ssl = true if uri.scheme == 'https'
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE if disable_ssl
-
     case type.downcase
     when 'get', :get
       request = Net::HTTP::Get.new(uri.request_uri)
