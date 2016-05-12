@@ -95,16 +95,14 @@ module Chef::Provisioning
       if @icsp_base_url.nil?
         Chef::Log.warn('knife.rb is missing knife[:icsp_url]')
         @icsp_ignore = true
-      end
-
-      if @icsp_username.nil?
-        Chef::Log.warn('knife.rb is missing knife[:icsp_username]')
-        @icsp_ignore = true
-      end
-
-      if @icsp_password.nil?
-        Chef::Log.warn('knife.rb is missing knife[:icsp_password]')
-        @icsp_ignore = true
+        if @icsp_username.nil?
+          Chef::Log.warn('knife.rb is missing knife[:icsp_username]')
+          @icsp_ignore = true
+          if @icsp_password.nil?
+            Chef::Log.warn('knife.rb is missing knife[:icsp_password]')
+            @icsp_ignore = true
+          end
+        end
       end
 
       if @icsp_ignore == false
