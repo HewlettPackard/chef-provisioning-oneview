@@ -41,9 +41,10 @@ supermarket_site = config[:knife][:supermarket_site] rescue nil
 puts "============================Adding certs to system keystores============================\n"
 keystores = []
 keystores.push ENV['SSL_CERT_FILE'] if ENV['SSL_CERT_FILE']
-['c:/Program Files (x86)/Git/bin/curl-ca-bundle.crt',
- 'c:/opscode/chefdk/embedded/ssl/certs/cacert.pem',
- '/opt/chefdk/embedded/ssl/certs/cacert.pem'
+[
+  'c:/Program Files (x86)/Git/bin/curl-ca-bundle.crt',
+  'c:/opscode/chefdk/embedded/ssl/certs/cacert.pem',
+  '/opt/chefdk/embedded/ssl/certs/cacert.pem'
 ].each do |ca_bundle|
   keystores.push(ca_bundle) if File.exist?(ca_bundle) && !keystores.include?(ca_bundle)
 end

@@ -16,7 +16,7 @@ module OneViewAPI
         raise 'API version type mismatch' if !version > 0
       end
     rescue
-      puts 'Failed to get OneView API version. Setting to default (120)'
+      Chef::Log.warn 'Failed to get OneView API version. Setting to default (120)'
       version = 120
     end
     version
@@ -69,7 +69,7 @@ module OneViewAPI
     raise "Template '#{template_name}' not found! Please match the template name with one that exists on OneView."
   end
 
-  def available_hardware_for_template(template)
+  def available_hardware_for_template(template, location = nil)
     server_hardware_type_uri = template['serverHardwareTypeUri']
     enclosure_group_uri      = template['enclosureGroupUri']
     raise 'Template must specify a valid hardware type uri!' if server_hardware_type_uri.nil? || server_hardware_type_uri.empty?
@@ -77,23 +77,11 @@ module OneViewAPI
     params = "sort=name:asc&filter=serverHardwareTypeUri='#{server_hardware_type_uri}'&filter=serverGroupUri='#{enclosure_group_uri}'"
     blades = rest_api(:oneview, :get, "/rest/server-hardware?#{params}")
     raise 'Error! No available blades that are compatible with the server template!' unless blades['count'] > 0
+    Chef::Log.debug "Specific hardware requested: #{location}" if location
     blades['members'].each do |member|
-      return member if member['state'] == 'NoProfileApplied'
-    end
-    raise 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
-  end
-
-  def hardware_for_template_with_location(template, location)
-    server_hardware_type_uri = template['serverHardwareTypeUri']
-    enclosure_group_uri      = template['enclosureGroupUri']
-    raise 'Template must specify a valid hardware type uri!' if server_hardware_type_uri.nil? || server_hardware_type_uri.empty?
-    raise 'Template must specify a valid hardware type uri!' if enclosure_group_uri.nil? || enclosure_group_uri.empty?
-    raise 'Location can not be determined' if location.nil? || location.empty?
-    params = "sort=name:asc&filter=serverHardwareTypeUri='#{server_hardware_type_uri}'&filter=serverGroupUri='#{enclosure_group_uri}'"
-    blades = rest_api(:oneview, :get, "/rest/server-hardware?#{params}")
-    raise 'Error! No available blades that are compatible with the server template!' unless blades['count'] > 0
-    blades['members'].each do |member|
-      return member if member['state'] == 'NoProfileApplied' && member['name'] == location
+      next unless member['state'] == 'NoProfileApplied'
+      next if location && member['name'] != location
+      return member
     end
     raise 'No more blades are available for provisioning!' # Every bay is full and no more machines can be allocated
   end
@@ -115,7 +103,7 @@ module OneViewAPI
     false
   end
 
-  def wait_for_profile(action_handler, machine_spec, machine_options,  profile)
+  def wait_for_profile(action_handler, machine_spec, machine_options, profile)
     unless profile['state'] == 'Normal'
       action_handler.perform_action "Wait for #{machine_spec.name} server to start and profile to be applied" do
         action_handler.report_progress "INFO: Waiting for #{machine_spec.name} server to start and profile to be applied"

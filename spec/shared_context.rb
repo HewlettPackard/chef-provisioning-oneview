@@ -11,6 +11,7 @@ RSpec.shared_context 'shared context', a: :b do
       oneview_username: 'Administrator',
       oneview_password: 'password12',
       oneview_ignore_ssl: true,
+      oneview_timeout: 15,
 
       icsp_url: icsp,
       icsp_username: 'administrator',

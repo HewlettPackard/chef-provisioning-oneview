@@ -12,12 +12,6 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
     it 'can parse the icsp sessionID' do
       expect(@instance.instance_eval { login_to_icsp }).to match(@icsp_key)
     end
-
-    it 'gets both auth tokens via the auth_tokens method' do
-      @instance.instance_eval { auth_tokens }
-      expect(@instance.instance_variable_get('@oneview_key')).to match(@oneview_key)
-      expect(@instance.instance_variable_get('@icsp_key')).to match(@icsp_key)
-    end
   end
 
 end
