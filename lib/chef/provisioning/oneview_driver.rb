@@ -158,7 +158,7 @@ module Chef::Provisioning
     end
 
 
-    def destroy_machine(action_handler, machine_spec, machine_options)
+    def destroy_machine(action_handler, machine_spec, _machine_options)
       if machine_spec.reference
         power_off(action_handler, machine_spec) # Power off server
         destroy_icsp_server(action_handler, machine_spec) unless @icsp_ignore # Delete os deployment server from ICSP
