@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'chef', '~> 12.0'
   s.add_dependency 'chef-provisioning', '~> 1.0'
-  s.add_dependency 'ridley', '~> 4.2'
 
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'rake'

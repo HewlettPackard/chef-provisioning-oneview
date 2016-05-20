@@ -72,7 +72,7 @@ machine 'web01' do
 
   machine_options :driver_options => {
       :server_template => 'Web Server Template', # Name of Template OR Server Profile
-      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP
+      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP. Supports array of strings also.
       :server_location => 'Encl1, bay 16', # Optional. Use to provision a specific server
       
       :host_name => 'chef-web01',

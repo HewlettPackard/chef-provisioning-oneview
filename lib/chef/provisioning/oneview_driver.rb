@@ -6,7 +6,6 @@ require 'chef/provisioning/driver'
 require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/machine/unix_machine'
 require 'json'
-require 'ridley'
 require_relative 'driver_init/oneview'
 require_relative 'version'
 require_relative 'rest'
@@ -164,43 +163,22 @@ module Chef::Provisioning
         power_off(action_handler, machine_spec) # Power off server
         destroy_icsp_server(action_handler, machine_spec) unless @icsp_ignore # Delete os deployment server from ICSP
         destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
-        return unless @icsp_ignore # No need to do anything else if the OS was never installed
 
         name = machine_spec.name # Save for next steps
 
-        # Delete the node from the Chef server
-        action_handler.perform_action "Release machine #{machine_spec.reference['serial_number']}" do
-          machine_spec.reference = nil
-          machine_spec.delete(action_handler)
-        end
-
-        # Delete client from the Chef server
-        action_handler.perform_action "Delete client '#{name}' from Chef server" do
-          begin
-            ridley = Ridley.new(
-              server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
-              client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
-              client_key:  machine_options[:convergence_options][:chef_server][:options][:signing_key_filename]
-            )
-            ridley.client.delete(name)
-          rescue  Exception => e
-            action_handler.report_progress "WARN: Failed to delete client #{name} from server!"
-            puts "Error: #{e.message}"
-          end
-        end
-
         # Remove entry from known_hosts file(s)
-        if machine_options[:driver_options][:ip_address]
-          action_handler.perform_action "Delete entry for '#{machine_options[:driver_options][:ip_address]}' from known_hosts file(s)" do
+        ip_address = machine_spec.data['automatic']['ipaddress'] rescue nil
+        if ip_address
+          action_handler.perform_action "Delete entry for #{name} (#{ip_address}) from known_hosts file(s)" do
             files = [File.expand_path('~/.ssh/known_hosts'), File.expand_path('/etc/ssh/known_hosts')]
             files.each do |f|
-              next if !File.exist?(f)
+              next unless File.exist?(f)
               begin
                 text = File.read(f)
-                text.gsub!(/#{machine_options[:driver_options][:ip_address]} ssh-rsa.*(\n|\r\n)/, '')
+                text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
                 File.open(f, 'w') {|file| file.puts text } if text
               rescue  Exception => e
-                action_handler.report_progress "WARN: Failed to delete entry for '#{machine_options[:driver_options][:ip_address]}' from known_hosts file: '#{f}'! "
+                action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
                 puts "Error: #{e.message}"
               end
             end
