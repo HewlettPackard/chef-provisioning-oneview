@@ -24,11 +24,13 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect(@instance.instance_variable_get('@oneview_username')).to eq('Administrator')
       expect(@instance.instance_variable_get('@oneview_password')).to eq('password12')
       expect(@instance.instance_variable_get('@oneview_disable_ssl')).to eq(true)
+      expect(@instance.instance_variable_get('@api_timeout')).to eq(15)
 
       expect(@instance.instance_variable_get('@icsp_base_url')).to eq('https://my-icsp.my-domain.com')
       expect(@instance.instance_variable_get('@icsp_username')).to eq('administrator')
       expect(@instance.instance_variable_get('@icsp_password')).to eq('password123')
       expect(@instance.instance_variable_get('@icsp_disable_ssl')).to eq(nil)
+      expect(@instance.instance_variable_get('@icsp_ignore')).to eq(false)
     end
 
     it 'uses the correct api versions' do
@@ -40,32 +42,38 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
 
     it 'requires the oneview_url knife param' do
       knife_config[:knife].delete(:oneview_url)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:oneview_url] attribute!')
+      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set knife[:oneview_url] attribute!')
     end
 
     it 'requires the oneview_username knife param' do
       knife_config[:knife].delete(:oneview_username)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:oneview_username] attribute!')
+      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set knife[:oneview_username] attribute!')
     end
 
     it 'requires the oneview_password knife param' do
       knife_config[:knife].delete(:oneview_password)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:oneview_password] attribute!')
+      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set knife[:oneview_password] attribute!')
     end
 
-    it 'requires the icsp_url knife param' do
+    it 'gives a warning if the knife[:icsp_url] is not set' do
       knife_config[:knife].delete(:icsp_url)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_url] attribute!')
+      expect(Chef::Log).to receive(:warn).with('knife[:icsp_url] not set in knife.rb!')
+      driver = Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config)
+      expect(driver.instance_variable_get('@icsp_ignore')).to eq(true)
     end
 
-    it 'requires the icsp_username knife param' do
+    it 'gives a warning if the knife[:icsp_username] is not set' do
       knife_config[:knife].delete(:icsp_username)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_username] attribute!')
+      expect(Chef::Log).to receive(:warn).with('knife[:icsp_username] not set in knife.rb!')
+      driver = Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config)
+      expect(driver.instance_variable_get('@icsp_ignore')).to eq(true)
     end
 
-    it 'requires the icsp_password knife param' do
+    it 'gives a warning if the knife[:icsp_password] is not set' do
       knife_config[:knife].delete(:icsp_password)
-      expect { Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config) }.to raise_error('Must set the knife[:icsp_password] attribute!')
+      expect(Chef::Log).to receive(:warn).with('knife[:icsp_password] not set in knife.rb!')
+      driver = Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config)
+      expect(driver.instance_variable_get('@icsp_ignore')).to eq(true)
     end
   end
 end

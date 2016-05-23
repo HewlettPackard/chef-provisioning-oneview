@@ -14,14 +14,13 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'chef', '~> 12.0'
   s.add_dependency 'chef-provisioning', '~> 1.0'
-  s.add_dependency 'ridley', '~> 4.2'
 
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'sinatra'
   s.add_development_dependency 'webmock'
   s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'rubocop', '= 0.40.0'
   s.add_development_dependency 'pry'
 
   s.bindir       = 'bin'

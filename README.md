@@ -36,6 +36,7 @@ Currently supports:
   knife[:oneview_username]   = 'Administrator'
   knife[:oneview_password]   = 'password123'
   knife[:oneview_ignore_ssl] = true # For self-signed certs
+  knife[:oneview_timeout]    = 10 # Optional. 10 (seconds) is the default
   
   knife[:icsp_url]           = 'https://my-icsp.my-domain.com'
   knife[:icsp_username]      = 'Administrator'
@@ -51,6 +52,8 @@ Currently supports:
 
 - Your OneView, Insight Controll Server Provisioning(ICSP), and Chef server must be trusted by your certificate stores. See [examples/ssl_issues.md](examples/ssl_issues.md) for more info on how to do this.
 - Your OneView and ICSP servers must be set up beforehand. Unfortunately, this driver doesn't do that for you too.
+
+Note: ICSP is no longer required, so if you don't want to use it, you can leave those config options from your knife.rb.
 
 # Usage
 
@@ -69,7 +72,8 @@ machine 'web01' do
 
   machine_options :driver_options => {
       :server_template => 'Web Server Template', # Name of Template OR Server Profile
-      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP
+      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP. Supports array of strings also.
+      :server_location => 'Encl1, bay 16', # Optional. Use to provision a specific server
       
       :host_name => 'chef-web01',
       :ip_address => 'xx.xx.xx.xx', # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection; see below

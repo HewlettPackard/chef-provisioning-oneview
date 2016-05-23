@@ -6,7 +6,6 @@ require 'chef/provisioning/driver'
 require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/machine/unix_machine'
 require 'json'
-require 'ridley'
 require_relative 'driver_init/oneview'
 require_relative 'version'
 require_relative 'rest'
@@ -22,6 +21,7 @@ module Chef::Provisioning
     include RestAPI
     include OneViewAPI
     include ICspAPI
+
 
     def self.canonicalize_url(url, config)
       _scheme, oneview_url = url.split(':', 2)
@@ -40,26 +40,35 @@ module Chef::Provisioning
       super(canonical_url, config)
 
       @oneview_base_url    = config[:knife][:oneview_url]
-      raise 'Must set the knife[:oneview_url] attribute!' if @oneview_base_url.nil? || @oneview_base_url.empty?
       @oneview_username    = config[:knife][:oneview_username]
-      raise 'Must set the knife[:oneview_username] attribute!' if @oneview_username.nil? || @oneview_username.empty?
       @oneview_password    = config[:knife][:oneview_password]
-      raise 'Must set the knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
       @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
+      @api_timeout         = config[:knife][:oneview_timeout] || 10 # Default timeout: 10 seconds
+      raise 'Must set knife[:oneview_url] attribute!'      if @oneview_base_url.nil? || @oneview_base_url.empty?
+      raise 'Must set knife[:oneview_username] attribute!' if @oneview_username.nil? || @oneview_username.empty?
+      raise 'Must set knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
       @oneview_api_version = 120 # Use this version for all calls that don't override it
       @current_oneview_api_version = get_oneview_api_version
+      Chef::Log.debug("Logging into OneView at #{@oneview_base_url}")
       @oneview_key         = login_to_oneview
 
       @icsp_base_url       = config[:knife][:icsp_url]
-      raise 'Must set the knife[:icsp_url] attribute!' if @icsp_base_url.nil? || @icsp_base_url.empty?
       @icsp_username       = config[:knife][:icsp_username]
-      raise 'Must set the knife[:icsp_username] attribute!' if @icsp_username.nil? || @icsp_username.empty?
       @icsp_password       = config[:knife][:icsp_password]
-      raise 'Must set the knife[:icsp_password] attribute!' if @icsp_password.nil? || @icsp_password.empty?
       @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
-      @current_icsp_api_version = get_icsp_api_version
-      @icsp_key            = login_to_icsp
+
+      Chef::Log.warn 'knife[:icsp_url] not set in knife.rb!'      if @icsp_base_url.nil?
+      Chef::Log.warn 'knife[:icsp_username] not set in knife.rb!' if @icsp_username.nil?
+      Chef::Log.warn 'knife[:icsp_password] not set in knife.rb!' if @icsp_password.nil?
+
+      @icsp_ignore = @icsp_base_url.nil? || @icsp_username.nil? || @icsp_password.nil?
+      # If the config is not specified, skip ICSP
+      unless @icsp_ignore
+        Chef::Log.debug("Logging into ICSP at #{@icsp_base_url}")
+        @current_icsp_api_version = get_icsp_api_version
+        @icsp_key = login_to_icsp
+      end
     end
 
 
@@ -93,12 +102,19 @@ module Chef::Provisioning
       end
     end
 
-
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
-      customize_machine(action_handler, machine_spec, machine_options, profile)
-      machine_for(machine_spec, machine_options) # Return the Machine object
+      if @icsp_ignore == true
+        wait_for_profile(action_handler, machine_spec, machine_options, profile)
+        Chef::Log.warn('Action converge action being used, without an ICSP configuration')
+        Machine::BasicMachine.new(machine_spec, OneViewNilTransport.new, OneViewNilConvergence.new)
+      else
+        # This function takes care of installing the operating system etc. to the machine (blade)
+        customize_machine(action_handler, machine_spec, machine_options, profile)
+        # This is a provisining function and handles installing a chef-client
+        machine_for(machine_spec, machine_options) # Return the Machine object
+      end
     end
 
 
@@ -130,60 +146,39 @@ module Chef::Provisioning
         ssh_pty_enable: true
       }
       options = machine_options[:transport_options][:options] || default_options rescue default_options
-
       transport = Chef::Provisioning::Transport::SSH.new(bootstrap_ip_address, username, ssh_options, options, config)
       convergence_strategy = Chef::Provisioning::ConvergenceStrategy::InstallSh.new(
-        machine_options[:convergence_options], {})
+        machine_options[:convergence_options], {}
+      )
       Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport, convergence_strategy)
     end
-
 
     def stop_machine(action_handler, machine_spec, _machine_options)
       power_off(action_handler, machine_spec) if machine_spec.reference
     end
 
 
-    def destroy_machine(action_handler, machine_spec, machine_options)
+    def destroy_machine(action_handler, machine_spec, _machine_options)
       if machine_spec.reference
         power_off(action_handler, machine_spec) # Power off server
-        destroy_icsp_server(action_handler, machine_spec) # Delete os deployment server from ICSP
+        destroy_icsp_server(action_handler, machine_spec) unless @icsp_ignore # Delete os deployment server from ICSP
         destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
 
         name = machine_spec.name # Save for next steps
 
-        # Delete the node from the Chef server
-        action_handler.perform_action "Release machine #{machine_spec.reference['serial_number']}" do
-          machine_spec.reference = nil
-          machine_spec.delete(action_handler)
-        end
-
-        # Delete client from the Chef server
-        action_handler.perform_action "Delete client '#{name}' from Chef server" do
-          begin
-            ridley = Ridley.new(
-              server_url:  machine_options[:convergence_options][:chef_server][:chef_server_url],
-              client_name: machine_options[:convergence_options][:chef_server][:options][:client_name],
-              client_key:  machine_options[:convergence_options][:chef_server][:options][:signing_key_filename]
-            )
-            ridley.client.delete(name)
-          rescue  Exception => e
-            action_handler.report_progress "WARN: Failed to delete client #{name} from server!"
-            puts "Error: #{e.message}"
-          end
-        end
-
         # Remove entry from known_hosts file(s)
-        if machine_options[:driver_options][:ip_address]
-          action_handler.perform_action "Delete entry for '#{machine_options[:driver_options][:ip_address]}' from known_hosts file(s)" do
+        ip_address = machine_spec.data['automatic']['ipaddress'] rescue nil
+        if ip_address
+          action_handler.perform_action "Delete entry for #{name} (#{ip_address}) from known_hosts file(s)" do
             files = [File.expand_path('~/.ssh/known_hosts'), File.expand_path('/etc/ssh/known_hosts')]
             files.each do |f|
-              next if !File.exist?(f)
+              next unless File.exist?(f)
               begin
                 text = File.read(f)
-                text.gsub!(/#{machine_options[:driver_options][:ip_address]} ssh-rsa.*(\n|\r\n)/, '')
+                text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
                 File.open(f, 'w') {|file| file.puts text } if text
               rescue  Exception => e
-                action_handler.report_progress "WARN: Failed to delete entry for '#{machine_options[:driver_options][:ip_address]}' from known_hosts file: '#{f}'! "
+                action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
                 puts "Error: #{e.message}"
               end
             end
@@ -198,14 +193,24 @@ module Chef::Provisioning
       machine_for(machine_spec, machine_options)
     end
 
-    private
+  end # class end
 
-    # Login to both OneView and ICsp
-    def auth_tokens
-      @icsp_key  ||= login_to_icsp
-      @oneview_key ||= login_to_oneview
-      { 'icsp_key' => @icsp_key, 'oneview_key' => @oneview_key }
+  # Additional No-Op classes to nil return when a :converge is called
+  # Returns a OneViewTransport::disconnect (nil)
+  class OneViewNilTransport
+    def disconnect(*_args, &_block)
+      nil
+    end
+  end
+
+  # Additional Converge class that nils the called methods under a :converge action
+  class OneViewNilConvergence
+    def setup_convergence(*_args, &_block)
+      nil
     end
 
-  end # class end
+    def converge(*_args, &_block)
+      nil
+    end
+  end
 end # module end
