@@ -35,6 +35,15 @@ This directory contains everything you need to start provisioning with OneView a
   ```
  
  4. If you want to continue and bootstrap the machine, you'll have two options: (1) set up a Chef Server and bootstrap it like normal or (2) copy the cookbooks onto the node and run chef-client in local (zero) mode from there.
+ 
+## Building a Docker container with OneView provisioning and ChefDK
+The `examples\Docker\` contains a `Dockerfile` that can be used to build a container with the latest components that can be used to automate HPE OneView with Chef. To build the container the Dockerfile will need copying to a docker host then the `$ docker build` command can be used to pull all the requirements and build the container.
+
+Build Example:
+
+`$ docker build -t OneView-Chef -f <path_to_Dockerfile>`
+
+This container can then be run using the `$ docker run OneView-Chef` command. Further documentation can be found at https://hub.docker.com/r/thebsdbox/oneview-chef/ for passing recipes and configuration into the docker container.
 
 ## Troubleshooting
 
