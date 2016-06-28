@@ -6,61 +6,57 @@ require 'chef/provisioning/driver'
 require 'chef/provisioning/transport/ssh'
 require 'chef/provisioning/machine/unix_machine'
 require 'json'
+require 'oneview-sdk'
 require_relative 'driver_init/oneview'
 require_relative 'version'
-require_relative 'rest'
-require_relative 'create_machine'
-require_relative 'customize_machine'
-require_relative 'oneview/oneview_api'
-require_relative 'icsp/icsp_api'
+require_relative 'helpers'
 
 module Chef::Provisioning
   class OneViewDriver < Chef::Provisioning::Driver
-    include CreateMachine
-    include CustomizeMachine
-    include RestAPI
-    include OneViewAPI
-    include ICspAPI
-
+    include OneviewChefProvisioningDriver::Helpers
 
     def self.canonicalize_url(url, config)
       _scheme, oneview_url = url.split(':', 2)
-      if oneview_url.nil? || oneview_url == ''
-        oneview_url = config[:knife][:oneview_url]
-      end
-      raise 'Must set the knife[:oneview_url] attribute!' if oneview_url.nil? || oneview_url.empty?
-      'oneview:' + oneview_url
+      oneview_url ||= config[:driver_options][:oneview][:url] rescue nil
+      oneview_url ||= config[:knife][:oneview_url] rescue nil
+      oneview_url ||= ENV['ONEVIEWSDK_URL']
+      raise 'Must set the oneview driver url! See docs for more info' if oneview_url.nil? || oneview_url.empty?
+      "oneview:#{oneview_url}"
     end
 
-    def self.from_url(oneview_url, config)
-      OneViewDriver.new(oneview_url, config)
+    def self.from_url(url, config)
+      OneViewDriver.new(url, config)
     end
 
-    def initialize(canonical_url, config)
-      super(canonical_url, config)
+    def initialize(url, config)
+      _scheme, oneview_url = url.split(':', 2)
+      super(url, config)
 
-      @oneview_base_url    = config[:knife][:oneview_url]
-      @oneview_username    = config[:knife][:oneview_username]
-      @oneview_password    = config[:knife][:oneview_password]
-      @oneview_disable_ssl = config[:knife][:oneview_ignore_ssl]
-      @api_timeout         = config[:knife][:oneview_timeout] || 10 # Default timeout: 10 seconds
-      raise 'Must set knife[:oneview_url] attribute!'      if @oneview_base_url.nil? || @oneview_base_url.empty?
-      raise 'Must set knife[:oneview_username] attribute!' if @oneview_username.nil? || @oneview_username.empty?
-      raise 'Must set knife[:oneview_password] attribute!' if @oneview_password.nil? || @oneview_password.empty?
-      @oneview_api_version = 120 # Use this version for all calls that don't override it
-      @current_oneview_api_version = get_oneview_api_version
-      Chef::Log.debug("Logging into OneView at #{@oneview_base_url}")
-      @oneview_key         = login_to_oneview
+      ov_config = config[:driver_options][:oneview] || {} rescue {}
+      ov_config = Hash[ov_config.map { |k, v| [k.to_sym, v] }] # Convert string keys to symbols
 
-      @icsp_base_url       = config[:knife][:icsp_url]
-      @icsp_username       = config[:knife][:icsp_username]
-      @icsp_password       = config[:knife][:icsp_password]
-      @icsp_disable_ssl    = config[:knife][:icsp_ignore_ssl]
+      ov_config[:url] = oneview_url
+      ov_config[:user] ||= config[:knife][:oneview_username] || ENV['ONEVIEWSDK_USER']
+      ov_config[:password] ||= config[:knife][:oneview_password] || ENV['ONEVIEWSDK_PASSWORD']
+      ov_config[:token] ||= config[:knife][:oneview_token] || ENV['ONEVIEWSDK_TOKEN']
+      ov_config[:ssl_enabled] = false if ov_config[:ssl_enabled] == false || config[:knife][:oneview_ignore_ssl]
+      ov_config[:timeout] ||= config[:knife][:oneview_timeout] if config[:knife][:oneview_timeout]
+      ov_config[:print_wait_dots] ||= true if ov_config[:print_wait_dots].nil?
+      ov_config[:logger] = Chef::Log
+      @ov = OneviewSDK::Client.new(ov_config) # OneView client object
+
+      icsp_config = config[:driver_options][:icsp] || {} rescue {}
+
+      @icsp_base_url       = icsp_config[:url] || config[:knife][:icsp_url]
+      @icsp_username       = icsp_config[:user] || config[:knife][:icsp_username]
+      @icsp_password       = icsp_config[:password] || config[:knife][:icsp_password]
+      @icsp_disable_ssl    = false
+      @icsp_disable_ssl    = true if icsp_config[:ssl_enabled] == false || config[:knife][:icsp_ignore_ssl] == true
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
 
-      Chef::Log.warn 'knife[:icsp_url] not set in knife.rb!'      if @icsp_base_url.nil?
-      Chef::Log.warn 'knife[:icsp_username] not set in knife.rb!' if @icsp_username.nil?
-      Chef::Log.warn 'knife[:icsp_password] not set in knife.rb!' if @icsp_password.nil?
+      Chef::Log.warn 'ICSP url not set! ICSP will be ignored'      if @icsp_base_url.nil?
+      Chef::Log.warn 'ICSP user not set! ICSP will be ignored'     if @icsp_username.nil?
+      Chef::Log.warn 'ICSP password not set! ICSP will be ignored' if @icsp_password.nil?
 
       @icsp_ignore = @icsp_base_url.nil? || @icsp_username.nil? || @icsp_password.nil?
       # If the config is not specified, skip ICSP
@@ -73,23 +69,27 @@ module Chef::Provisioning
 
 
     def allocate_machine(action_handler, machine_spec, machine_options)
-      host_name = machine_options[:driver_options][:host_name]
+      raise 'Machine definition missing :driver_options parameter!' unless machine_options[:driver_options]
       if machine_spec.reference
-        if get_oneview_profile_by_sn(machine_spec.reference['serial_number']).nil? # It doesn't really exist
-          action_handler.report_progress "Machine #{host_name} does not really exist.  Recreating ..."
-          machine_spec.reference = nil
-        else # Update reference data
+        profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
+        if profile # Update reference data
           machine_spec.reference['driver_url'] = driver_url
           machine_spec.reference['driver_version'] = ONEVIEW_DRIVER_VERSION
+          # TODO: Update profile if differs from Chef and/or Template config
+          machine_spec.reference['profile_name'] = profile['name']
+        else # It doesn't really exist
+          action_handler.report_progress "Machine #{machine_spec.name} does not really exist.  Recreating ..."
+          machine_spec.reference = nil
         end
       end
       if !machine_spec.reference
-        action_handler.perform_action "Creating server #{machine_spec.name}" do
-          profile = create_machine(action_handler, machine_spec, machine_options)
+        action_handler.perform_action "Allocate server #{machine_spec.name}" do
+          profile = create_machine(action_handler, machine_spec.name, machine_options)
           machine_spec.reference = {
             'driver_url' => driver_url,
             'driver_version' => ONEVIEW_DRIVER_VERSION,
-            'serial_number' => profile['serialNumber']
+            'serial_number' => profile['serialNumber'],
+            'profile_name' => profile['name']
           }
         end
       end
@@ -102,18 +102,18 @@ module Chef::Provisioning
       end
     end
 
+
     def ready_machine(action_handler, machine_spec, machine_options)
-      profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+      profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
       if @icsp_ignore == true
-        wait_for_profile(action_handler, machine_spec, machine_options, profile)
-        Chef::Log.warn('Action converge action being used, without an ICSP configuration')
+        wait_for_profile(action_handler, machine_spec.name, profile)
+        Chef::Log.warn("Skipping ICSP configuration for machine '#{machine_spec.name}'")
         Machine::BasicMachine.new(machine_spec, OneViewNilTransport.new, OneViewNilConvergence.new)
-      else
-        # This function takes care of installing the operating system etc. to the machine (blade)
+      else # Boot the server, install the OS etc.
         customize_machine(action_handler, machine_spec, machine_options, profile)
-        # This is a provisining function and handles installing a chef-client
-        machine_for(machine_spec, machine_options) # Return the Machine object
+        # Return a machine object that Chef can connect to (to install chef-client)
+        machine_for(machine_spec, machine_options)
       end
     end
 
@@ -125,7 +125,7 @@ module Chef::Provisioning
         raise 'Must specify a connection to use to bootstrap!' unless id && connection
         bootstrap_ip_address = connection[:ip4Address] # For static IPs
         unless bootstrap_ip_address # Look for dhcp address given to this connection
-          profile = get_oneview_profile_by_sn(machine_spec.reference['serial_number'])
+          profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
           my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
           mac = profile['connections'].find {|x| x['id'] == id}['mac']
           interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
@@ -153,39 +153,46 @@ module Chef::Provisioning
       Chef::Provisioning::Machine::UnixMachine.new(machine_spec, transport, convergence_strategy)
     end
 
-    def stop_machine(action_handler, machine_spec, _machine_options)
-      power_off(action_handler, machine_spec) if machine_spec.reference
+    def stop_machine(_action_handler, machine_spec, _machine_options)
+      return unless machine_spec.reference
+      profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
+      profile.server_hardware.power_off
     end
 
 
     def destroy_machine(action_handler, machine_spec, _machine_options)
-      if machine_spec.reference
-        power_off(action_handler, machine_spec) # Power off server
-        destroy_icsp_server(action_handler, machine_spec) unless @icsp_ignore # Delete os deployment server from ICSP
-        destroy_oneview_profile(action_handler, machine_spec) # Delete server profile from OneView
+      return unless machine_spec.reference
+      profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
+      if profile
+        profile.server_hardware.power_off
+        action_handler.perform_action "Delete server profile #{machine_spec.name}" do
+          action_handler.report_progress "INFO: Deleting server profile #{machine_spec.name}"
+          profile.delete
+        end
+      else
+        action_handler.report_progress "INFO: #{machine_spec.name} is already deleted."
+      end
+      destroy_icsp_server(action_handler, machine_spec) unless @icsp_ignore # Delete os deployment server from ICSP
 
-        name = machine_spec.name # Save for next steps
+      name = machine_spec.name # Save for next steps
 
-        # Remove entry from known_hosts file(s)
-        ip_address = machine_spec.data['automatic']['ipaddress'] rescue nil
-        if ip_address
-          action_handler.perform_action "Delete entry for #{name} (#{ip_address}) from known_hosts file(s)" do
-            files = [File.expand_path('~/.ssh/known_hosts'), File.expand_path('/etc/ssh/known_hosts')]
-            files.each do |f|
-              next unless File.exist?(f)
-              begin
-                text = File.read(f)
-                text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
-                File.open(f, 'w') {|file| file.puts text } if text
-              rescue  Exception => e
-                action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
-                puts "Error: #{e.message}"
-              end
-            end
+      # Remove entry from known_hosts file(s)
+      ip_address = machine_spec.data['automatic']['ipaddress'] rescue nil
+      return unless ip_address
+      action_handler.perform_action "Delete entry for #{name} (#{ip_address}) from known_hosts file(s)" do
+        files = [File.expand_path('~/.ssh/known_hosts'), File.expand_path('/etc/ssh/known_hosts')]
+        files.each do |f|
+          next unless File.exist?(f)
+          begin
+            text = File.read(f)
+            text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
+            File.open(f, 'w') {|file| file.puts text } if text
+          rescue  Exception => e
+            action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
+            puts "Error: #{e.message}"
           end
         end
-
-      end # End if machine_spec.reference
+      end
     end # destroy_machine method end
 
 

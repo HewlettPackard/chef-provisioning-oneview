@@ -8,12 +8,6 @@ AllCops:
 
 
 # Modified Cops:
-Metrics/AbcSize:
-  Max: 175
-
-Metrics/CyclomaticComplexity:
-  Max: 25
-
 Metrics/PerceivedComplexity:
   Max: 25
 
@@ -47,10 +41,16 @@ Style/GlobalVars:
 
 
 # Disabled Cops:
+Metrics/AbcSize:
+  Enabled: false
+
 Style/AlignHash:
   Enabled: false
 
 Style/BracesAroundHashParameters:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
   Enabled: false
 
 Style/AccessorMethodName:
