@@ -22,7 +22,7 @@ module OneviewChefProvisioningDriver
         action_handler.report_progress "INFO: Waiting for #{machine_name} to PXE boot into HP Intelligent Provisioning"
         360.times do # Wait for up to 1 hr
           my_server = get_icsp_server_by_sn(profile['serialNumber'])
-          break if !my_server.nil?
+          break unless my_server.nil?
           print '.'
           sleep 10
         end
@@ -46,12 +46,12 @@ module OneviewChefProvisioningDriver
           machine_options[:driver_options][:connections].each do |id, data|
             next unless data && data[:net] && data[:deployNet]
             action_handler.report_progress "INFO: Performing network flipping on #{machine_name}, connection #{id}"
-            deploy_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:deployNet] }
-            new_network = available_networks['ethernetNetworks'].find {|n| n['name'] == data[:net] }
+            deploy_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:deployNet] }
+            new_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:net] }
             raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
             raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
             profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
-            profile['connections'].find {|c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
+            profile['connections'].find { |c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
             options = { 'body' => profile }
             task = rest_api(:oneview, :put, profile['uri'], options)
             raise "Failed to perform network flipping on #{machine_name}. Details: #{task['message'] || task}" unless task['uri']

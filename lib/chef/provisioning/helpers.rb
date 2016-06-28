@@ -5,6 +5,7 @@ require_relative 'oneview/san_storage'
 require_relative 'icsp/icsp_helper'
 
 module OneviewChefProvisioningDriver
+  # Module that just includes all other helper modules
   module Helpers
     include CreateMachine # Handles allocation of OneView ServerProfile
     include CustomizeMachine # Handles OS install and network configuration

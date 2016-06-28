@@ -9,8 +9,8 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
     end
 
     before :each do
-      @profile = OneviewSDK::ServerProfile.new(@ov_200, name: 'chef-web01', uri: '/rest/fake',
-        serverHardwareTypeUri: '/rest/fake2', enclosureGroupUri: '/rest/fake3')
+      options = { name: 'chef-web01', uri: '/rest/fake', serverHardwareTypeUri: '/rest/fake2', enclosureGroupUri: '/rest/fake3' }
+      @profile = OneviewSDK::ServerProfile.new(@ov_200, options)
       @hw = OneviewSDK::ServerHardware.new(@ov_200, name: 'Enclosure-1, bay 1', uri: '/rest/fake4')
     end
 

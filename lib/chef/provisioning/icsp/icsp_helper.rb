@@ -9,7 +9,7 @@ module OneviewChefProvisioningDriver
 
     def get_icsp_api_version
       begin
-        version = rest_api(:icsp, :get, '/rest/version', { 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none })['currentVersion']
+        version = rest_api(:icsp, :get, '/rest/version', 'Content-Type' => :none, 'X-API-Version' => :none, 'auth' => :none)['currentVersion']
         raise "Couldn't get API version" unless version
         if version.class != Fixnum
           version = version.to_i
@@ -87,10 +87,10 @@ module OneviewChefProvisioningDriver
       if machine_options[:driver_options][:custom_attributes]
         curr_server = rest_api(:icsp, :get, my_server['uri'])
         machine_options[:driver_options][:custom_attributes].each do |key, val|
-          curr_server['customAttributes'].push({
-            'values' => [{ 'scope' => 'server',  'value' => val.to_s }],
+          curr_server['customAttributes'].push(
+            'values' => [{ 'scope' => 'server', 'value' => val.to_s }],
             'key' => key.to_s
-          })
+          )
         end
         options = { 'body' => curr_server }
         rest_api(:icsp, :put, my_server['uri'], options)
@@ -125,7 +125,7 @@ module OneviewChefProvisioningDriver
           while uri
             matching_plans = rest_api(:icsp, :get, uri)
             raise "Search failed for OSBP '#{os_build}'. Response: #{matching_plans}" unless matching_plans['members']
-            build_plan_uri = matching_plans['members'].find {|bp| bp['name'] == os_build}['uri'] rescue nil
+            build_plan_uri = matching_plans['members'].find { |bp| bp['name'] == os_build }['uri'] rescue nil
             break unless build_plan_uri.nil?
             uri = URI.unescape(matching_plans['nextPageUri']) rescue nil
           end
@@ -192,7 +192,7 @@ module OneviewChefProvisioningDriver
 
         # Set interface data as normal node attributes
         my_server_connections.each do |c|
-          c['oneViewId'] = profile['connections'].find {|x| x['mac'] == c['macAddr']}['id'] rescue nil
+          c['oneViewId'] = profile['connections'].find { |x| x['mac'] == c['macAddr'] }['id'] rescue nil
         end
         machine_spec.data['normal']['icsp'] ||= {}
         machine_spec.data['normal']['icsp']['interfaces'] = my_server_connections
@@ -207,10 +207,10 @@ module OneviewChefProvisioningDriver
           c = Marshal.load(Marshal.dump(data))
           next unless c[:dhcp] || c[:dhcpv4] || c[:ip4Address] || c[:ipv6autoconfig] || c[:staticNetworks] # Invalid network or only switch networks specified
           begin
-            c[:macAddress] = profile['connections'].find {|x| x['id'] == id}['mac']
+            c[:macAddress] = profile['connections'].find { |x| x['id'] == id }['mac']
           rescue NoMethodError
             ids = []
-            profile['connections'].each {|x| ids.push x['id']}
+            profile['connections'].each { |x| ids.push x['id'] }
             raise "Could not find connection id #{id} for #{profile['name']}. Available connection ids are: #{ids}. Please make sure the connection ids map to those on OneView."
           end
           if @current_icsp_api_version.between?(104, 108)
@@ -267,11 +267,11 @@ module OneviewChefProvisioningDriver
         raise "#{options[:team]}: Team names must not include hyphens" if options[:team].to_s.include?('-')
         teams[options[:team].to_s] ||= []
         begin
-          mac = profile['connections'].find {|x| x['id'] == id}['mac']
+          mac = profile['connections'].find { |x| x['id'] == id }['mac']
           teams[options[:team].to_s].push mac
         rescue NoMethodError
           ids = []
-          profile['connections'].each {|x| ids.push x['id']}
+          profile['connections'].each { |x| ids.push x['id'] }
           raise "Failed to configure nic teams: Could not find connection id #{id} for #{profile['name']}. Available connection ids are: #{ids}. Please make sure the connection ids map to those on OneView."
         end
       end

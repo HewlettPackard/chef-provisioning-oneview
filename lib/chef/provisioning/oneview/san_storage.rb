@@ -28,20 +28,18 @@ module OneviewChefProvisioningDriver
         boot_vols.push(v['volumeName']) if v['volumeName'] =~ /^boot/i
         v['volumeName'] += " #{profile['name']}" unless v['volumeShareable'] # Append profile name to volume name
 
-        unless profile['serverProfileTemplateUri'] # Only needed when coppied from profile
-          v['state'] = nil
-          v['status'] = nil
-          v['storagePaths'].each { |s| s['status'] = nil }
+        next if profile['serverProfileTemplateUri'] # Only needed when coppied from profile
+        v['state'] = nil
+        v['status'] = nil
+        v['storagePaths'].each { |s| s['status'] = nil }
 
-          unless v['volumeShareable']
-            # It is private in the profile, so we will clone it
-            v['volumeUri'] = nil
+        next if v['volumeShareable']
+        # It is private in the profile, so we will clone it
+        v['volumeUri'] = nil
 
-            # Assumes all cloned volumes are non-permanet. Might want some global config to control this
-            v['permanent'] = false
-            v['lun'] = nil if v['lunType'].casecmp('auto') == 0
-          end
-        end
+        # Assumes all cloned volumes are non-permanet. Might want some global config to control this
+        v['permanent'] = false
+        v['lun'] = nil if v['lunType'].casecmp('auto') == 0
       end
       raise "#{machine_name}: There should only be 1 SAN boot volume. Boot volumes: #{boot_vols}" if boot_vols.size > 1
       profile
@@ -70,12 +68,12 @@ module OneviewChefProvisioningDriver
           target = {}
           target['arrayWwpn'] = s['storageTargets'].first.delete(':')
           target['lun'] = v['lun']
-          unless connection['boot']['targets'] && connection['boot']['targets'].first &&
-                 connection['boot']['targets'].first['arrayWwpn'] == target['arrayWwpn'] &&
-                 connection['boot']['targets'].first['lun'] == target['lun']
-            connection['boot']['targets'] = [target]
-            update_needed = true
-          end
+          unchanged = connection['boot']['targets'] && connection['boot']['targets'].first &&
+                      connection['boot']['targets'].first['arrayWwpn'] == target['arrayWwpn'] &&
+                      connection['boot']['targets'].first['lun'] == target['lun']
+          next if unchanged
+          connection['boot']['targets'] = [target]
+          update_needed = true
         end
       end
 

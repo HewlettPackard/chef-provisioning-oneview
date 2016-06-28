@@ -14,7 +14,7 @@ end
 
 def install_cert(url, cert_file = ENV['SSL_CERT_FILE'], name = 'Chef Server')
   uri = URI.parse(url)
-  pem = Net::HTTP.start(uri.host, uri.port, { use_ssl: true, verify_mode: OpenSSL::SSL::VERIFY_NONE }) do |http|
+  pem = Net::HTTP.start(uri.host, uri.port, use_ssl: true, verify_mode: OpenSSL::SSL::VERIFY_NONE) do |http|
     http.peer_cert.to_pem
   end
 
@@ -58,12 +58,11 @@ keystores.each do |keystore|
     install_cert(chef_server_url, keystore)
   end
 
-  if supermarket_site
-    if ssl_verify(supermarket_site, keystore)
-      puts "  #{URI.parse(supermarket_site).host}: Nothing to do"
-    else
-      install_cert(supermarket_site, keystore, 'Chef Private Supermarket')
-    end
+  next unless supermarket_site
+  if ssl_verify(supermarket_site, keystore)
+    puts "  #{URI.parse(supermarket_site).host}: Nothing to do"
+  else
+    install_cert(supermarket_site, keystore, 'Chef Private Supermarket')
   end
 end
 

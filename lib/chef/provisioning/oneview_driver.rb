@@ -12,6 +12,7 @@ require_relative 'version'
 require_relative 'helpers'
 
 module Chef::Provisioning
+  # Provisioning driver for HPE OneView
   class OneViewDriver < Chef::Provisioning::Driver
     include OneviewChefProvisioningDriver::Helpers
 
@@ -60,11 +61,10 @@ module Chef::Provisioning
 
       @icsp_ignore = @icsp_base_url.nil? || @icsp_username.nil? || @icsp_password.nil?
       # If the config is not specified, skip ICSP
-      unless @icsp_ignore
-        Chef::Log.debug("Logging into ICSP at #{@icsp_base_url}")
-        @current_icsp_api_version = get_icsp_api_version
-        @icsp_key = login_to_icsp
-      end
+      return if @icsp_ignore
+      Chef::Log.debug("Logging into ICSP at #{@icsp_base_url}")
+      @current_icsp_api_version = get_icsp_api_version
+      @icsp_key = login_to_icsp
     end
 
 
@@ -82,7 +82,7 @@ module Chef::Provisioning
           machine_spec.reference = nil
         end
       end
-      if !machine_spec.reference
+      unless machine_spec.reference
         action_handler.perform_action "Allocate server #{machine_spec.name}" do
           profile = create_machine(action_handler, machine_spec.name, machine_options)
           machine_spec.reference = {
@@ -127,7 +127,7 @@ module Chef::Provisioning
         unless bootstrap_ip_address # Look for dhcp address given to this connection
           profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
           my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
-          mac = profile['connections'].find {|x| x['id'] == id}['mac']
+          mac = profile['connections'].find { |x| x['id'] == id }['mac']
           interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
           bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
         end
@@ -186,8 +186,8 @@ module Chef::Provisioning
           begin
             text = File.read(f)
             text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
-            File.open(f, 'w') {|file| file.puts text } if text
-          rescue  Exception => e
+            File.open(f, 'w') { |file| file.puts text } if text
+          rescue Exception => e
             action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
             puts "Error: #{e.message}"
           end

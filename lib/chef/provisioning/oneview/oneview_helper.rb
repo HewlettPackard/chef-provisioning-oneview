@@ -17,7 +17,7 @@ module OneviewChefProvisioningDriver
       profile['name'] = profile_name
 
       # Remove unwanted fields
-      %w(uri serialNumber uuid taskUri).each {|key| profile[key] = nil}
+      %w(uri serialNumber uuid taskUri).each { |key| profile[key] = nil }
       profile['connections'].each do |c|
         %w(wwnn wwpn mac deploymentStatus interconnectUri wwpnType macType).each { |key| c[key] = nil }
       end

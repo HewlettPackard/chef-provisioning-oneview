@@ -1,3 +1,4 @@
+# Helper module for ICSP v104 API requests
 module ICspAPIv104
   # Parse and clean connection data for api call
   def icsp_v104_parse_connection(machine_options, c)
@@ -11,14 +12,14 @@ module ICspAPIv104
     c[:dnsServers]    = nil if c[:dnsServers] == :none
     c[:dnsServers]    = c[:dnsServers].split(',') if c[:dnsServers].class == String
     c[:staticNetworks] ||= ["#{c[:ip4Address]}/#{c[:mask] || machine_options[:driver_options][:mask] || '24'}"] if c[:ip4Address]
-    c.keep_if {|k, _v| allowed_keys.include? k.to_s }
+    c.keep_if { |k, _v| allowed_keys.include? k.to_s }
   end
 
   # Parse and clean personality_data data for api call
   def icsp_v104_build_personality_data(machine_options, nics)
     allowed_keys = %w(hostname domain workgroup)
     personality_data = Marshal.load(Marshal.dump(machine_options[:driver_options])) || {}
-    personality_data.keep_if {|k, _v| allowed_keys.include? k.to_s }
+    personality_data.keep_if { |k, _v| allowed_keys.include? k.to_s }
     personality_data['hostname'] ||= machine_options[:driver_options][:host_name]
     personality_data['domain']   ||= machine_options[:driver_options][:domainName]
     personality_data['interfaces'] = nics

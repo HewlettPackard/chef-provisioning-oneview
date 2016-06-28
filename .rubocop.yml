@@ -8,16 +8,13 @@ AllCops:
 
 
 # Modified Cops:
-Metrics/PerceivedComplexity:
-  Max: 25
-
 Metrics/ClassLength:
   Max: 200
 
 Metrics/MethodLength:
-  Max: 125
+  Max: 50
 
-Metrics/LineLength:
+Metrics/LineLength: # TODO: Lower to 150
   Max: 210
 
 Style/IndentationWidth:
@@ -44,19 +41,10 @@ Style/GlobalVars:
 Metrics/AbcSize:
   Enabled: false
 
-Style/AlignHash:
-  Enabled: false
-
-Style/BracesAroundHashParameters:
-  Enabled: false
-
 Metrics/CyclomaticComplexity:
   Enabled: false
 
 Style/AccessorMethodName:
-  Enabled: false
-
-Style/ClassAndModuleCamelCase:
   Enabled: false
 
 Style/ClassAndModuleChildren:
@@ -68,36 +56,17 @@ Style/EmptyLines:
 Style/EmptyLinesAroundClassBody:
   Enabled: false
 
-Style/GuardClause:
+Style/GuardClause: # TODO: Re-enable at some point
   Enabled: false
 
-Style/IndentHash:
-  Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/Next:
+Metrics/PerceivedComplexity:
   Enabled: false
 
 Lint/RescueException:
   Enabled: false
 
-Style/NegatedIf:
-  Enabled: false
-
 Style/RescueModifier:
-  Enabled: false
-
-Style/SpaceInsideBlockBraces:
   Enabled: false
 
 Metrics/ModuleLength:
   Enabled: false
-
-Style/SpaceAroundOperators:
-  Enabled: false
-
-Style/ExtraSpacing:
-  Enabled: false
-
