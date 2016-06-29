@@ -108,49 +108,49 @@ with_driver 'oneview:https://oneview.example.com', {
 machine 'web01' do
   recipe 'my_server_cookbook::default'
 
-  machine_options :driver_options => {
-      :server_template => 'Web Server Template', # Name of Template OR Server Profile
-      :os_build => 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP. Supports array of strings also.
-      :server_location => 'Encl1, bay 16', # Optional. Use to provision a specific server
+  machine_options driver_options: {
+      server_template: 'Web Server Template', # Name of Template OR Server Profile
+      os_build: 'CHEF-RHEL-6.5-x64', # Name of OS Build Plan on ICSP. Supports array of strings also.
+      server_location: 'Encl1, bay 16', # Optional. Use to provision a specific server
       
-      :host_name => 'chef-web01',
-      :ip_address => 'xx.xx.xx.xx', # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection; see below
-      :domainType => 'workgroup',
-      :domainName => 'sub.domain.com',
-      :mask => '255.255.255.0', # Can set here or in individual connections below
-      :dhcp => false, # Can set here or in individual connections below
-      :gateway =>  'xx.xx.xx.1', # Can set here or in individual connections below
-      :dns => 'xx.xx.xx.xx,xx.xx.xx.xx,xx.xx.xx.xx', # Can set here or in individual connections below
-      :connections => {
+      host_name: 'chef-web01',
+      ip_address: 'xx.xx.xx.xx', # For bootstrapping. Deprecated in favor of { bootstrap: true } in connection; see below
+      domainType: 'workgroup',
+      domainName: 'sub.domain.com',
+      mask: '255.255.255.0', # Can set here or in individual connections below
+      dhcp: false, # Can set here or in individual connections below
+      gateway:  'xx.xx.xx.1', # Can set here or in individual connections below
+      dns: 'xx.xx.xx.xx,xx.xx.xx.xx,xx.xx.xx.xx', # Can set here or in individual connections below
+      connections: {
         #1 => { ... } (Reserved for PXE on our setup)
         2 => {
-          :ip4Address => 'xx.xx.xx.xx',
-          :mask => '255.255.254.0', # Optional. Overrides mask property above
-          :dhcp => false            # Optional. Overrides dhcp property above
-          :gateway => 'xx.xx.xx.1'  # Optional. Overrides gateway property above
-          :dns => 'xx.xx.xx.xx'     # Optional. Overrides dns property above
-          :bootstrap => true        # Set this on 1 connection only. Tells Chef which connection to use to bootstrap.
+          ip4Address: 'xx.xx.xx.xx',
+          mask: '255.255.254.0', # Optional. Overrides mask property above
+          dhcp: false            # Optional. Overrides dhcp property above
+          gateway: 'xx.xx.xx.1'  # Optional. Overrides gateway property above
+          dns: 'xx.xx.xx.xx'     # Optional. Overrides dns property above
+          bootstrap: true        # Set this on 1 connection only. Tells Chef which connection to use to bootstrap.
         },
         3 => {
-          :dhcp => true             # Optional. Overrides dhcp property above
-          :gateway => :none         # Optional. Overrides gateway property above
-          :dns => :none             # Optional. Overrides dns property above
+          dhcp: true             # Optional. Overrides dhcp property above
+          gateway: :none         # Optional. Overrides gateway property above
+          dns: :none             # Optional. Overrides dns property above
         }
       },
-      :skip_network_configuration => false, # Default. Set to true for EXSi hosts, etc.
-      :custom_attributes => {
-        :chefCert => 'ssh-rsa AA...' # Optional
+      skip_network_configuration: false, # Default. Set to true for EXSi hosts, etc.
+      custom_attributes: {
+        chefCert: 'ssh-rsa AA...' # Optional
       }
     },
-    :transport_options => {
-      :user => 'root', # Optional. Defaults to 'root'
-      :ssh_options => {
-        :password => Chef::Config.knife[:node_root_password]
+    transport_options: {
+      user: 'root', # Optional. Defaults to 'root'
+      ssh_options: {
+        password: Chef::Config.knife[:node_root_password]
       }
     },
-    :convergence_options => {
-      :ssl_verify_mode => :verify_none, # Optional. For Chef servers with self-signed certs
-      :bootstrap_proxy => 'http://proxy.example.com:8080' # Optional
+    convergence_options: {
+      ssl_verify_mode: :verify_none, # Optional. For Chef servers with self-signed certs
+      bootstrap_proxy: 'http://proxy.example.com:8080' # Optional
     }
 
   chef_environment '_default'
@@ -167,8 +167,8 @@ NOTE: Some basic connection settings such as :ip4Address and :dhcp are shown in 
 Insided the custom attributes hash, you can specify any data that you would like to pass into your ICsp build plan scripts or configuration files. For example, to specify a list of trusted public keys to be placed into the node's .ssh/authorized_keys file, add a custom attribute to the machine resource definition:
 
 ```ruby
-:custom_attributes => {
-  :chefCert => 'ssh-rsa AA...'
+custom_attributes: {
+  chefCert: 'ssh-rsa AA...'
 }
 ```
 
@@ -187,10 +187,10 @@ fi
 To use SSH keys insead of passwords to connect to nodes, you'll need to modify your transport_options to look something like:
 
 ```ruby
-:transport_options => {
-  :ssh_options => {
-    :auth_methods => ['publickey'],
-    :keys => ['~/.ssh/id_rsa']
+transport_options: {
+  ssh_options: {
+    auth_methods: ['publickey'],
+    keys: ['~/.ssh/id_rsa']
   }
 }
 ```
@@ -199,7 +199,7 @@ You'll also need to put the corresponding public key(s) into the node's authoriz
 
 ### Behind a proxy
 
-Add `:bootstrap_proxy => 'http://proxy.example.com:8080'` to your convergence_options hash.
+Add `bootstrap_proxy: 'http://proxy.example.com:8080'` to your convergence_options hash.
 Also, make sure your OS build plans set up the proxy configuration in a post OS install script.
 
 ### SAN Storage
@@ -208,12 +208,12 @@ In order to attach a SAN volume as a bootable volume, the volume name must start
 
 ### Switching to a different network after provisioning
 
-Add `1 => {:net => "Deadnetwork", :deployNet => "PXE Network", :dhcp => true}` to your connections hash. 
+Add `1 => {net: "Deadnetwork", deployNet: "PXE Network", dhcp: true}` to your connections hash. 
 This will flip the first connection of the newly provisioned machine off of your pxe network to your Deadnetwork right after provisioning. This is helpful for taking the newly provisioned machine off the PXE network as soon as possible. 
 
 ### Adding Nic Teams
 
-Add `:team => 'TeamName'` into a connection in your connections hash. Make sure that you have 2 connections in a team and the name does not include hyphens. This information will be passed to ISCP as the 'teams' custom attribute in the format: `"TeamName1-mac1,mac2|TeamName2-mac6,mac7,mac8"` to be consumed in a custom build plan script.
+Add `team: 'TeamName'` into a connection in your connections hash. Make sure that you have 2 connections in a team and the name does not include hyphens. This information will be passed to ISCP as the 'teams' custom attribute in the format: `"TeamName1-mac1,mac2|TeamName2-mac6,mac7,mac8"` to be consumed in a custom build plan script.
 
 # Doing a test run
 
