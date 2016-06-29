@@ -40,9 +40,9 @@ module Chef::Provisioning
       ov_config[:user] ||= config[:knife][:oneview_username] || ENV['ONEVIEWSDK_USER']
       ov_config[:password] ||= config[:knife][:oneview_password] || ENV['ONEVIEWSDK_PASSWORD']
       ov_config[:token] ||= config[:knife][:oneview_token] || ENV['ONEVIEWSDK_TOKEN']
-      ov_config[:ssl_enabled] = false if ov_config[:ssl_enabled] == false || config[:knife][:oneview_ignore_ssl]
+      ov_config[:ssl_enabled] = false if ov_config[:ssl_enabled] == false || (ov_config[:ssl_enabled].nil? && config[:knife][:oneview_ignore_ssl])
       ov_config[:timeout] ||= config[:knife][:oneview_timeout] if config[:knife][:oneview_timeout]
-      ov_config[:print_wait_dots] ||= true if ov_config[:print_wait_dots].nil?
+      ov_config[:print_wait_dots] = true if ov_config[:print_wait_dots].nil?
       ov_config[:logger] = Chef::Log
       @ov = OneviewSDK::Client.new(ov_config) # OneView client object
 
