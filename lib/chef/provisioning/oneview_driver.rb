@@ -54,6 +54,7 @@ module Chef::Provisioning
       @icsp_disable_ssl    = false
       @icsp_disable_ssl    = true if icsp_config[:ssl_enabled] == false || config[:knife][:icsp_ignore_ssl] == true
       @icsp_api_version    = 102 # Use this version for all calls that don't override it
+      @icsp_timeout        = icsp_config[:timeout] || config[:knife][:icsp_timeout]
 
       Chef::Log.warn 'ICSP url not set! ICSP will be ignored'      if @icsp_base_url.nil?
       Chef::Log.warn 'ICSP user not set! ICSP will be ignored'     if @icsp_username.nil?

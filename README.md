@@ -38,13 +38,14 @@ There are a few different ways to provide credentials and configuration for this
       password: 'secret123',
       token: 'token123', # Optional. Use EITHER this or the username & password
       ssl_enabled: true, # Optional. Defaults to true
-      timeout: 10 # Optional
+      timeout: 10 # Optional. In seconds
     },
     icsp: {
       url: 'https://icsp.example.com'
       user: 'Admin',
       password: 'secret456',
-      ssl_enabled: true # Optional. Defaults to true
+      ssl_enabled: true, # Optional. Defaults to true
+      timeout: 20 # Optional. In seconds
     }
   }
   ```
@@ -58,13 +59,14 @@ There are a few different ways to provide credentials and configuration for this
   knife[:oneview_username]   = 'Administrator'
   knife[:oneview_password]   = 'password123'
   knife[:oneview_token]      = 'token123' # Use EITHER this or the username & password
-  knife[:oneview_ignore_ssl] = true # For self-signed certs
-  knife[:oneview_timeout]    = 10 # Optional. 10 (seconds) is the default
+  knife[:oneview_ignore_ssl] = true # For self-signed certs (discouraged)
+  knife[:oneview_timeout]    = 10 # Optional. In seconds
   
   knife[:icsp_url]           = 'https://icsp.example.com'
   knife[:icsp_username]      = 'Administrator'
   knife[:icsp_password]      = 'password123'
-  knife[:icsp_ignore_ssl]    = true # For self-signed certs
+  knife[:icsp_ignore_ssl]    = true # For self-signed certs (discouraged)
+  knife[:icsp_timeout]       = 20 # Optional. In seconds
   
   knife[:node_root_password] = 'password123'
   

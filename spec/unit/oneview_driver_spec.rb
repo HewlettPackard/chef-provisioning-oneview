@@ -53,6 +53,7 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect(ov.print_wait_dots).to eq(true)
       expect(ov.logger).to eq(Chef::Log)
       expect(ov.log_level).to eq(Chef::Log.level)
+      expect(ov.timeout).to eq(nil)
 
       # ICSP defaults:
       expect(driver.instance_variable_get('@icsp_base_url')).to eq(@icsp_url)
@@ -62,13 +63,14 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect(driver.instance_variable_get('@icsp_api_version')).to eq(102)
       expect(driver.instance_variable_get('@icsp_ignore')).to eq(false)
       expect(driver.instance_variable_get('@icsp_key')).to eq(@icsp_key)
+      expect(driver.instance_variable_get('@icsp_timeout')).to eq(nil)
     end
 
     it 'reads knife config values' do
       config = {
         knife: {
           oneview_username: @oneview_user, oneview_password: @oneview_password,
-          oneview_ignore_ssl: true, oneview_timeout: 7, icsp_url: @icsp_url,
+          oneview_ignore_ssl: true, oneview_timeout: 7, icsp_url: @icsp_url, icsp_timeout: 8,
           icsp_username: @icsp_user, icsp_password: @icsp_password, icsp_ignore_ssl: true
         }
       }
@@ -94,6 +96,7 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect(driver.instance_variable_get('@icsp_api_version')).to eq(102)
       expect(driver.instance_variable_get('@icsp_ignore')).to eq(false)
       expect(driver.instance_variable_get('@icsp_key')).to eq(@icsp_key)
+      expect(driver.instance_variable_get('@icsp_timeout')).to eq(8)
     end
 
     it 'reads ONEVIEWSDK user and password environment variables' do
@@ -121,7 +124,7 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       config = {
         driver_options: {
           oneview: { token: @oneview_token, ssl_enabled: false, timeout: 7, print_wait_dots: false },
-          icsp: { url: @icsp_url, user: @icsp_user, password: @icsp_password, ssl_enabled: false }
+          icsp: { url: @icsp_url, user: @icsp_user, password: @icsp_password, ssl_enabled: false, timeout: 8 }
         },
         knife: {}
       }
@@ -145,6 +148,7 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       expect(driver.instance_variable_get('@icsp_api_version')).to eq(102)
       expect(driver.instance_variable_get('@icsp_ignore')).to eq(false)
       expect(driver.instance_variable_get('@icsp_key')).to eq(@icsp_key)
+      expect(driver.instance_variable_get('@icsp_timeout')).to eq(8)
     end
 
     it 'requires a oneview password or token' do
