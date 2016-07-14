@@ -171,7 +171,7 @@ module OneviewChefProvisioningDriver
 
         task = rest_api(:icsp, :post, '/rest/os-deployment-jobs/?force=true', options)
         task_uri = task['uri']
-        raise "Failed to start network personalization job. Details: #{task['details']}" unless task_uri
+        raise "Failed to start network personalization job. Details: #{task['details'] || task['message'] || task}" unless task_uri
         task = icsp_wait_for(task_uri, 60) # Wait for up to 10 min
         raise "Error running network personalization job: #{task['jobResult'].first['jobMessage']}\n#{task['jobResult'].first['jobResultErrorDetails']}" unless task == true
 
