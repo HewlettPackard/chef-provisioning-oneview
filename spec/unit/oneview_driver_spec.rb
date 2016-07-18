@@ -191,4 +191,99 @@ RSpec.describe Chef::Provisioning::OneViewDriver do
       end
     end
   end
+
+  describe '#ip_from_machine' do
+    include_context 'shared context'
+
+    before :each do
+      @ip = '10.10.1.6'
+    end
+
+    it 'returns the driver_options ip_address attribute if set' do
+      s = machine_spec
+      m = valid_machine_options
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(m[:driver_options][:ip_address])
+    end
+
+    it 'requries a connection to set :bootstrap to true' do
+      s = machine_spec
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      expect { @driver_200.instance_eval { ip_from_machine(s, m) } }
+        .to raise_error(/Must specify a connection to use to bootstrap/)
+    end
+
+    it 'looks for the static IP of a connection with bootstrap: true' do
+      s = machine_spec
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][2][:bootstrap] = true
+      m[:driver_options][:connections][2][:ip4Address] = @ip
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+
+    it 'looks for the ipv4Addr machine_spec value of a connection with bootstrap: true' do
+      s = machine_spec
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][1][:bootstrap] = true
+      s.data['normal'] = { 'icsp' => { 'interfaces' => [{ 'oneViewId' => 1, 'ipv4Addr' => @ip }] } }
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+
+    it 'looks for the ipv6Addr machine_spec value of a connection with bootstrap: true' do
+      s = machine_spec
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][1][:bootstrap] = true
+      s.data['normal'] = { 'icsp' => { 'interfaces' => [{ 'oneViewId' => 1, 'ipv6Addr' => @ip }] } }
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+
+    it 'looks for the ipv4Addr on ICSP of a connection with bootstrap: true' do
+      p = { 'connections' => [{ 'id' => 1, 'mac' => 'fakeMac' }] }
+      expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([p])
+      ms = { 'interfaces' => [{ 'macAddr' => 'fakeMac', 'ipv4Addr' => @ip }] }
+      allow(@driver_200).to receive(:get_icsp_server_by_sn).and_return(ms)
+      s = machine_spec
+      s.data['normal'] = {}
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][1][:bootstrap] = true
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+
+    it 'looks for the ipv6Addr on ICSP of a connection with bootstrap: true' do
+      p = { 'connections' => [{ 'id' => 1, 'mac' => 'fakeMac' }] }
+      expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([p])
+      ms = { 'interfaces' => [{ 'macAddr' => 'fakeMac', 'ipv6Addr' => @ip }] }
+      allow(@driver_200).to receive(:get_icsp_server_by_sn).and_return(ms)
+      s = machine_spec
+      s.data['normal'] = {}
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][1][:bootstrap] = true
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+
+    it 'uses the ICSP hostname as a last resort' do
+      p = { 'connections' => [{ 'id' => 1, 'mac' => 'fakeMac' }] }
+      expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([p])
+      ms = { 'hostName' => @ip, 'interfaces' => [{ 'macAddr' => 'fakeMac' }] }
+      allow(@driver_200).to receive(:get_icsp_server_by_sn).and_return(ms)
+      s = machine_spec
+      s.data['normal'] = {}
+      m = valid_machine_options
+      m[:driver_options].delete(:ip_address)
+      m[:driver_options][:connections][1][:bootstrap] = true
+      ip = @driver_200.instance_eval { ip_from_machine(s, m) }
+      expect(ip).to eq(@ip)
+    end
+  end
 end
