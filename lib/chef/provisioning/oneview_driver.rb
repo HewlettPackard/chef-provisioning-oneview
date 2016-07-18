@@ -120,20 +120,7 @@ module Chef::Provisioning
 
 
     def machine_for(machine_spec, machine_options)
-      bootstrap_ip_address = machine_options[:driver_options][:ip_address]
-      unless bootstrap_ip_address
-        id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
-        raise 'Must specify a connection to use to bootstrap!' unless id && connection
-        bootstrap_ip_address = connection[:ip4Address] # For static IPs
-        unless bootstrap_ip_address # Look for dhcp address given to this connection
-          profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
-          my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
-          mac = profile['connections'].find { |x| x['id'] == id }['mac']
-          interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
-          bootstrap_ip_address = interface['ipv4Addr'] || interface['ipv6Addr']
-        end
-        bootstrap_ip_address ||= my_server['hostName'] # Fall back on hostName
-      end
+      bootstrap_ip_address = ip_from_machine(machine_spec, machine_options)
       raise 'Server IP address not specified and could not be retrieved!' unless bootstrap_ip_address
       username = machine_options[:transport_options][:user] || 'root' rescue 'root'
       default_ssh_options = {
@@ -161,7 +148,7 @@ module Chef::Provisioning
     end
 
 
-    def destroy_machine(action_handler, machine_spec, _machine_options)
+    def destroy_machine(action_handler, machine_spec, machine_options)
       return unless machine_spec.reference
       profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
       if profile
@@ -178,9 +165,9 @@ module Chef::Provisioning
       name = machine_spec.name # Save for next steps
 
       # Remove entry from known_hosts file(s)
-      ip_address = machine_spec.data['automatic']['ipaddress'] rescue nil
+      ip_address = ip_from_machine(machine_spec, machine_options)
       return unless ip_address
-      action_handler.perform_action "Delete entry for #{name} (#{ip_address}) from known_hosts file(s)" do
+      action_handler.perform_action "Delete entries for #{name} (#{ip_address}) from known_hosts file(s)" do
         files = [File.expand_path('~/.ssh/known_hosts'), File.expand_path('/etc/ssh/known_hosts')]
         files.each do |f|
           next unless File.exist?(f)
@@ -189,7 +176,7 @@ module Chef::Provisioning
             text.gsub!(/#{ip_address} ssh-rsa.*(\n|\r\n)/, '')
             File.open(f, 'w') { |file| file.puts text } if text
           rescue Exception => e
-            action_handler.report_progress "WARN: Failed to delete entry for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
+            action_handler.report_progress "WARN: Failed to delete entries for #{name} (#{ip_address}) from known_hosts file: '#{f}'! "
             puts "Error: #{e.message}"
           end
         end
@@ -199,6 +186,32 @@ module Chef::Provisioning
 
     def connect_to_machine(machine_spec, machine_options)
       machine_for(machine_spec, machine_options)
+    end
+
+    private
+
+    def ip_from_machine(machine_spec, machine_options)
+      return machine_options[:driver_options][:ip_address] if machine_options[:driver_options][:ip_address]
+
+      id, connection = machine_options[:driver_options][:connections].find { |_id, c| c[:bootstrap] == true }
+      raise 'Must specify a connection to use to bootstrap!' unless id && connection # TODO: Try first connection anyways?
+      return connection[:ip4Address] if connection[:ip4Address] # Return static IP if set
+      # Look for dhcp address given to this connection
+      if machine_spec.data['normal']['icsp'] && machine_spec.data['normal']['icsp']['interfaces']
+        interface = machine_spec.data['normal']['icsp']['interfaces'].find { |i| i['oneViewId'] == id }
+        if interface
+          addr = interface['ipv4Addr'] || interface['ipv6Addr']
+          return addr if addr
+        end
+      end
+      profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
+      my_server = get_icsp_server_by_sn(machine_spec.reference['serial_number'])
+      mac = profile['connections'].find { |x| x['id'] == id }['mac']
+      interface = my_server['interfaces'].find { |i| i['macAddr'] == mac }
+      addr = interface['ipv4Addr'] || interface['ipv6Addr']
+      addr ||= my_server['hostName'] # Fall back on hostName
+      Chef::Log.warn "IP address for '#{machine_spec.name}' not specified and could not be retrieved!" unless addr
+      addr
     end
 
   end # class end
