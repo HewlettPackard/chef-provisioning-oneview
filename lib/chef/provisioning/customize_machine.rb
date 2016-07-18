@@ -42,22 +42,19 @@ module OneviewChefProvisioningDriver
 
         # Switch deploy networks to post-deploy networks if specified
         if machine_options[:driver_options][:connections]
-          available_networks = rest_api(:oneview, :get, "/rest/server-profiles/available-networks?serverHardwareTypeUri=#{profile['serverHardwareTypeUri']}&enclosureGroupUri=#{profile['enclosureGroupUri']}")
+          available_networks = profile.available_networks
           machine_options[:driver_options][:connections].each do |id, data|
             next unless data && data[:net] && data[:deployNet]
-            action_handler.report_progress "INFO: Performing network flipping on #{machine_name}, connection #{id}"
-            deploy_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:deployNet] }
-            new_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:net] }
-            raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
-            raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
-            profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
-            profile['connections'].find { |c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
-            options = { 'body' => profile }
-            task = rest_api(:oneview, :put, profile['uri'], options)
-            raise "Failed to perform network flipping on #{machine_name}. Details: #{task['message'] || task}" unless task['uri']
-            task = oneview_wait_for(task['uri']) # Wait up to 10 min
-            raise "Timed out waiting for network flipping on #{machine_name}" if task == false
-            raise "Error performing network flip on #{machine_name}. Response: #{task}" unless task == true
+            action_handler.perform_action "Perform network flipping on #{machine_name}, connection #{id}" do
+              action_handler.report_progress "INFO: Performing network flipping on #{machine_name}, connection #{id}"
+              deploy_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:deployNet] }
+              new_network = available_networks['ethernetNetworks'].find { |n| n['name'] == data[:net] }
+              raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:net]}' network not found" if new_network.nil?
+              raise "Failed to perform network flipping on #{machine_name}, connection #{id}. '#{data[:deployNet]}' network not found" if deploy_network.nil?
+              profile.refresh
+              profile['connections'].find { |c| c['networkUri'] == deploy_network['uri'] }['networkUri'] = new_network['uri']
+              profile.update
+            end
           end
         end
         machine_spec.reference['network_personalitation_finished'] = true

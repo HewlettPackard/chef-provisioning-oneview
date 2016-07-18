@@ -10,11 +10,6 @@ module OneviewChefProvisioningDriver
         options['X-API-Version'] ||= @icsp_api_version unless [:put, 'put'].include?(type.downcase)
         options['auth'] ||= @icsp_key
         disable_ssl = true if @icsp_disable_ssl
-      when 'oneview', :oneview
-        uri = URI.parse(URI.escape(@oneview_base_url + path))
-        options['X-API-Version'] ||= @oneview_api_version
-        options['auth'] ||= @oneview_key
-        disable_ssl = true if @oneview_disable_ssl
       else
         raise "Invalid rest host: #{host}"
       end
