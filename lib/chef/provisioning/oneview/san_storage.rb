@@ -80,7 +80,7 @@ module OneviewChefProvisioningDriver
       if update_needed
         action_handler.perform_action "Enable SAN-bootable connections for #{machine_name}" do
           action_handler.report_progress "INFO: Enabling SAN-bootable connections for #{machine_name}"
-          profile.server_hardware.power_off
+          profile.get_server_hardware.power_off
           profile.update
         end
         profile.refresh

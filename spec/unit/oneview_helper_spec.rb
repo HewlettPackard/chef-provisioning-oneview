@@ -92,24 +92,24 @@ RSpec.describe OneviewChefProvisioningDriver::OneViewHelper do
     end
 
     it 'raises an error if there is no available (matching) hardware' do
-      expect(@profile).to receive(:available_hardware).and_return []
+      expect(@profile).to receive(:get_available_hardware).and_return []
       expect { helper.available_hardware_for_profile(@profile) }.to raise_error(/No available blades/)
     end
 
     it 'returns the first available (matching) hardware if no location is specified' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw, @hw2]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw, @hw2]
       hw = helper.available_hardware_for_profile(@profile)
       expect(hw).to eq(@hw)
     end
 
     it 'returns the matching hardware if a location is specified' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw, @hw2]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw, @hw2]
       hw = helper.available_hardware_for_profile(@profile, 'Enclosure-1, bay 2')
       expect(hw).to eq(@hw2)
     end
 
     it 'raises an error if a location is specified but that hardware is not available' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw]
       expect { helper.available_hardware_for_profile(@profile, 'Enclosure-1, bay 2') }.to raise_error(/doesn't exist or doesn't match/)
     end
   end

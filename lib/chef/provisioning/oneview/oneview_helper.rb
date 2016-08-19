@@ -28,7 +28,7 @@ module OneviewChefProvisioningDriver
     # @return [OneviewSDK::ServerHardware]
     def available_hardware_for_profile(profile, location = nil)
       Chef::Log.debug "Specific hardware requested: #{location}" if location
-      hw_list = profile.available_hardware
+      hw_list = profile.get_available_hardware
       raise 'Error! No available blades that are compatible with the server template!' if hw_list.empty?
       if location
         chosen_blade = hw_list.find { |h| h['name'] == location }
