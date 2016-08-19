@@ -9,12 +9,13 @@ Gem::Specification.new do |s|
   s.summary = 'Chef Provisioning driver for OneView'
   s.description = 'Chef Provisioning driver for creating and managing OneView infrastructure.'
   s.author = 'Hewlett Packard Enterprise'
-  s.email = ['jared.smartt@hp.com', 'gunjan.kamle@hp.com', 'matthew.frahry@hp.com']
+  s.email = ['jared.smartt@hpe.com', 'gunjan.kamle@hpe.com', 'matthew.frahry@hpe.com']
   s.homepage = 'https://github.com/HewlettPackard/chef-provisioning-oneview'
 
+  s.add_dependency 'oneview-sdk', '~> 2.0'
   s.add_dependency 'chef', '~> 12.0'
   s.add_dependency 'chef-provisioning', '~> 1.0'
-  s.add_dependency 'oneview-sdk', '~> 2.0'
+  s.add_dependency 'cheffish', '~> 2.0' # v3.0 broke compatibility with chef < 12.6
 
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'rake'
