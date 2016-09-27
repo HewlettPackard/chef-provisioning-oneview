@@ -35,11 +35,11 @@ module OneviewChefProvisioningDriver
         end
         60.times do # Wait for up to 5 min for profile to appear in OneView
           return profile if profile.retrieve!
+          task = @ov.response_handler(@ov.rest_get(response.header['location'] || JSON.parse(response.body)['uri']))
+          break if task['taskState'] == 'Error'
           print '.'
           sleep 5
         end
-        task_response = @ov.rest_get(response.header['location'] || JSON.parse(response.body)['uri'])
-        task = @ov.response_handler(task_response)
         raise "Server profile couldn't be created! #{task['taskStatus']}. #{task['taskErrors'].first['message'] rescue nil}"
       end
       profile

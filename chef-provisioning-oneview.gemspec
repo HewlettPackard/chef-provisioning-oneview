@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'chef', '~> 12.0'
   s.add_dependency 'chef-provisioning', '~> 1.0'
-  s.add_dependency 'oneview-sdk', '~> 1.0'
+  s.add_dependency 'oneview-sdk', '~> 2.1'
 
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'rake'

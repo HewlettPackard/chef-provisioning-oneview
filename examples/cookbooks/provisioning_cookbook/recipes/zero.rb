@@ -38,16 +38,20 @@ require 'chef/provisioning'
 
 with_driver 'oneview'
 
-log "Using '#{Chef::Config[:node_name]}' for knife client name"
-log "Using '#{Chef::Config[:client_key]}' for knife client key"
+action_verb = knife_options['action'] || :setup
+if [:ready, :converge, :converge_only].include?(action_verb)
+  log "\n\nWARNING: Action '#{action_verb}' might not work properly with Chef Zero. You've been warned...\n\n" do
+    level :warn
+  end
+end
 
 machine_batch 'oneview-machine-batch' do
 # Note: Enclosing the machine resources in this machine_batch block allows them to provision in parallel.
-  
-  action :setup # We can only go this far with Chef Zero. You'll have to bootstrap the node seperately.
+
+  action action_verb
 
   my_machines.each do |m_name, options|
-    
+
     machine m_name do
 
       machine_options :driver_options => {
@@ -55,7 +59,7 @@ machine_batch 'oneview-machine-batch' do
         :os_build => os_build,
         :host_name => m_name,
         :ip_address => options['ip4'], # For bootstrapping only.
-        
+
         :domainType => 'workgroup',
         :domainName => domain_name,
         :gateway =>  gateway,
@@ -83,7 +87,7 @@ machine_batch 'oneview-machine-batch' do
       chef_environment '_default'
       converge false
     end # End machine resource block
-    
+
   end # End my_machines.each loop
 
 end # End machine_batch resource block

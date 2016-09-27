@@ -144,7 +144,7 @@ module Chef::Provisioning
     def stop_machine(_action_handler, machine_spec, _machine_options)
       return unless machine_spec.reference
       profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
-      profile.server_hardware.power_off
+      profile.get_server_hardware.power_off
     end
 
 
@@ -152,7 +152,7 @@ module Chef::Provisioning
       return unless machine_spec.reference
       profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
       if profile
-        profile.server_hardware.power_off
+        profile.get_server_hardware.power_off
         action_handler.perform_action "Delete server profile #{machine_spec.name}" do
           action_handler.report_progress "INFO: Deleting server profile #{machine_spec.name}"
           profile.delete

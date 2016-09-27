@@ -15,13 +15,50 @@ RSpec.describe OneviewChefProvisioningDriver::OneViewHelper do
     'chef-web01'
   end
 
+  let(:profile_data) do
+    {
+      name: template_name,
+      uri: '/rest/fake2',
+      connections: [
+        {
+          'id' => 1,
+          'name' => 'net1',
+          'functionType' => 'Ethernet',
+          'deploymentStatus' => 'Deployed',
+          'networkUri' => '/rest/ethernet-networks/fake',
+          'portId' => 'Flb 1:1-a',
+          'requestedVFs' => 'Auto',
+          'allocatedVFs' => nil,
+          'interconnectUri' => '/rest/interconnects/fake',
+          'macType' => 'Virtual',
+          'wwpnType' => 'Virtual',
+          'mac' => 'CA:1D:00:00:00:00',
+          'wwnn' => nil,
+          'wwpn' => nil,
+          'requestedMbps' => '2500',
+          'allocatedMbps' => 2500,
+          'maximumMbps' => 10_000,
+          'boot' => {
+            'priority' => 'Primary',
+            'targets' => [{ 'arrayWwpn' => '20000002AC0008DA', 'lun' => '0' }]
+          }
+        }
+      ],
+      serialNumber: 'fakesn',
+      uuid: 'fakeuuid',
+      taskUri: '/rest/fake3',
+      enclosureBay: 4,
+      enclosureUri: '/rest/fake4'
+    }
+  end
+
   describe '#profile_from_template' do
     it 'requires a template_name' do
       expect { helper.profile_from_template(nil, profile_name) }.to raise_error(/Template name missing/)
     end
 
     before :each do
-      @profile = OneviewSDK::ServerProfile.new(@ov_200, name: template_name, uri: '/rest/fake2', connections: [])
+      @profile = OneviewSDK::ServerProfile.new(@ov_200, profile_data)
     end
 
     context 'OneView 2.0' do
@@ -56,8 +93,11 @@ RSpec.describe OneviewChefProvisioningDriver::OneViewHelper do
         expect(OneviewSDK::ServerProfileTemplate).to receive(:find_by).and_return []
         expect(OneviewSDK::ServerProfile).to receive(:find_by).with(@ov_200, name: t).and_return([@profile])
         p = @driver_200.instance_eval { profile_from_template(t, p) }
-        %w(wwnn wwpn mac deploymentStatus interconnectUri wwpnType macType).each do |key|
+        %w(uri serialNumber uuid taskUri enclosureBay enclosureUri).each do |key|
           expect(p[key]).to be_nil
+        end
+        %w(wwnn wwpn mac deploymentStatus interconnectUri wwpnType macType).each do |key|
+          expect(p['connections'].first[key]).to be_nil
         end
       end
     end
@@ -92,24 +132,24 @@ RSpec.describe OneviewChefProvisioningDriver::OneViewHelper do
     end
 
     it 'raises an error if there is no available (matching) hardware' do
-      expect(@profile).to receive(:available_hardware).and_return []
+      expect(@profile).to receive(:get_available_hardware).and_return []
       expect { helper.available_hardware_for_profile(@profile) }.to raise_error(/No available blades/)
     end
 
     it 'returns the first available (matching) hardware if no location is specified' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw, @hw2]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw, @hw2]
       hw = helper.available_hardware_for_profile(@profile)
       expect(hw).to eq(@hw)
     end
 
     it 'returns the matching hardware if a location is specified' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw, @hw2]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw, @hw2]
       hw = helper.available_hardware_for_profile(@profile, 'Enclosure-1, bay 2')
       expect(hw).to eq(@hw2)
     end
 
     it 'raises an error if a location is specified but that hardware is not available' do
-      expect(@profile).to receive(:available_hardware).and_return [@hw]
+      expect(@profile).to receive(:get_available_hardware).and_return [@hw]
       expect { helper.available_hardware_for_profile(@profile, 'Enclosure-1, bay 2') }.to raise_error(/doesn't exist or doesn't match/)
     end
   end
