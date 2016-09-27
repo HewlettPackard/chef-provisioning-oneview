@@ -12,9 +12,7 @@ module OneviewChefProvisioningDriver
       enable_boot_from_san(action_handler, machine_name, profile) unless machine_spec.reference['network_personalitation_finished']
 
       # Make sure server is started
-      hw = OneviewSDK::ServerHardware.new(@ov, uri: profile['serverHardwareUri'])
-      hw.power_on
-      # profile.server_hardware.power_on # TODO: Use this when it's merged in
+      profile.get_server_hardware.power_on
 
       # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
       my_server = nil
