@@ -12,8 +12,15 @@ Gem::Specification.new do |s|
   s.email = ['jared.smartt@hpe.com', 'gunjan.kamle@hpe.com', 'matthew.frahry@hpe.com']
   s.homepage = 'https://github.com/HewlettPackard/chef-provisioning-oneview'
 
+  case RUBY_VERSION
+  when /^2\.0/
+    s.add_dependency 'chef', '~> 12.0', '< 12.9'
+  when /^2\.(1|2\.[01])/
+    s.add_dependency 'chef', '~> 12.0', '< 12.14'
+  else
+    s.add_dependency 'chef', '~> 12.0'
+  end
   s.add_dependency 'oneview-sdk', '~> 2.1'
-  s.add_dependency 'chef', '~> 12.6'
   s.add_dependency 'chef-provisioning', '~> 1.0'
 
   s.add_development_dependency 'rspec', '~> 3.0'
