@@ -39,7 +39,7 @@ require 'chef/provisioning'
 with_driver 'oneview'
 
 action_verb = knife_options['action'] || :setup
-if [:ready, :converge, :converge_only].include?(action_verb)
+if [:converge, :converge_only].include?(action_verb)
   log "\n\nWARNING: Action '#{action_verb}' might not work properly with Chef Zero. You've been warned...\n\n" do
     level :warn
   end

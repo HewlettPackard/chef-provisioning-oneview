@@ -14,6 +14,8 @@ module OneviewChefProvisioningDriver
       # Make sure server is started
       profile.get_server_hardware.power_on
 
+      return if @icsp_ignore == true
+
       # Get ICSP servers to poll and wait until server PXE complete (to make sure ICSP is available).
       my_server = nil
       action_handler.perform_action "Wait for #{machine_name} to boot into HP Intelligent Provisioning" do

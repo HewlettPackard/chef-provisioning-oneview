@@ -107,13 +107,11 @@ module Chef::Provisioning
     def ready_machine(action_handler, machine_spec, machine_options)
       profile = OneviewSDK::ServerProfile.find_by(@ov, serialNumber: machine_spec.reference['serial_number']).first
       raise "Failed to retrieve Server Profile for #{machine_spec.name}. Serial Number used to search: #{machine_spec.reference['serial_number']}" unless profile
+      customize_machine(action_handler, machine_spec, machine_options, profile)
       if @icsp_ignore == true
-        wait_for_profile(action_handler, machine_spec.name, profile)
         Chef::Log.warn("Skipping ICSP configuration for machine '#{machine_spec.name}'")
         Machine::BasicMachine.new(machine_spec, OneViewNilTransport.new, OneViewNilConvergence.new)
-      else # Boot the server, install the OS etc.
-        customize_machine(action_handler, machine_spec, machine_options, profile)
-        # Return a machine object that Chef can connect to (to install chef-client)
+      else # Return a machine object that Chef can connect to (to install chef-client)
         machine_for(machine_spec, machine_options)
       end
     end
