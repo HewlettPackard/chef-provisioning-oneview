@@ -204,6 +204,7 @@ module ICspAPI
       machine_options[:driver_options][:connections].each do |id, data|
         c = Marshal.load(Marshal.dump(data))
         next unless c[:dhcp] || c[:dhcpv4] || c[:ip4Address] || c[:ipv6autoconfig] || c[:staticNetworks] # Invalid network or only switch networks specified
+        c.delete_if { |k, _v| k.to_s == 'bootstrap' }
         begin
           c[:macAddress] = profile['connections'].find {|x| x['id'] == id}['mac']
         rescue NoMethodError
