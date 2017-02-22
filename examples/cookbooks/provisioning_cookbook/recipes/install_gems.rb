@@ -7,4 +7,6 @@
 # All rights reserved - Do Not Redistribute
 #
 
-chef_gem 'chef-provisioning-oneview'
+chef_gem 'chef-provisioning-oneview' do
+  compile_time true
+end
