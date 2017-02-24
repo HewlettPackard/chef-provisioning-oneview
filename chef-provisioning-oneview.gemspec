@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary = 'Chef Provisioning driver for OneView'
   s.description = 'Chef Provisioning driver for creating and managing OneView infrastructure.'
   s.author = 'Hewlett Packard Enterprise'
-  s.email = ['jared.smartt@hpe.com', 'gunjan.kamle@hpe.com', 'matthew.frahry@hpe.com']
+  s.email = ['jared.smartt@hpe.com', 'gunjan.kamle@hpe.com']
   s.homepage = 'https://github.com/HewlettPackard/chef-provisioning-oneview'
   s.license = 'Apache-2.0'
 

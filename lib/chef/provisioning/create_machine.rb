@@ -14,7 +14,7 @@ module OneviewChefProvisioningDriver
       template_name = machine_options[:driver_options][:server_template]
       profile = profile_from_template(template_name, profile_name)
 
-      # Get first availabe (and compatible) HP OV server blade.
+      # Get first availabe (and compatible) OneView server blade.
       # If a server_location has been specified, uses that
       hw = available_hardware_for_profile(profile, machine_options[:driver_options][:server_location])
 

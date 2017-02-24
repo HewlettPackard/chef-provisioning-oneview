@@ -2,20 +2,20 @@
 
 Chef Provisioning driver for HPE OneView
 
-
 [![Build Status](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview.svg?branch=master)](https://travis-ci.org/HewlettPackard/chef-provisioning-oneview)
 [![Gem Version](https://badge.fury.io/rb/chef-provisioning-oneview.svg)](https://badge.fury.io/rb/chef-provisioning-oneview)
 
 Questions or comments? Join the Gitter room  [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HewlettPackard/chef-provisioning-oneview?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
-Currently supports:
+Verified on (may support other versions too, but no guarantees):
 - OneView v1.2.0 - 2.0.0
 - ICsp v7.4.0 - 7.5.0
 
 # Installation
 
 - This program is meant to run inside the chef-client. To install it, add the following to a Chef recipe and run it:
+
   ```ruby
   chef_gem 'chef-provisioning-oneview'
   ```
