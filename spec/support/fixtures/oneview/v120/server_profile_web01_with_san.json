@@ -1,0 +1,193 @@
+{
+  "data": {
+    "type": "ServerProfileV4",
+    "uri": "/rest/server-profiles/1c5e807d-acbe-4ee8-868b-2fb0b6504476",
+    "name": "web01",
+    "description": "Web server machine",
+    "serialNumber": "VCGE9KB042",
+    "uuid": "1c5e807d-acbe-4ee8-868b-2fb0b6504476",
+    "serverHardwareUri": "/rest/server-hardware/31363636-3136-584D-5132-333230314D38",
+    "serverHardwareTypeUri": "/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD",
+    "enclosureGroupUri": "/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39",
+    "enclosureUri": "/rest/enclosures/09SGH236PMVW",
+    "enclosureBay": 2,
+    "affinity": "Bay",
+    "associatedServer": null,
+    "hideUnusedFlexNics": true,
+    "firmware": {
+      "forceInstallFirmware": false,
+      "manageFirmware": true,
+      "firmwareBaselineUri": "/rest/firmware-drivers/bp-hp-service-pack-for-proliant-oneview-2014-11-30-05"
+    },
+    "macType": "Virtual",
+    "wwnType": "Virtual",
+    "serialNumberType": "Virtual",
+    "category": "server-profiles",
+    "created": "20150810T040139.738Z",
+    "modified": "20150810T042450.221Z",
+    "status": "OK",
+    "state": "Normal",
+    "inProgress": false,
+    "taskUri": "/rest/tasks/2A17C3F9-6DBF-40B1-B99E-E8BA40848B40",
+    "connections": [
+      {
+        "id": 1,
+        "name": "Altair PXE 1133",
+        "functionType": "Ethernet",
+        "deploymentStatus": "Deployed",
+        "networkUri": "/rest/ethernet-networks/02b0b5c3-1a0a-4d5f-b5c9-0c7532cb1e5e",
+        "portId": "Flb 1:1-a",
+        "interconnectUri": "/rest/interconnects/34501559-719f-4393-9fb1-a43714037f06",
+        "macType": "Virtual",
+        "wwpnType": "Virtual",
+        "mac": "11:11:11:11:01:14",
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "2500",
+        "allocatedMbps": 2500,
+        "maximumMbps": 10000,
+        "boot": {
+          "priority": "Primary"
+        }
+      },
+      {
+        "id": 2,
+        "name": "corpnet 10",
+        "functionType": "Ethernet",
+        "deploymentStatus": "Deployed",
+        "networkUri": "/rest/ethernet-networks/7a4698ae-5933-4e2e-8af3-57893c23a2d2",
+        "portId": "Flb 1:2-a",
+        "interconnectUri": "/rest/interconnects/d6c76eb3-10e6-43bf-95a6-ec824dc7bb2e",
+        "macType": "Virtual",
+        "wwpnType": "Virtual",
+        "mac": "11:11:11:11:01:15",
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "2500",
+        "allocatedMbps": 2500,
+        "maximumMbps": 10000,
+        "boot": {
+          "priority": "NotBootable"
+        }
+      },
+      {
+        "id": 3,
+        "name": "san1",
+        "functionType": "FibreChannel",
+        "deploymentStatus": "Deployed",
+        "networkUri": "/rest/fc-networks/2c04a682-66b4-4a64-8c2d-3095937a8e7e",
+        "portId": "Flb 1:1-b",
+        "interconnectUri": "/rest/interconnects/f43ee5ba-a3b5-44c3-a299-4cc9c100debc",
+        "macType": "Virtual",
+        "wwpnType": "Virtual",
+        "mac": "6E:D2:84:B0:08:9D",
+        "wwnn": "10:00:fa:a9:af:e0:04:4d",
+        "wwpn": "10:00:fa:a9:af:e0:04:4c",
+        "requestedMbps": "4000",
+        "allocatedMbps": 4000,
+        "maximumMbps": 4000,
+        "boot": {
+          "priority": "Primary",
+          "targets": [
+            {
+              "arrayWwpn": "20540002AC00159E",
+              "lun": "0"
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "name": "san2",
+        "functionType": "FibreChannel",
+        "deploymentStatus": "Deployed",
+        "networkUri": "/rest/fc-networks/93c97ad9-3e6d-4cc4-8b37-3ef3a6a9cf77",
+        "portId": "Flb 1:2-b",
+        "interconnectUri": "/rest/interconnects/964c1236-4eca-4410-b219-911e6ae0b731",
+        "macType": "Virtual",
+        "wwpnType": "Virtual",
+        "mac": "6E:D2:84:B0:08:9E",
+        "wwnn": "10:00:fa:a9:af:e0:04:4f",
+        "wwpn": "10:00:fa:a9:af:e0:04:4e",
+        "requestedMbps": "4000",
+        "allocatedMbps": 4000,
+        "maximumMbps": 4000,
+        "boot": {
+          "priority": "Secondary",
+          "targets": [
+            {
+              "arrayWwpn": "21210002AC00159E",
+              "lun": "0"
+            }
+          ]
+        }
+      }
+    ],
+    "bootMode": null,
+    "boot": {
+      "manageBoot": true,
+      "order": [
+        "HardDisk",
+        "PXE",
+        "CD",
+        "Floppy",
+        "USB"
+      ]
+    },
+    "bios": {
+      "manageBios": true,
+      "overriddenSettings": [
+        {
+          "id": "158",
+          "value": "2"
+        },
+        {
+          "id": "181",
+          "value": "1"
+        },
+        {
+          "id": "176",
+          "value": "1"
+        }
+      ]
+    },
+    "localStorage": {
+      "logicalDrives": [],
+      "manageLocalStorage": false,
+      "initialize": false
+    },
+    "sanStorage": {
+      "volumeAttachments": [
+        {
+          "storagePaths": [
+            {
+              "storageTargets": ["20:54:00:02:AC:00:15:9E"],
+              "storageTargetType": "Auto",
+              "connectionId": 3,
+              "isEnabled": true,
+              "status": "OK"
+            },
+            {
+              "storageTargets": ["21:21:00:02:AC:00:15:9E"],
+              "storageTargetType": "Auto",
+              "connectionId": 4,
+              "isEnabled": true,
+              "status": "OK"
+            }
+          ],
+          "state": "Attached",
+          "volumeStoragePoolUri": "/rest/storage-pools/707E383B-56F6-48A1-BFF1-782BB2AC6BA7",
+          "volumeStorageSystemUri": "/rest/storage-systems/1405534",
+          "lun": "0",
+          "lunType": "Manual",
+          "volumeUri": "/rest/storage-volumes/1B5D3CA2-6C5B-41C2-8B97-1821F1883F22",
+          "status": "OK",
+          "id": 1
+        }
+      ],
+      "hostOSType": "RHE Linux (5.x, 6.x)",
+      "manageSanStorage": true
+    },
+    "eTag": "1439179303124/6"
+  }
+}

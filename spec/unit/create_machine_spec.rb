@@ -1,78 +1,69 @@
 require_relative './../spec_helper'
 
 RSpec.describe Chef::Provisioning::OneViewDriver do
-  include_context 'shared context'
-
   describe '#create_machine' do
+    include_context 'shared context'
+
+    let(:machine_name) do
+      'chef-web01'
+    end
+
     before :each do
-      $server_created = nil
+      options = { name: 'chef-web01', uri: '/rest/fake', serverHardwareTypeUri: '/rest/fake2', enclosureGroupUri: '/rest/fake3' }
+      @profile = OneviewSDK::ServerProfile.new(@ov_200, options)
+      @hw = OneviewSDK::ServerHardware.new(@ov_200, name: 'Enclosure-1, bay 1', uri: '/rest/fake4')
     end
 
-    context 'OneView 120' do
-      it 'skips creating machines that already exist' do
+    context 'when the profile already exists' do
+      it 'skips creating the profile' do
+        expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([@profile])
+        expect(@driver_200).to_not receive(:get_oneview_template)
         a = action_handler
-        m = machine_spec
+        m = machine_name
         o = valid_machine_options
-        ret_val = @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles})).to_not have_been_made
-        expect(ret_val['name']).to eq('chef-web01')
-      end
-
-      it 'creates a machine from a Profile Template if it does not exist' do
-        a = action_handler
-        m = machine_spec
-        o = valid_machine_options
-        o[:driver_options][:host_name] = 'chef-web03'
-        @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles})).to have_been_made.times(1)
-      end
-
-      it 'sets the correct HW uri to create a machine if it does not exist' do
-        a = action_handler
-        m = machine_spec
-        o = valid_machine_options
-        o[:driver_options][:host_name] = 'chef-web03'
-        @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles}).with do |req|
-          req.body.match('"serverHardwareUri":"/rest/server-hardware/31363636-3136-584D-5132-333230314D38"') &&
-          req.body.match('"serverHardwareTypeUri":"/rest/server-hardware-types/2947DC35-BE48-4075-A3FD-254A9B42F5BD"') &&
-          req.body.match('"enclosureGroupUri":"/rest/enclosure-groups/3a11ccdd-b352-4046-a568-a8b0faa6cc39"') &&
-          !req.body.match('"enclosureUri":"') &&
-          !req.body.match('"enclosureBay":"')
-        end).to have_been_made
+        p = @driver_200.instance_eval { create_machine(a, m, o) }
+        expect(p).to eq(@profile)
       end
     end
 
-    context 'OneView 200' do
-      before :each do
-        @instance.instance_variable_set('@current_oneview_api_version', 200)
+    context 'when the profile does not exist' do
+      it 'creates a new profile' do
+        expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([])
+        a = action_handler
+        m = machine_name
+        o = valid_machine_options
+        expect(@driver_200).to receive(:profile_from_template)
+          .with(o[:driver_options][:server_template], o[:driver_options][:profile_name]).and_return(@profile)
+        expect(@driver_200).to receive(:available_hardware_for_profile)
+          .with(@profile, o[:driver_options][:server_location]).and_return(@hw)
+        expect(@hw).to receive(:power_off).and_return(true)
+        expect(@profile).to receive(:set_server_hardware).with(@hw).and_call_original
+        expect(@driver_200).to receive(:update_san_info).and_return(true)
+        expect(@ov_200).to receive(:rest_post).and_return(FakeResponse.new({}, 202))
+        expect(@profile).to receive(:retrieve!).and_return(true)
+        p = @driver_200.instance_eval { create_machine(a, m, o) }
+        expect(p[:name]).to eq(o[:driver_options][:profile_name])
+        expect(p[:serverHardwareTypeUri]).to eq('/rest/fake2')
+        expect(p[:enclosureGroupUri]).to eq('/rest/fake3')
+        expect(p[:serverHardwareUri]).to eq('/rest/fake4')
       end
 
-      it 'creates a machine from a Template if it does not exist' do
+      it 'prints an error message if the creation failed' do
+        expect(OneviewSDK::ServerProfile).to receive(:find_by).and_return([])
         a = action_handler
-        m = machine_spec
+        m = machine_name
         o = valid_machine_options
-        o[:driver_options][:host_name] = 'chef-web03'
-        o[:driver_options][:server_template] = 'Web Server Template'
-        @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles})).to have_been_made.times(1)
-      end
-
-      it 'sets the correct HW uri from a Template to create a machine if it does not exist' do
-        a = action_handler
-        m = machine_spec
-        o = valid_machine_options
-        o[:driver_options][:host_name] = 'chef-web03'
-        o[:driver_options][:server_template] = 'Web Server Template'
-        @instance.instance_eval { create_machine(a, m, o) }
-        expect(a_request(:post, %r{/rest/server-profiles}).with do |req|
-          req.body.match('"serverHardwareUri":"/rest/server-hardware/37333036-3831-584D-5131-303030323037"') &&
-          req.body.match('"serverHardwareTypeUri":"/rest/server-hardware-types/5B42EABE-5140-4E38-91F0-68367B529DE9"') &&
-          req.body.match('"enclosureGroupUri":"/rest/enclosure-groups/c0f86584-5a82-4480-ad13-8ed6544d6c98"') &&
-          !req.body.match('"enclosureUri":"') &&
-          !req.body.match('"enclosureBay":"')
-        end).to have_been_made
+        expect(@driver_200).to receive(:profile_from_template)
+          .with(o[:driver_options][:server_template], o[:driver_options][:profile_name]).and_return(@profile)
+        expect(@driver_200).to receive(:available_hardware_for_profile)
+          .with(@profile, o[:driver_options][:server_location]).and_return(@hw)
+        expect(@hw).to receive(:power_off).and_return(true)
+        expect(@profile).to receive(:set_server_hardware).with(@hw).and_call_original
+        expect(@driver_200).to receive(:update_san_info).and_return(true)
+        expect(@ov_200).to receive(:rest_post).and_return(FakeResponse.new({}, 500))
+        expect { @driver_200.instance_eval { create_machine(a, m, o) } }.to raise_error(/Server profile couldn't be created/)
       end
     end
+
   end
 end

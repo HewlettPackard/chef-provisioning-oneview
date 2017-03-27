@@ -5,6 +5,10 @@ RSpec.shared_context 'shared context', a: :b do
   oneview = "https://my-oneview.#{domain}"
   icsp = "https://my-icsp.#{domain}"
 
+  let(:oneview_url) do
+    'https://oneview.example.com'
+  end
+
   let(:knife_config) do
     { knife: {
       oneview_url: oneview,
@@ -17,6 +21,16 @@ RSpec.shared_context 'shared context', a: :b do
       icsp_username: 'administrator',
       icsp_password: 'password123'
     } }
+  end
+
+  let(:driver_config) do
+    {
+      driver_options: {
+        oneview: { token: @oneview_token },
+        icsp: { url: @icsp_url, user: @icsp_user, password: @icsp_password }
+      },
+      knife: {}
+    }
   end
 
   let(:valid_machine_options) do
@@ -36,6 +50,7 @@ RSpec.shared_context 'shared context', a: :b do
         server_template: 'Template - Web Server',
         os_build: 'CHEF-RHEL-6.5-x64',
         host_name: 'chef-web01',
+        profile_name: 'chef-web01',
         ip_address: '192.168.1.2',
         domainType: 'workgroup',
         domainName: domain,
@@ -47,7 +62,6 @@ RSpec.shared_context 'shared context', a: :b do
         }
       },
       custom_attributes: {
-
       },
       transport_options: {
         ssh_options: { password: 'password1234' }
@@ -68,11 +82,17 @@ RSpec.shared_context 'shared context', a: :b do
   end
 
   before :each do
-    @oneview_key = 'A954A2A6Psy7Alg3HApAcEbAcAwa-ftA'
-    @icsp_key = 'AA_aaAaa3AA3Aa0_aAaAA4AAAA3AAAAA'
-    @url = oneview
-    @canonical_url = "oneview:#{@url}"
-    @instance = Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config)
+    # @oneview_key = 'A954A2A6Psy7Alg3HApAcEbAcAwa-ftA'
+    # @icsp_key = 'AA_aaAaa3AA3Aa0_aAaAA4AAAA3AAAAA'
+    # @url = oneview
+    # @canonical_url = "oneview:#{@url}"
+    # @instance = Chef::Provisioning::OneViewDriver.new(@canonical_url, knife_config)
+
+    @driver_200 = Chef::Provisioning::OneViewDriver.new(@canonical_url, driver_config)
+    @ov_200 = @driver_200.instance_variable_get(:@ov)
+    driver_config[:driver_options][:oneview][:api_version] = 120
+    @driver_120 = Chef::Provisioning::OneViewDriver.new(@canonical_url, driver_config)
+    @ov_120 = @driver_120.instance_variable_get(:@ov)
   end
 
 end

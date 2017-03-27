@@ -9,10 +9,19 @@ Gem::Specification.new do |s|
   s.summary = 'Chef Provisioning driver for OneView'
   s.description = 'Chef Provisioning driver for creating and managing OneView infrastructure.'
   s.author = 'Hewlett Packard Enterprise'
-  s.email = ['jared.smartt@hp.com', 'gunjan.kamle@hp.com', 'matthew.frahry@hp.com']
+  s.email = ['jared.smartt@hpe.com', 'gunjan.kamle@hpe.com']
   s.homepage = 'https://github.com/HewlettPackard/chef-provisioning-oneview'
+  s.license = 'Apache-2.0'
 
-  s.add_dependency 'chef', '~> 12.0'
+  case RUBY_VERSION
+  when /^2\.0/
+    s.add_dependency 'chef', '~> 12.0', '< 12.9'
+  when /^2\.(1|2\.[01])/
+    s.add_dependency 'chef', '~> 12.0', '< 12.14'
+  else
+    s.add_dependency 'chef', '~> 12.0'
+  end
+  s.add_dependency 'oneview-sdk', '~> 2.1'
   s.add_dependency 'chef-provisioning', '~> 1.0'
 
   s.add_development_dependency 'rspec', '~> 3.0'
@@ -23,10 +32,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '= 0.40.0'
   s.add_development_dependency 'pry'
 
-  s.bindir       = 'bin'
-  s.executables  = %w( )
-
   s.require_path = 'lib'
-  s.files = %w(Rakefile LICENSE README.md) + Dir.glob('{distro,lib,spec}/**/*', File::FNM_DOTMATCH).reject {|f| File.directory?(f) }
-  s.license = 'Apache-2.0'
+
+  all_files = `git ls-files -z`.split("\x0")
+  s.files = Dir['LICENSE', 'README.md', '*.gemspec', 'lib/**/*'].reject { |f| !all_files.include?(f) }
 end

@@ -1,0 +1,180 @@
+{
+  "data": {
+    "type": "ServerProfileV5",
+    "uri": null,
+    "name": "web01",
+    "description": "Web server template with SAN",
+    "serialNumber": null,
+    "uuid": null,
+    "serverProfileTemplateUri": "/rest/server-profile-templates/d64da635-f08a-41d4-b6eb-6517206a8baf",
+    "templateCompliance": "Unknown",
+    "serverHardwareUri": null,
+    "serverHardwareTypeUri": "/rest/server-hardware-types/5B42EABE-5140-4E38-91F0-68367B529DE9",
+    "enclosureGroupUri": "/rest/enclosure-groups/c0f86584-5a82-4480-ad13-8ed6544d6c98",
+    "enclosureUri": null,
+    "enclosureBay": null,
+    "affinity": "Bay",
+    "associatedServer": null,
+    "hideUnusedFlexNics": true,
+    "firmware": {
+      "firmwareInstallType": null,
+      "forceInstallFirmware": false,
+      "manageFirmware": false,
+      "firmwareBaselineUri": null
+    },
+    "macType": "Virtual",
+    "wwnType": "Virtual",
+    "serialNumberType": "Virtual",
+    "category": "server-profiles",
+    "created": null,
+    "modified": null,
+    "status": "OK",
+    "state": "Creating",
+    "inProgress": false,
+    "taskUri": null,
+    "connections": [
+      {
+        "id": 1,
+        "name": "Altair PXE",
+        "functionType": "Ethernet",
+        "deploymentStatus": null,
+        "networkUri": "/rest/ethernet-networks/7984a764-69ae-48c0-aec2-780d4f0366f8",
+        "portId": "Flb 1:1-a",
+        "requestedVFs": "Auto",
+        "allocatedVFs": null,
+        "interconnectUri": null,
+        "macType": null,
+        "wwpnType": null,
+        "mac": null,
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "1000",
+        "allocatedMbps": 0,
+        "maximumMbps": 0,
+        "boot": {
+          "priority": "Primary"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Corpnet",
+        "functionType": "Ethernet",
+        "deploymentStatus": null,
+        "networkUri": "/rest/ethernet-networks/52b6f044-f51b-4d4c-8d59-497c14c4681c",
+        "portId": "Flb 1:1-c",
+        "requestedVFs": "Auto",
+        "allocatedVFs": null,
+        "interconnectUri": null,
+        "macType": null,
+        "wwpnType": null,
+        "mac": null,
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "2500",
+        "allocatedMbps": 0,
+        "maximumMbps": 0,
+        "boot": {
+          "priority": "NotBootable"
+        }
+      },
+      {
+        "id": 3,
+        "name": "san1",
+        "functionType": "FibreChannel",
+        "deploymentStatus": null,
+        "networkUri": "/rest/fc-networks/2c04a682-66b4-4a64-8c2d-3095937a8e7e",
+        "portId": "Flb 1:1-b",
+        "requestedVFs": null,
+        "allocatedVFs": null,
+        "interconnectUri": null,
+        "macType": null,
+        "wwpnType": null,
+        "mac": null,
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "4000",
+        "allocatedMbps": 0,
+        "maximumMbps": 0,
+        "boot": {
+          "priority": "Primary"
+        }
+      },
+      {
+        "id": 4,
+        "name": "san2",
+        "functionType": "FibreChannel",
+        "deploymentStatus": null,
+        "networkUri": "/rest/fc-networks/93c97ad9-3e6d-4cc4-8b37-3ef3a6a9cf77",
+        "portId": "Flb 1:2-b",
+        "requestedVFs": null,
+        "allocatedVFs": null,
+        "interconnectUri": null,
+        "macType": null,
+        "wwpnType": null,
+        "mac": null,
+        "wwnn": null,
+        "wwpn": null,
+        "requestedMbps": "4000",
+        "allocatedMbps": 0,
+        "maximumMbps": 0,
+        "boot": {
+          "priority": "Secondary"
+        }
+      }
+    ],
+    "bootMode": null,
+    "boot": {
+      "order": [
+        "HardDisk",
+        "PXE",
+        "CD",
+        "Floppy",
+        "USB"
+      ],
+      "manageBoot": true
+    },
+    "bios": {
+      "overriddenSettings": [
+
+      ],
+      "manageBios": false
+    },
+    "localStorage": {
+      "controllers": []
+    },
+    "sanStorage": {
+      "volumeAttachments": [
+        {
+          "permanent": false,
+          "storagePaths": [
+            {
+              "storageTargets": [],
+              "storageTargetType": "Auto",
+              "connectionId": 3,
+              "isEnabled": true
+            },
+            {
+              "storageTargets": [],
+              "storageTargetType": "Auto",
+              "connectionId": 4,
+              "isEnabled": true
+            }
+          ],
+          "volumeStoragePoolUri": "/rest/storage-pools/707E383B-56F6-48A1-BFF1-782BB2AC6BA7",
+          "volumeStorageSystemUri": "/rest/storage-systems/1405534",
+          "volumeDescription": "",
+          "volumeShareable": false,
+          "volumeProvisionType": "Thin",
+          "volumeProvisionedCapacityBytes": "53687091200",
+          "lun": "0",
+          "lunType": "Manual",
+          "volumeName": "boot",
+          "id": 1
+        }
+      ],
+      "hostOSType": "RHE Linux (5.x, 6.x)",
+      "manageSanStorage": true
+    },
+    "eTag": null
+  }
+}

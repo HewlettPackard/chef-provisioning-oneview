@@ -1,10 +1,12 @@
 module ChefProvisioningOneviewHelpers
   class FakeMachineSpec
     attr_reader :name
+    attr_accessor :data
 
     def initialize(name, sn)
       @name = name
       @sn = sn
+      @data = {}
     end
 
     def reference

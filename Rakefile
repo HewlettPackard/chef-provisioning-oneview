@@ -10,7 +10,9 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = 'spec/**/*_spec.rb'
 end
 
-RuboCop::RakeTask.new
+RuboCop::RakeTask.new do |task|
+  task.options << '--display-cop-names'
+end
 
 desc 'Runs rubocop and rspec'
 task :test do
