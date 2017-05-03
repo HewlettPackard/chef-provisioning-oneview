@@ -11,7 +11,7 @@ Verified on (may support other versions too, but no guarantees):
 - OneView v1.2.0 - 2.0.0
 - ICsp v7.4.0 - 7.5.0
 
-:warning: This driver does not support provisioning with HPE Synergy Image Streamer. It is recommended to use the [HPE OneView Chef cookbook](https://github.com/HewlettPackard/oneview-chef) if you are trying to do it.
+:warning: This driver does not support provisioning with HPE Synergy Image Streamer. It is recommended to use the [HPE OneView Chef cookbook](https://github.com/HewlettPackard/oneview-chef) to do that.
 
 # Installation
 
